@@ -19,3 +19,6 @@ Installing Ant For Windows
 Install the ARM toolchain (arm-none-eabi-gcc)
 
 https://launchpad.net/gcc-arm-embedded
+
+1.  Test the compiler by running 'arm-none-eabi-gcc' from the command line.
+
