@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+
+<!-- Dockable component definition file for Aithon plugin -->
+<!-- $Id$
+-->
+
+<!DOCTYPE DOCKABLES SYSTEM "dockables.dtd">
+
+<!-- Aithon dockable windows -->
+
+<DOCKABLES>
+	<DOCKABLE NAME="aithon">
+		new Aithon(view, position);
+	</DOCKABLE>
+</DOCKABLES>
