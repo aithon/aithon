@@ -1,0 +1,32 @@
+Coding Style Guildelines
+======
+
+Comments above functions, example:
+/**
+ * @brief   Waits on the condition variable releasing the mutex lock.
+ * @details Releases the currently owned mutex, waits on the condition
+ *          variable, and finally acquires the mutex again. All the sequence
+ *          is performed atomically.
+ * @pre     The invoking thread <b>must</b> have at least one owned mutex.
+ *
+ * @param[in] cp        pointer to the @p CondVar structure
+ * @return              A message specifying how the invoking thread has been
+ *                      released from the condition variable.
+ * @retval RDY_OK       if the condvar has been signaled using
+ *                      @p chCondSignal().
+ * @retval RDY_RESET    if the condvar has been signaled using
+ *                      @p chCondBroadcast().
+ *
+ */
+
+ 
+- Curly braces for functions, if-else, while, for, struct, enum, ... get 
+  their own line
+- Single line if, for, while, no curly braces
+- Put a space between if, for, while and the (...)
+- Spaces between equations in if, for, while
+- Spaces not needed between simple equations in brackets
+- Put a space between double slashes and the comment
+- Use soft tabs, 3 spaces
+- Increase readability by putting blank lines between chunks of code 
+  (8 lines is about the max chunk size you want)
