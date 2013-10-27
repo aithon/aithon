@@ -7,6 +7,7 @@
 #include <iostream>
 #include <iomanip>
 #include <stdint.h>
+#include <unistd.h>
 
 #ifdef Q_OS_WIN32
 #include <windows.h>
