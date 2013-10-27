@@ -1,0 +1,6 @@
+Building the code
+
+1.  install version 5 of Qt.
+2.  run 'qmake' that was installed with Qt.
+3.  run 'make'
+
