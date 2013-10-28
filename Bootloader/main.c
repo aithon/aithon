@@ -1,125 +1,103 @@
-#include "Aithon.h"
-#include "flash_if.h"
-
-/* Private functions ---------------------------------------------------------*/
-
-#define ACK          0x79
-#define NACK         0x1F
-#define PACKET_LEN   1024
-#define BOOT_TIMEOUT 5000
-
-typedef  void (*pFunction)(void);
-pFunction Jump_To_Application;
-uint32_t JumpAddress;
-
-static SerialDriver *chan;
+#include "main.h"
 
 void sendByte(uint8_t byte)
 {
-   sdPut(chan, byte);
+   sdPut(_interface, byte);
 }
 
 int getByte(void)
 {
-   return sdGetTimeout(chan, 100);
+   return sdGetTimeout(_interface, DEFAULT_TIMEOUT);
 }
 
 void startProgram(void)
 {
-	JumpAddress = *(__IO uint32_t*) (APPLICATION_ADDRESS + 4);
 	/* Jump to user application */
-	Jump_To_Application = (pFunction) JumpAddress;
+	funcPtr userAppStart = (funcPtr) (*(__IO uint32_t*) (APPLICATION_ADDRESS + 4));
 	/* Initialize user application's Stack Pointer */
 	__set_MSP(*(__IO uint32_t*) APPLICATION_ADDRESS);
-	Jump_To_Application();
+	userAppStart();
 }
 
-void downloadProgram(void)
+uint8_t calcChecksum(uint8_t *bytes, int len)
 {
-   static uint8_t temp_data[PACKET_LEN];
    int i;
-   // aiLCDBottomLine();
-   // aiLCDPrintf("Programming...");
-   aiLCDClear();
+   uint8_t checksum = 0;
+   for (i = 0; i < len; i++)
+   {
+      checksum ^= bytes[i];
+   }
+   return checksum;
+}
+
+
+void updateProgram(void)
+{
+   int cmdByte, i, temp;
+   uint32_t addr;
+
+   aiLCDBottomLine();
+   aiLCDPrintf("Programming...");
+   
    while(1)
    {
-      int cmdByte = getByte();
+      cmdByte = getByte();
       switch (cmdByte)
       {
-      case 0x7F:
+      case SYNC:
          // initial sync
          sendByte(ACK);
          break;
-      case 0x43:
+      case ERASE_FLASH:
          // global flash erase
          sendByte(ACK);
          sendByte(!FLASH_If_Erase()?ACK:NACK);
          break;
-      case 0x31:
-         sendByte(ACK);
-         uint32_t addr = getByte();
-         addr <<= 8;
-         addr |= getByte();
-         addr <<= 8;
-         addr |= getByte();
-         addr <<= 8;
-         addr |= getByte();
-         sendByte(ACK);
-         
-         uint8_t crc = 0xFF;
-         uint16_t len = getByte();
-         len <<= 8;
-         len |= getByte();
-         for (i = 0; i <= len; i++)
+      case SET_ADDR:
+         addr = 0;
+         for (i = 0; i < 4; i++)
          {
-            int c = getByte();
-            if (c == Q_TIMEOUT)
+            if ((temp = getByte()) == Q_TIMEOUT)
             {
-               sendByte(NACK);
-               aiLCDPrintf("DATA TIMEOUT");
-               aiDelayS(1);
-               break;
+               sendByte(ABORT);
+               return;
             }
-            crc ^= (uint8_t) c;
-            temp_data[i] = c;
+            addr |= (((uint8_t) temp) & 0xFF) << (i * 8);
          }
-         if (i > len)
+         sendByte(ACK);
+         sendByte(calcChecksum((uint8_t *)&addr, 4));
+         break;
+      case FILL_BUFFER:
+         for (i = 0; i < PACKET_LEN; i++)
          {
-            for (; i < PACKET_LEN; i++)
+            if ((temp = getByte()) == Q_TIMEOUT)
             {
-               temp_data[i] = 0xFF;
+               sendByte(ABORT);
+               return;
             }
-            if (crc == getByte())
-            {
-               if (len & 0x03)
-                  len += 4;
-               len >>= 2;
-               FLASH_If_Write(&addr, (uint32_t *)temp_data, len);
-               sendByte(ACK);
-            }
-            else
-            {
-               sendByte(NACK);
-            }
+            _buffer[i] = (uint8_t) (temp & 0xFF);
          }
+         sendByte(ACK);
+         sendByte(calcChecksum(_buffer, PACKET_LEN));
+         break;
+      case COMMIT_BUFFER:
+         if (FLASH_If_Write((__IO uint32_t *)&addr, (uint32_t *)_buffer, PACKET_LEN/4))
+            sendByte(NACK);
          else
-         {
-            aiLCDPrintf("HERE");
-            aiDelayS(1);
-         }
+            sendByte(ACK);
          break;
-      case 0x21:
-         chThdSleepMilliseconds(100);
+      case START_PROGRAM:
          sendByte(ACK);
-         chThdSleepMilliseconds(100);
+         aiLCDBottomLine();
+         aiLCDPrintf("ABOUT TO START!!");
+         aiDelayS(2);
          startProgram();
-         break;
-      case 0x11:
-         break;
+         // ...should never get here
+         return;
       case Q_TIMEOUT:
-         sendByte(NACK);
          break;
       default:
+         aiLCDBottomLine();
          aiLCDPrintf("DONE %d", cmdByte);
          aiDelayS(2);
          sendByte(NACK);
@@ -140,32 +118,28 @@ int main(void)
    
    sdStart(&SD1, NULL);
    sdStart(&SD2, NULL);
-   aiUSBCDCInit();
    
-   palSetPadMode(GPIOD, GPIOD_DIGITAL14, PAL_MODE_INPUT_PULLDOWN);
-   
-   int i;
-   SerialDriver *channels[3] = {&SD1, &SD2, (SerialDriver *)&SDU1};
-   
+   int i, j;
    for (i = 0; i < BOOT_TIMEOUT; i++)
    {
+      // update the countdown
       if (i % 1000 == 0)
       {
          aiLCDBottomLine();
          aiLCDPrintf("%d", (BOOT_TIMEOUT-i)/1000);
       }
-      int j;
-      for (j = 0; j < 3; j++)
+      // check all the interfaces for a SYNC
+      for (j = 0; j < NUM_INTERFACES; j++)
       {
-         if (sdGetTimeout(channels[j], TIME_IMMEDIATE) == 0x11)
+         if (sdGetTimeout(_interfaces[j], TIME_IMMEDIATE) == SYNC)
          {
-            chan = channels[j];
-            downloadProgram();
+            _interface = _interfaces[j];
+            updateProgram();
+            // if we get here, we didn't program successfully
+            aiLCDBottomLine();
+            aiLCDPrintf("Prog Failed   :(");
+            while(1);
          }
-      }
-      if (palReadPad(GPIOD, GPIOD_DIGITAL14))
-      {
-         break;
       }
       chThdSleepMilliseconds(1);
    }

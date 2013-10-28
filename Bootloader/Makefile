@@ -77,8 +77,8 @@ CSRC = $(PORTSRC) \
        $(CHIBIOS)/os/various/chprintf.c \
        $(AITHON_LIBRARY)/Board/board.c \
        $(AITHON_LIBRARY)/Aithon.c \
-       $(AITHON_LIBRARY)/lcd.c \
        $(AITHON_LIBRARY)/usbCDC.c \
+       $(AITHON_LIBRARY)/lcd.c \
        $(USER_SRC_FILES)
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
