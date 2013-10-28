@@ -62,7 +62,7 @@ uint32_t FLASH_If_Erase(void)
   /* Get the sector where start the user flash area */
   UserStartSector = GetSector(APPLICATION_ADDRESS);
 
-  for(i = UserStartSector; i <= FLASH_Sector_5; i += 8)
+  for(i = UserStartSector; i <= FLASH_Sector_7; i += 8)
   {
     /* Device voltage range supposed to be [2.7V to 3.6V], the operation will
        be done by word */ 
