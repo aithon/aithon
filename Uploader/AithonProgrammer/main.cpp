@@ -8,64 +8,282 @@
 #include <iomanip>
 #include <stdint.h>
 #include <unistd.h>
+#include <qmath.h>
 
 #ifdef Q_OS_WIN32
 #include <windows.h>
+#define SLEEP(x) Sleep(uint(x))
+#else
+#define SLEEP(x) sleep(uint(x))
 #endif
 
-#define START_ADDR  0x08008000
-#define PACKET_LEN  1024
+#define START_ADDR      0x08008000
+#define PACKET_LEN      1024
+#define MAX_RETRIES     5
 
-QextSerialPort *port;
+// timeouts
+#define DEFAULT_TIMEOUT 1000
+#define SYNC_TIMEOUT    500
+#define ERASE_TIMEOUT   15000
+
+// control characters
+#define SYNC            0xA5
+#define ACK             0x79
+#define NACK            0x1F
+#define ABORT           0x99
+#define ERASE_FLASH     0x43
+#define SET_ADDR        0x31
+#define FILL_BUFFER     0xC7
+#define COMMIT_BUFFER   0x6E
+#define START_PROGRAM   0x2A
+
+typedef enum {
+    SUCCESS = 0,
+    TIMEOUT,
+    BAD_RESPONSE,
+    RECV_NACK
+} error_t;
+
+QextSerialPort *_port = NULL;
+QByteArray _programData;
+error_t _error;
+
 
 void error(QString msg)
 {
-    qDebug() << msg;
+    qDebug() << "ERROR: " << msg;
+    if (_port != NULL && _port->isOpen())
+        _port->close();
     exit(1);
 }
 
-bool waitAsk(QString msg)
+void printStatus(int current, int total)
 {
-    while (!port->bytesAvailable());
-    uint8_t ask = port->read(1).at(0);
-    if (ask == 0x79)
-    {
-        // ACK
-        // do nothing
-    }
-    else if (ask == 0x1F)
-    {
-        // NACK
-        //qDebug() << "NACK " << msg;
-        return false;
-    }
-    else
-    {
-        // Unknown response
-        error("Unknown response " + QString::number((int)ask, 16) + ": " + msg);
-    }
-    return true;
+    std::cout << std::setfill('0') << std::setw(2) << (total-current)*100 / total << "%\b\b\b";
 }
+
 
 void writeByte(uint8_t byte)
 {
-    port->write((const char *)&byte, 1);
+    _port->write((const char *)&byte, 1);
+}
+
+uint8_t getByte(int timeout=DEFAULT_TIMEOUT)
+{
+    while (!_port->bytesAvailable())
+    {
+        if (timeout <= 0)
+        {
+            _error = TIMEOUT;
+            return 0;
+        }
+
+        SLEEP(1);
+        timeout--;
+    }
+    _error = SUCCESS;
+    return (uint8_t) _port->read(1).at(0);
+}
+
+void waitForACK(int timeout=DEFAULT_TIMEOUT)
+{
+    uint8_t data = getByte(timeout);
+
+    if (_error)
+        return;
+
+    switch (data)
+    {
+    case ACK:
+        _error = SUCCESS;
+        break;
+    case NACK:
+        _error = RECV_NACK;
+        break;
+    default:
+        qDebug() << "Expected ACK or NACK - got "+QString("0x%1").arg((int)data, 0, 16);
+        _error = BAD_RESPONSE;
+        break;
+    }
+}
+
+void processACKError(QString state)
+{
+    if (_error == TIMEOUT)
+        error("Timed out waiting for ACK from "+state+".");
+    else if (_error == RECV_NACK)
+        error("Got unexpected NACK from "+state+".");
+    else if (_error == BAD_RESPONSE)
+        error("Got bad response from "+state+".");
+}
+
+void setAddress(uint32_t addr)
+{
+    writeByte(SET_ADDR);
+
+    uint8_t checksum = 0;
+    for (int i = 0; i < 4; i++)
+        checksum ^= (addr >> (8 * i)) & 0xFF;
+
+    _port->write((char *)&addr, 4);
+
+    // wait for ACK
+    waitForACK();
+    processACKError("SET_ADDR");
+
+    // compare checksum
+    uint8_t checksum2 = getByte();
+    if (_error == TIMEOUT)
+        error("Did not receive checksum back from SET_ADDR.");
+    else if (checksum2 != checksum)
+        error("Got invalid checksum back from SET_ADDR.");
+}
+
+void writePacket(int packetNum)
+{
+    QByteArray data = _programData.mid(packetNum*PACKET_LEN, PACKET_LEN);
+
+    // set address
+    uint32_t addr = packetNum * PACKET_LEN + START_ADDR;
+    setAddress(addr);
+
+    // fill buffer
+    writeByte(FILL_BUFFER);
+    _port->write(data);
+
+    // wait for ACK
+    waitForACK();
+    processACKError("FILL_BUFFER");
+
+    // compare checksum
+    uint8_t checksum = 0;
+    for (int i = 0; i < PACKET_LEN; i++)
+    {
+        checksum ^= (uint8_t) data.at(i);
+    }
+    uint8_t checksum2 = getByte();
+    if (_error == TIMEOUT)
+        error("Did not receive checksum back from FILL_BUFFER.");
+    else if (checksum2 != checksum)
+        error("Got invalid checksum back from FILL_BUFFER.");
+
+    // commit buffer to FLASH
+    writeByte(COMMIT_BUFFER);
+
+    // wait for ACK
+    waitForACK(ERASE_TIMEOUT);
+    processACKError("COMMIT_BUFFER");
+}
+
+
+
+void readFile(QString fileName)
+{
+    QFile file(fileName);
+    if (fileName.right(4).compare(".bin"))
+        error("Incorrect file type. Expected .bin file.");
+    else if (!file.open(QIODevice::ReadOnly))
+        error("Could not open binary file.");
+
+    std::cout << "Reading binary file...\t\t";
+    _programData = file.readAll();
+    while (_programData.length() % PACKET_LEN)
+        _programData.append(0xFF);
+    std::cout << "Done\n";
+}
+
+void openPort(QString port)
+{
+    std::cout << "Opening serial port...\t\t";
+    _port = new QextSerialPort(port);
+    _port->setBaudRate(BAUD115200);
+    _port->setTimeout(5000);
+    if (!_port->open(QextSerialPort::ReadWrite))
+        error("Could not open serial port.");
+    std::cout << "Done\n";
 }
 
 void initChip()
 {
+    for (int i = 0; i < 50; i++)
+    {
+        writeByte(SYNC);
+        waitForACK(SYNC_TIMEOUT);
+        if (_error == SUCCESS)
+            break;
+        else if (_error == RECV_NACK)
+            // Aithon may respond with a NACK if it can't currently be programmed.
+            // This is not a current use-case, but may be useful in the future.
+            error("Aithon board is not ready to be programmed.");
+    }
+    qDebug() << "Initialized chip!";
+}
+
+void eraseFlash()
+{
+    // send command
+    writeByte(ERASE_FLASH);
+
+    // wait for ACK of command
+    waitForACK();
+    processACKError("ERASE_FLASH");
+    qDebug() << "Starting erasing FLASH!";
+
+    // wait for ACK signaling that we're done erasing the flash
+    waitForACK(ERASE_TIMEOUT);
+    processACKError("ERASE_FLASH (done)");
+    qDebug() << "Erased FLASH!";
+}
+
+void writeProgram()
+{
+    for (int i = 0; i < (_programData.length() / PACKET_LEN); i++)
+    {
+        std::cout << "Writing packet " << i << "...";
+        writePacket(i);
+        std::cout << "done\n";
+        SLEEP(100);
+    }
+}
+
+void startProgram()
+{
+    writeByte(START_PROGRAM);
+
+    // wait for ACK
+    waitForACK();
+    processACKError("START_PROGRAM");
+}
+
+int main(int argc, char *argv[])
+{
+    QCoreApplication a(argc, argv);
+
+    if (argc != 3)
+    {
+        qDebug() << "Usage: AithonProgram <COM PORT> <BIN FILE>";
+        return 1;
+    }
+
+    readFile(QString(argv[2]));
+    openPort(QString(argv[1]));
+    initChip();
+    eraseFlash();
+    writeProgram();
+    startProgram();
+
+    _port->close();
+    return 0;
+}
+
+/* old code...
+
+void initChip()
+{
     writeByte(0x11);
-#ifdef Q_OS_WIN32
-    Sleep(uint(500));
-#else
-    sleep(uint(500));
-#endif
+    SLEEP(500);
     writeByte(0x11);
-#ifdef Q_OS_WIN32
-    Sleep(uint(100));
-#else
-    sleep(uint(100));
-#endif
+    SLEEP(100);
     writeByte(0x7F);
     waitAsk("Syncro");
 }
@@ -149,7 +367,7 @@ void writeMemory(uint32_t addr, QByteArray data)
     int offs = 0;
     while (len > PACKET_LEN)
     {
-        std::cout << std::setfill('0') << std::setw(2) << (data.length()-len)*100 / data.length() << "%\b\b\b";
+        printStatus(len, data.length());
         writeMemoryAddress(addr, getChunk(data, offs, PACKET_LEN));
         offs += PACKET_LEN;
         addr += PACKET_LEN;
@@ -192,6 +410,11 @@ int main(int argc, char *argv[])
     }
 
     QFile file(argv[2]);
+    if (QString(argv[2]).right(4).compare(".bin"))
+    {
+        qDebug() << "Incorrect file type. Expected .bin file.";
+        return 1;
+    }
     if (!file.open(QIODevice::ReadOnly))
     {
         qDebug() << "Could not open binary file:" << argv[2];
@@ -220,4 +443,4 @@ int main(int argc, char *argv[])
     startProgram();
 
     return 0;
-}
+}*/
