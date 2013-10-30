@@ -10,7 +10,7 @@ int getByte(void)
    return sdGetTimeout(_interface, DEFAULT_TIMEOUT);
 }
 
-void flushInterface()
+void flushInterface(void)
 {
 	// empty output buffer
 	while (sdPutWouldBlock(_interface));
