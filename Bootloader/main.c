@@ -10,12 +10,25 @@ int getByte(void)
    return sdGetTimeout(_interface, DEFAULT_TIMEOUT);
 }
 
+void flushInterface()
+{
+	// empty output buffer
+	while (sdPutWouldBlock(_interface));
+	
+	// very small sleep to reduce chance of race conditions
+	chThdSleepMilliseconds(1);
+	
+	// empty input buffer
+	while (!sdGetWouldBlock(_interface))
+		sdGet(_interface);
+}
+
 void startProgram(void)
 {
 	/* Jump to user application */
-	funcPtr userAppStart = (funcPtr) (*(__IO uint32_t*) (APPLICATION_ADDRESS + 4));
+	funcPtr userAppStart = (funcPtr) (*(__IO uint32_t*) (APPLICATION_START_ADDRESS + 4));
 	/* Initialize user application's Stack Pointer */
-	__set_MSP(*(__IO uint32_t*) APPLICATION_ADDRESS);
+	__set_MSP(*(__IO uint32_t*) APPLICATION_START_ADDRESS);
 	userAppStart();
 }
 
@@ -45,8 +58,9 @@ void updateProgram(void)
       switch (cmdByte)
       {
       case SYNC:
-         // initial sync
-         sendByte(ACK);
+         // sync
+			flushInterface();
+         sendByte(SYNC);
          break;
       case ERASE_FLASH:
          // global flash erase
@@ -54,31 +68,40 @@ void updateProgram(void)
          sendByte(!FLASH_If_Erase()?ACK:NACK);
          break;
       case SET_ADDR:
+			// Read in the address, MSB first.
          addr = 0;
          for (i = 0; i < 4; i++)
          {
             if ((temp = getByte()) == Q_TIMEOUT)
-            {
-               sendByte(ABORT);
-               return;
-            }
+               break;
             addr |= (((uint8_t) temp) & 0xFF) << (i * 8);
          }
-         sendByte(ACK);
-         sendByte(calcChecksum((uint8_t *)&addr, 4));
+			
+			// Check for errors.
+			if (temp == Q_TIMEOUT)
+				sendByte(NACK);
+			else
+			{
+				sendByte(ACK);
+				sendByte(calcChecksum((uint8_t *)&addr, 4));
+				// We'll get relative addresses, so add the start address.
+				addr += APPLICATION_START_ADDRESS;
+			}
          break;
       case FILL_BUFFER:
          for (i = 0; i < PACKET_LEN; i++)
          {
             if ((temp = getByte()) == Q_TIMEOUT)
-            {
-               sendByte(ABORT);
-               return;
-            }
+               break;
             _buffer[i] = (uint8_t) (temp & 0xFF);
          }
-         sendByte(ACK);
-         sendByte(calcChecksum(_buffer, PACKET_LEN));
+			if (temp == Q_TIMEOUT)
+				sendByte(NACK);
+			else
+			{
+				sendByte(ACK);
+				sendByte(calcChecksum(_buffer, PACKET_LEN));
+			}
          break;
       case COMMIT_BUFFER:
          if (FLASH_If_Write((__IO uint32_t *)&addr, (uint32_t *)_buffer, PACKET_LEN/4))
@@ -88,20 +111,13 @@ void updateProgram(void)
          break;
       case START_PROGRAM:
          sendByte(ACK);
-         aiLCDBottomLine();
-         aiLCDPrintf("ABOUT TO START!!");
-         aiDelayS(2);
+			flushInterface();
          startProgram();
          // ...should never get here
          return;
       case Q_TIMEOUT:
-         break;
       default:
-         aiLCDBottomLine();
-         aiLCDPrintf("DONE %d", cmdByte);
-         aiDelayS(2);
-         sendByte(NACK);
-         return;
+         break;
       }
    }
 }
@@ -135,9 +151,7 @@ int main(void)
          {
             _interface = _interfaces[j];
             updateProgram();
-            // if we get here, we didn't program successfully
-            aiLCDBottomLine();
-            aiLCDPrintf("Prog Failed   :(");
+            // We should never get here...
             while(1);
          }
       }

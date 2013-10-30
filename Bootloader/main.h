@@ -2,15 +2,14 @@
 #include "flash_if.h"
 
 // general constants
-#define PACKET_LEN      1024
+#define PACKET_LEN      4096
 #define BOOT_TIMEOUT    30000
-#define DEFAULT_TIMEOUT 1000
+#define DEFAULT_TIMEOUT 100
 
 // control characters
 #define SYNC            0xA5
 #define ACK             0x79
 #define NACK            0x1F
-#define ABORT           0x99
 #define ERASE_FLASH     0x43
 #define SET_ADDR        0x31
 #define FILL_BUFFER     0xC7
