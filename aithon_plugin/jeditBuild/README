@@ -1,0 +1,8 @@
+This directory is for building the jEdit installers.  Run the script run.sh on a Mac and the script will:
+
+1.  download the source for jEdit 5.1.1
+2.  copy over new versions of ld and windres
+3.  copy the AithonLibrary from the git repository
+4.  build the installers
+
+You will find the installers in the 'dist' directory.
