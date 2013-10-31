@@ -5,7 +5,7 @@
 svn co -r 23300 https://jedit.svn.sourceforge.net/svnroot/jedit/jEdit/branches/5.1.x jedit_temp
 
 cd jedit_temp
-cp -r ../../../AithonLibrary .
+cp -r ../../AithonLibrary .
 #set +e #continue even with error
 ant dist
 #set -e
