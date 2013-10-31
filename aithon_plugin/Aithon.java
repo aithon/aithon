@@ -1,4 +1,5 @@
 // {{{ imports
+import java.awt.image.BufferedImage;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Dimension;
@@ -17,6 +18,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
@@ -26,6 +28,8 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
+import javax.swing.JLabel;
+import javax.swing.ImageIcon;
 
 import org.gjt.sp.jedit.EBComponent;
 import org.gjt.sp.jedit.EBMessage;
@@ -76,7 +80,7 @@ implements ActionListener, EBComponent, AithonActions,
    * 	which can be DockableWindowManager.FLOATING, TOP, BOTTOM, LEFT, RIGHT, etc.
    * 	see @ref DockableWindowManager for possible values.
    */
-  public Aithon(View view, String position) {
+  public Aithon(View view, String position) throws IOException{
     //The top level layout is a BoxLayout with the boxes side by side.
     //The buttons on the left and the console on the right.
     this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
@@ -88,23 +92,33 @@ implements ActionListener, EBComponent, AithonActions,
 
     //The buttons panel is a FlowLayout with a fixed maximum size which
     //forces the buttons to be arranged in a single column.
+    BufferedImage aithon_logo = ImageIO.read(getClass().getResource("/images/AithonEmblemRedClear.png"));
+    JLabel picLabel = new JLabel(new ImageIcon(aithon_logo));
+    add(picLabel);
+    
+    Dimension button_size = new Dimension(120, 25);
     JPanel buttons = new JPanel();
     buttons.setLayout(new FlowLayout());
     buttons.setPreferredSize(new Dimension(150,180));
     buttons.setMaximumSize(new Dimension(150, 180));
     
     detectButton = new JButton("Detect\nBoard");
-    detectButton.setText("<html><center>"+"Detect"+"<br>"+"Board"+"</center></html>");
+    detectButton.setText("<html><center>"+"Detect Board"+"</center></html>");
+    detectButton.setPreferredSize(button_size);
     detectButton.addActionListener(this);
     
     compileButton = new JButton("Compile");
-    compileButton.setText("<html><center>"+"Compile"+"<br>"+"Code"+"</center></html>");
+    compileButton.setText("<html><center>"+"Compile"+"</center></html>");
+    compileButton.setPreferredSize(button_size);
     compileButton.addActionListener(this);
     
     uploadButton = new JButton("Upload");
-    uploadButton.setText("<html><center>"+"Upload"+"<br>"+"HEX File"+"</center></html>");
+    uploadButton.setText("<html><center>"+"Upload"+"</center></html>");
+    uploadButton.setPreferredSize(button_size);
     uploadButton.addActionListener(this);
+    
     showSerialTerminal = new JToggleButton("Serial Terminal");
+    showSerialTerminal.setPreferredSize(button_size);
     
     buttons.add(detectButton);
     buttons.add(compileButton);
@@ -114,7 +128,7 @@ implements ActionListener, EBComponent, AithonActions,
     add(buttons);
 
     //create the console area
-    console_area = new JTextArea("This is the console area");
+    console_area = new JTextArea("This is a console area");
     console_area.setLineWrap(true);
     console_area.setWrapStyleWord(true);
     console_area.setEditable(false);
