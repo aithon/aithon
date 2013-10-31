@@ -8,6 +8,7 @@ cd jedit_temp
 cp -r ../../AithonLibrary .
 #set +e #continue even with error
 ant dist
+cp ../../aithon_plugin/jars/Aithon.jar ./lib/default-plugins
 #set -e
 
 #copy over the most recent versions of 'ld' and 'windres' (needed for Mac installer)
