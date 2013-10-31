@@ -14,6 +14,7 @@
   <!-- Extra files that should be included in the jar -->
   <selector id="packageFiles">
     <or>
+    	<filename name="images/*.png" />
         <filename name="*.txt" />
     </or>
   </selector>
