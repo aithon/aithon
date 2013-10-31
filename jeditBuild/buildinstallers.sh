@@ -15,6 +15,14 @@ cp ../ld-new ./build/launch4j/bin/ld
 cp ../windres ./build/launch4j/bin/windres
 
 cp ../build.xml.modified_5.1.1 ./build.xml
+
+#need for InnoSetup
+cp ../build.properties ./build.properties
+cp ../win32installer.iss ./package-files/windows/win32installer.iss
+
+#cp Aithon plugin
+
+
 ant dist
 
 

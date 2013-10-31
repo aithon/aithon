@@ -11,7 +11,7 @@ AppContact=jedit-devel@lists.sourceforge.net
 AppCopyright=Copyright © 1998-@current.year@ Contributors
 AppID=jEdit
 AppName=jEdit
-AppPublisher=Contributors
+AppPublisher=Aithon Development Team
 AppPublisherURL=http://www.jEdit.org
 AppReadmeFile={app}\doc\README.txt
 AppSupportURL=http://www.jEdit.org
@@ -36,7 +36,7 @@ SourceDir=@dist.dir.for.innosetup@
 TimeStampsInUTC=true
 UninstallDisplayIcon={app}\jedit.exe
 UninstallDisplayName=jEdit @jedit.version@
-VersionInfoCompany=Contributors
+VersionInfoCompany=Aithon Development Team
 VersionInfoCopyright=Copyright © 1998-@current.year@ Contributors
 VersionInfoDescription=Programmer's Text Editor
 VersionInfoTextVersion=@jedit.version@
@@ -45,7 +45,7 @@ WizardImageFile=@base.dir.for.innosetup@\icons\WindowsInstallerImage.bmp
 WizardSmallImageFile=@base.dir.for.innosetup@\icons\WindowsInstallerSmallImage.bmp
 
 [Components]
-Name: main; Description: jEdit - Programmer's Text Editor; Flags: fixed; Types: custom compact full
+Name: main; Description: jEdit - (Aithon Edition); Flags: fixed; Types: custom compact full
 Name: apidoc; Description: {cm:APIDocumentation}; Types: full
 Name: macros; Description: {cm:Macros}; Types: compact full
 
@@ -61,6 +61,7 @@ Source: classes\package-files\windows\jEdit.url; DestDir: {app}; Flags: ignoreve
 Source: doc\*; DestDir: {app}\doc; Excludes: \doc\api\*; Flags: ignoreversion recursesubdirs createallsubdirs sortfilesbyextension sortfilesbyname; Components: main
 Source: doc\api\*; DestDir: {app}\doc\api; Flags: ignoreversion recursesubdirs createallsubdirs sortfilesbyextension sortfilesbyname; Components: apidoc
 Source: jars\QuickNotepad.jar; DestDir: {app}\jars; Flags: ignoreversion sortfilesbyextension sortfilesbyname; Components: main
+Source: jars\Aithon.jar; DestDir: {app}\jars; Flags: ignoreversion sortfilesbyextension sortfilesbyname; Components: main
 Source: macros\*; DestDir: {app}\macros; Flags: ignoreversion recursesubdirs createallsubdirs sortfilesbyextension sortfilesbyname; Components: macros
 Source: keymaps\*; DestDir: {app}\keymaps; Flags: ignoreversion recursesubdirs createallsubdirs sortfilesbyextension sortfilesbyname; Components: main
 Source: modes\*; DestDir: {app}\modes; Flags: ignoreversion recursesubdirs createallsubdirs sortfilesbyextension sortfilesbyname; Components: main
