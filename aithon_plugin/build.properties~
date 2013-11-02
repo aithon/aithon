@@ -9,7 +9,7 @@
 # jEdit & plugins directory settings
 
 # jEdit install directory
-jedit.install.dir=C:\\jEdit
+jedit.install.dir=C:\\Program Files\\jEdit
 #jedit.install.dir="C:\\jEdit"
 
 # location where your jars are installed
@@ -20,11 +20,11 @@ install.dir=${jedit.install.dir}/jars
 # <path id="project.class.path">
 #   <pathelement location="${jedit.plugins.dir}/ErrorList.jar" />
 # </path>
-jedit.plugins.dir=C:\\jEdit\\jars
+jedit.plugins.dir=C:\\Program Files\\jEdit\\jars
 #jedit.plugins.dir="C:\\jEdit\\jars"
 
 # Location to find built jars (for dependencies)
-jedit.jars.dir=C:\\jEdit\\jars
+jedit.jars.dir=C:\\Program Files\\jEdit\\jars
 #jedit.jars.dir="C:\\jEdit\\jars"
 
 # User settings directory

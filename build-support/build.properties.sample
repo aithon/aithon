@@ -9,59 +9,56 @@
 # jEdit & plugins directory settings
 
 # jEdit install directory
-jedit.install.dir=C:\\jEdit
-#jedit.install.dir="C:\\jEdit"
+#jedit.install.dir=../../jEdit
 
 # location where your jars are installed
-install.dir=${jedit.install.dir}/jars
+#install.dir=${jedit.install.dir}/jars
 
 # Location where the plugins are. This property used when defining dependencies on other plugins.
 # Eg. In your plugin's classpath.
 # <path id="project.class.path">
 #   <pathelement location="${jedit.plugins.dir}/ErrorList.jar" />
 # </path>
-jedit.plugins.dir=C:\\jEdit\\jars
-#jedit.plugins.dir="C:\\jEdit\\jars"
+#jedit.plugins.dir=${install.dir}
 
 # Location to find built jars (for dependencies)
-jedit.jars.dir=C:\\jEdit\\jars
-#jedit.jars.dir="C:\\jEdit\\jars"
+#jedit.jars.dir=${install.dir}
 
 # User settings directory
-jedit.user.home=${user.home}/.jedit
+#jedit.user.home=${user.home}/.jedit
 
 # Top-level of the plugins source tree
-plugins.srcdir=..
+#plugins.srcdir=..
 
 
 # Generic plugin build options
 
 # Where the plugin source is located
-src.dir=.
+#src.dir=.
 
 # The name of the JAR file
-jar.file=${ant.project.name}.jar
+#jar.file=${ant.project.name}.jar
 
 # The name of the source ZIP file
-src.zip.file=${ant.project.name}.zip
+#src.zip.file=${ant.project.name}.zip
 
 # The target run when running dist
-dist.target=dist.nojavadoc
+#dist.target=dist.nojavadoc
 
 # Where to put temporary build files
-build.dir=build
+#build.dir=build
 
 # Where to put compiled classes
-build.classes=${build.dir}/classes
+#build.classes=${build.dir}/classes
 
 # Where to put generated documentation
-build.docs=${build.dir}/docs
+#build.docs=${build.dir}/docs
 
 # Where to put generated javadoc
-build.javadoc=${build.docs}/javadoc
+#build.javadoc=${build.docs}/javadoc
 
 # Where to put other files
-build.extras=${build.dir}/extras
+#build.extras=${build.dir}/extras
 
 # Default compiler flags
 
@@ -105,7 +102,6 @@ build.extras=${build.dir}/extras
 # What target to use for the docs
 # can be 'none' if you provide HTML docs that are not generated
 #docs-proc.target=xsltproc
-docs-proc.target=none
 
 # Stylesheet file to use
 #user-doc.xsl=${build.support}/users-guide.xsl
