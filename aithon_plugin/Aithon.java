@@ -187,7 +187,8 @@ implements ActionListener, EBComponent, AithonActions,
   public void actionPerformed(ActionEvent evt) {
     Process compile;
     String line;
-    File dir = new File("C:\\Users\\Justine Dunham\\Documents\\GitHub\\aithon\\ProjectTemplate");
+    //File dir = new File("C:\\Users\\Justine Dunham\\Documents\\GitHub\\aithon\\ProjectTemplate");
+    File dir = new File("/Users/jseng/Desktop/jEdit.app/Contents/Resources/Java/ProjectTemplate");
     Object src = evt.getSource();
     
     if (src == uploadButton) { //check if upload clicked
@@ -212,7 +213,8 @@ implements ActionListener, EBComponent, AithonActions,
       }
     } else if (src == compileButton) { //check if compile clicked
       try {
-      	compile = r.exec("make", null, dir);
+        String env[] = {"PATH=/usr/bin:/bin:/usr/sbin:/Users/jseng/gccarm/bin"};
+      	compile = r.exec("make", env, dir);
       	inputStreamToOutputStream(compile.getInputStream());
         /*BufferedReader input = new BufferedReader(new InputStreamReader(compile.getInputStream()));
         while ((line = input.readLine()) != null) {
