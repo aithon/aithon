@@ -494,6 +494,11 @@
 				<exclude name="MacOSX.jar"/>
 			</fileset>
 		</copy>
+		<copy todir="${jar.location}/jars">
+			<fileset dir="${lib.dir}/default-plugins">
+				<include name="../../aithon_plugin/jars/Aithon.jar"/>
+			</fileset>
+		</copy>
 		<contrib:if>
 			<os family="mac"/>
 			<contrib:then>
