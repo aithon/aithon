@@ -104,7 +104,7 @@ implements ActionListener, EBComponent, AithonActions,
     buttons.setMaximumSize(new Dimension(150, 180));
     
     detectButton = new JButton("Detect\nBoard");
-    detectButton.setText("<html><center>"+"Detect Board"+"</center></html>");
+    detectButton.setText("Detect Board");
     detectButton.setPreferredSize(button_size);
     detectButton.addActionListener(this);
     
