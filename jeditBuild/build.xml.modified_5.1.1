@@ -489,14 +489,14 @@
 				<include name="AithonLibrary/**"/>
 			</fileset>
 		</copy>
-		<copy todir="${jar.location}/jars">
-			<fileset dir="${lib.dir}/default-plugins">
-				<exclude name="MacOSX.jar"/>
+		<copy todir="${lib.dir}/default-plugins">
+			<fileset dir="${basedir}/../../aithon_plugin/jars">
+				<include name="Aithon.jar"/>
 			</fileset>
 		</copy>
 		<copy todir="${jar.location}/jars">
 			<fileset dir="${lib.dir}/default-plugins">
-				<include name="../../aithon_plugin/jars/Aithon.jar"/>
+				<exclude name="MacOSX.jar"/>
 			</fileset>
 		</copy>
 		<contrib:if>
@@ -1416,6 +1416,11 @@
 			<param name="jar.location"
 			       location="${dist.dir}"/>
 		</antcall>
+		<copy todir="${lib.dir}/default-plugins">
+			<fileset dir="${basedir}/../../aithon_plugin/jars">
+				<include name="Aithon.jar"/>
+			</fileset>
+		</copy>
 		<copy todir="${dist.dir}/jars">
 			<fileset dir="${lib.dir}/default-plugins"/>
 		</copy>
@@ -2031,8 +2036,6 @@ Press Return key to continue...
 		<property name="wipe.dist.files"
 			  value="false"/>
 		<contrib:runtarget target="dist-java"/>
-		<contrib:runtarget target="dist-manuals"/>
-		<contrib:runtarget target="dist-src"/>
 		<contrib:runtarget target="dist-mac"/>
 		<contrib:runtarget target="dist-win"/>
 		<antcall target="dist-cleanup">
