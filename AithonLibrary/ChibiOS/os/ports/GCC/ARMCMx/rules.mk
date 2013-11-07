@@ -211,7 +211,7 @@ clean:
 	
 program: $(BUILDDIR)/$(PROJECT).bin
 	@echo Programming...
-	@$(AITHON_LIBRARY)/Programmer/AithonProgrammer.exe $(COM_PORT) $(BUILDDIR)/$(PROJECT).bin
+	@$(AITHON_LIBRARY)/Programmer/AithonProgrammer.exe program $(BUILDDIR)/$(PROJECT).bin $(COM_PORT)
 
 #
 # Include the dependency files, should be the last of the makefile

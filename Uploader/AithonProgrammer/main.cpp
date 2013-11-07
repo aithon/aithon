@@ -1,5 +1,4 @@
 #include <QtCore/QCoreApplication>
-#include <QDebug>
 #include "qextserialport.h"
 #include "qextserialenumerator.h"
 #include <QFile>
@@ -20,6 +19,8 @@
 // uncomment to enable debug printing
 //#define DEBUG
 
+#define USB_ST_VID      0x0483
+#define USB_STM32F4_PID 0x5740
 #define PACKET_LEN      4096
 #define MAX_RETRIES     5
 #define SYNC_RETRIES    100
@@ -331,7 +332,7 @@ state_t startProgram()
     return FSM_QUIT;
 }
 
-void doFSM()
+void doProgramFSM()
 {
     state_t state = FSM_INIT;
     state_t nextState = FSM_INIT;
@@ -400,21 +401,73 @@ void doFSM()
     }
 }
 
+QString getCOMPort()
+{
+    foreach (QextPortInfo info, QextSerialEnumerator::getPorts())
+    {
+        debug(QString(info.vendorID));
+        debug(QString(info.productID));
+        if (info.vendorID == USB_ST_VID && info.productID == USB_STM32F4_PID)
+        {
+            return info.portName;
+        }
+    }
+    return QString("");
+}
+
+void displayUsage()
+{
+    std::cout << "Usage:\n";
+    std::cout << "       AithonProgrammer.exe detect\n";
+    std::cout << "       AithonProgrammer.exe program <BINARY_FILE_PATH> [COM_PORT]\n";
+}
+
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    if (argc != 3)
+    if (argc < 2)
     {
-        qDebug() << "Usage: AithonProgram <COM PORT> <BIN FILE>";
-        return 1;
+        displayUsage();
+        return -1;
     }
 
-    readFile(QString(argv[2]));
-    openPort(QString(argv[1]));
+    QString cmd = argv[1];
+    QString comPort = getCOMPort();
+    if (!cmd.compare("detect", Qt::CaseInsensitive))
+    {
+        if (comPort.length() == 0)
+        {
+            std::cout << "No Aithon board detected.\n";
+        }
+        else
+        {
+            std::cout << "Aithon board detected on:\n";
+            std::cout << comPort.toStdString() << "\n";
+        }
+    }
+    else if (!cmd.compare("program", Qt::CaseInsensitive))
+    {
+        if (argc == 4)
+        {
+            // user specified com port
+            comPort = QString(argv[3]);
+        }
+        else if (comPort.length() == 0)
+        {
+            std::cout << "No Aithon board detected.\n";
+            return -1;
+        }
+        readFile(QString(argv[2]));
+        openPort(comPort);
+        doProgramFSM();
+        _port->close();
+    }
+    else
+    {
+        displayUsage();
+        return -1;
+    }
 
-    doFSM();
-
-    _port->close();
     return 0;
 }
