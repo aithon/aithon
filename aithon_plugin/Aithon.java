@@ -145,22 +145,7 @@ implements ActionListener, EBComponent, AithonActions,
 
     add(console_scrollbars);
 
-    //start console process
-    //String[] cmd = {"C:\\Python33\\python", "-i"}; //use python as test console
-    //Python test console not working for windows - outputting to textarea directly
     r = Runtime.getRuntime();
-    /*try {
-      p = r.exec(cmd); //start the console process
-      
-      //start the thread to capture output
-      inputStreamToOutputStream(p.getInputStream());
-      
-      //write to 'out' to send data to the console
-      out = new BufferedWriter( new OutputStreamWriter(p.getOutputStream()) );
-    } catch (IOException e) {
-      System.err.println("Caught IOException: " + e.getMessage());
-    }*/
-
   }
 
   //starts a thread that reads an OutputStream and displays it to the console
@@ -187,41 +172,28 @@ implements ActionListener, EBComponent, AithonActions,
   public void actionPerformed(ActionEvent evt) {
     Process compile;
     String line;
-    //File dir = new File("C:\\Users\\Justine Dunham\\Documents\\GitHub\\aithon\\ProjectTemplate");
-    File dir = new File("/Users/jseng/Desktop/jEdit.app/Contents/Resources/Java/ProjectTemplate");
+    //Location of makefile and main.c - make general with working directory somehow
+    File dir = new File("C:\\Users\\Justine Dunham\\Documents\\GitHub\\aithon\\ProjectTemplate");
+    //File dir = new File("/Users/jseng/Desktop/jEdit.app/Contents/Resources/Java/ProjectTemplate");
     Object src = evt.getSource();
     
     if (src == uploadButton) { //check if upload clicked
-      try {
-        out.write("print\"upload\"\n");
-        out.flush();
-        
-        //scroll the area
-        console_area.setCaretPosition (console_area.getDocument().getLength());
-      } catch (IOException e) {
-        System.err.println("Caught IOException: " + e.getMessage());
-      }
+      console_area.append("Upload to board");
+      //scroll the area
+      console_area.setCaretPosition (console_area.getDocument().getLength());
     } else if (src == detectButton) { //check if detect clicked
-      try {
-        out.write("print\"detect\"\n");
-        out.flush();
-        
-        //scroll the area
-        console_area.setCaretPosition (console_area.getDocument().getLength());
-      } catch (IOException e) {
-        System.err.println("Caught IOException: " + e.getMessage());
-      }
+      
+      console_area.append("Detect board");
+      //scroll the area
+      console_area.setCaretPosition (console_area.getDocument().getLength());
     } else if (src == compileButton) { //check if compile clicked
       try {
-        String env[] = {"PATH=/usr/bin:/bin:/usr/sbin:/Users/jseng/gccarm/bin"};
+      	//Path environment variables - required for mac/linux, use null for windows
+        //String env[] = {"PATH=/usr/bin:/bin:/usr/sbin:/Users/jseng/gccarm/bin"};
+        String env[] = {null};
       	compile = r.exec("make", env, dir);
       	inputStreamToOutputStream(compile.getInputStream());
-        /*BufferedReader input = new BufferedReader(new InputStreamReader(compile.getInputStream()));
-        while ((line = input.readLine()) != null) {
-          console_area.append(line + "\n");
-        }*/
-        //out.write("print\"compile\"\n");
-        //out.flush();
+      	inputStreamToOutputStream(compile.getErrorStream());
         
         //scroll the area
         console_area.setCaretPosition (console_area.getDocument().getLength());
