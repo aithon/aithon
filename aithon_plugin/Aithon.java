@@ -25,9 +25,10 @@ import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
 import javax.swing.JButton;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
-import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 import javax.swing.JLabel;
 import javax.swing.ImageIcon;
@@ -178,7 +179,9 @@ implements ActionListener, EBComponent, AithonActions,
     Object src = evt.getSource();
     
     if (src == uploadButton) { //check if upload clicked
-      console_area.append("Upload to board");
+      console_area.append("Compiler: " + jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "gcc-filepath") + "\n");
+      console_area.append("Library: " + jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "library-filepath") + "\n");
+      console_area.append("Programmer: " + jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "programmer-filepath") + "\n");
       //scroll the area
       console_area.setCaretPosition (console_area.getDocument().getLength());
     } else if (src == detectButton) { //check if detect clicked

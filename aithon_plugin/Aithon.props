@@ -47,11 +47,13 @@ options.aithon.code=new AithonOptionPane();
 
 # Option pane labels
 options.aithon.label=Aithon
-options.aithon.file=File:
 options.aithon.choose-file=Choose
 options.aithon.choose-file.title=Choose a notepad file
 options.aithon.choose-font=Font:
 options.aithon.show-filepath.title=Display notepad file path
+options.aithon.gcc-label=Compiler Location:
+options.aithon.library-label=Library Location:
+options.aithon.prog-label=Programmer Location:
 
 # window title
 aithon.title=Aithon
@@ -68,4 +70,6 @@ options.aithon.fontstyle=0
 options.aithon.fontsize=14
 
 # Setting not defined but supplied for completeness
-options.aithon.filepath=
+options.aithon.gcc-filepath=
+options.aithon.library-filepath=
+options.aithon.programmer-filepath=

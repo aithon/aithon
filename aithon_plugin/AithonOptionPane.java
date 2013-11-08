@@ -1,4 +1,5 @@
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,14 +14,14 @@ import org.gjt.sp.jedit.AbstractOptionPane;
 import org.gjt.sp.jedit.GUIUtilities;
 import org.gjt.sp.jedit.jEdit;
 import org.gjt.sp.jedit.gui.FontSelector;
+import org.gjt.sp.jedit.browser.VFSBrowser;
 
 public class AithonOptionPane extends AbstractOptionPane implements
 ActionListener {
   private JCheckBox showPath;
-
-  private JTextField pathName;
-
   private FontSelector font;
+  private JTextField gccPath, libPath, progPath;
+  private JButton gccPickPath, libPickPath, progPickPath;
 
   public AithonOptionPane() {
     super(AithonPlugin.NAME);
@@ -34,27 +35,55 @@ ActionListener {
               "true"));
     addComponent(showPath);
 
-    pathName = new JTextField(jEdit
-        .getProperty(AithonPlugin.OPTION_PREFIX + "filepath"));
-    JButton pickPath = new JButton(jEdit
+    gccPath = new JTextField(jEdit
+        .getProperty(AithonPlugin.OPTION_PREFIX + "gcc-filepath"));
+    gccPickPath = new JButton(jEdit
         .getProperty(AithonPlugin.OPTION_PREFIX + "choose-file"));
-    pickPath.addActionListener(this);
-
-    JPanel pathPanel = new JPanel(new BorderLayout(0, 0));
-    pathPanel.add(pathName, BorderLayout.CENTER);
-    pathPanel.add(pickPath, BorderLayout.EAST);
+    gccPickPath.addActionListener(this);
+    JPanel gccPanel = new JPanel(new BorderLayout(0, 0));
+    gccPanel.add(gccPath, BorderLayout.CENTER);
+    gccPanel.add(gccPickPath, BorderLayout.EAST);
 
     addComponent(jEdit.getProperty(AithonPlugin.OPTION_PREFIX
-          + "file"), pathPanel);
+          + "gcc-label"), gccPanel);
+
+    libPath = new JTextField(jEdit
+        .getProperty(AithonPlugin.OPTION_PREFIX + "library-filepath"));
+    libPickPath = new JButton(jEdit
+        .getProperty(AithonPlugin.OPTION_PREFIX + "choose-file"));
+    libPickPath.addActionListener(this);
+    JPanel libPanel = new JPanel(new BorderLayout(0, 0));
+    libPanel.add(libPath, BorderLayout.CENTER);
+    libPanel.add(libPickPath, BorderLayout.EAST);
+
+    addComponent(jEdit.getProperty(AithonPlugin.OPTION_PREFIX
+          + "library-label"), libPanel);   
+    
+    progPath = new JTextField(jEdit
+        .getProperty(AithonPlugin.OPTION_PREFIX + "programmer-filepath"));
+    progPickPath = new JButton(jEdit
+        .getProperty(AithonPlugin.OPTION_PREFIX + "choose-file"));
+    progPickPath.addActionListener(this);
+    JPanel progPanel = new JPanel(new BorderLayout(0, 0));
+    progPanel.add(progPath, BorderLayout.CENTER);
+    progPanel.add(progPickPath, BorderLayout.EAST);
+
+    addComponent(jEdit.getProperty(AithonPlugin.OPTION_PREFIX
+          + "prog-label"), progPanel);
 
     font = new FontSelector(makeFont());
     addComponent(jEdit.getProperty(AithonPlugin.OPTION_PREFIX
           + "choose-font"), font);
+    
   }
 
   public void _save() {
-    jEdit.setProperty(AithonPlugin.OPTION_PREFIX + "filepath",
-        pathName.getText());
+    jEdit.setProperty(AithonPlugin.OPTION_PREFIX + "gcc-filepath",
+        gccPath.getText());
+    jEdit.setProperty(AithonPlugin.OPTION_PREFIX + "library-filepath",
+        libPath.getText());
+    jEdit.setProperty(AithonPlugin.OPTION_PREFIX + "programmer-filepath",
+        progPath.getText());
     Font _font = font.getFont();
     jEdit.setProperty(AithonPlugin.OPTION_PREFIX + "font", _font
         .getFamily());
@@ -70,10 +99,27 @@ ActionListener {
 
   // begin ActionListener implementation
   public void actionPerformed(ActionEvent evt) {
-    String[] paths = GUIUtilities.showVFSFileDialog(null, null,
+    Object src = evt.getSource();
+    String[] paths;
+    if (src == gccPickPath) {
+      paths = GUIUtilities.showVFSFileDialog(null, null,
         JFileChooser.OPEN_DIALOG, false);
-    if (paths != null) {
-      pathName.setText(paths[0]);
+      
+      if (paths != null) {
+        gccPath.setText(paths[0]);
+      }
+    }
+    else {
+      paths = GUIUtilities.showVFSFileDialog(null, null,
+        VFSBrowser.CHOOSE_DIRECTORY_DIALOG, false);
+      if (paths != null) {
+        if (src == libPickPath) {
+          libPath.setText(paths[0]);
+        }
+        else if (src == progPickPath) {
+          progPath.setText(paths[0]);
+        }
+      }
     }
   }
 
