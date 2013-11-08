@@ -74,7 +74,10 @@ ActionListener {
     font = new FontSelector(makeFont());
     addComponent(jEdit.getProperty(AithonPlugin.OPTION_PREFIX
           + "choose-font"), font);
-    
+
+    gccPath.setText(autoDetectGcc());
+    libPath.setText(aithonLibraryPath());
+    progPath.setText(aithonProgrammerPath());
   }
 
   public void _save() {
@@ -93,6 +96,54 @@ ActionListener {
         String.valueOf(_font.getStyle()));
     jEdit.setProperty(AithonPlugin.OPTION_PREFIX + "show-filepath",
         String.valueOf(showPath.isSelected()));
+  }
+
+  private String autoDetectGcc() {
+    String gccPath = "";
+    String os = System.getProperty("os.name").toLowerCase();
+    String userDir = System.getProperty("user.dir");
+
+    if (os.indexOf("win") >= 0) {
+      gccPath = userDir + "/Windows";
+    } else if (os.indexOf("mac") >= 0) {
+      gccPath = userDir + "/MacOSX";
+    } else if (os.indexOf("nux") >= 0) {
+      gccPath = userDir + "/Linux";
+    }
+
+    return gccPath;
+  }
+
+  private String aithonLibraryPath() {
+    String libraryPath = "";
+    String os = System.getProperty("os.name").toLowerCase();
+    String userDir = System.getProperty("user.dir") + "/AithonLibrary/";
+
+    if (os.indexOf("win") >= 0) {
+      libraryPath = userDir + "Windows";
+    } else if (os.indexOf("mac") >= 0) {
+      libraryPath = userDir + "MacOSX";
+    } else if (os.indexOf("nux") >= 0) {
+      libraryPath = userDir + "Linux";
+    }
+
+    return libraryPath;
+  }
+
+  private String aithonProgrammerPath() {
+    String programmerPath = "";
+    String os = System.getProperty("os.name").toLowerCase();
+    String userDir = System.getProperty("user.dir") + "/AithonLibrary/Programmer/";
+
+    if (os.indexOf("win") >= 0) {
+      programmerPath = userDir + "Windows";
+    } else if (os.indexOf("mac") >= 0) {
+      programmerPath = userDir + "MacOSX";
+    } else if (os.indexOf("nux") >= 0) {
+      programmerPath = userDir + "Linux";
+    }
+
+    return programmerPath;
   }
 
   // end AbstractOptionPane implementation
