@@ -179,6 +179,7 @@ implements ActionListener, EBComponent, AithonActions,
     Object src = evt.getSource();
     
     if (src == uploadButton) { //check if upload clicked
+      //Using for testing - prints out current directories from property values
       console_area.append("Compiler: " + jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "gcc-filepath") + "\n");
       console_area.append("Library: " + jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "library-filepath") + "\n");
       console_area.append("Programmer: " + jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "programmer-filepath") + "\n");
@@ -186,7 +187,11 @@ implements ActionListener, EBComponent, AithonActions,
       console_area.setCaretPosition (console_area.getDocument().getLength());
     } else if (src == detectButton) { //check if detect clicked
       
-      console_area.append("Detect board");
+      //Using for testing - resets directory properties
+      console_area.append("Unset properties:\n");
+      jEdit.unsetProperty(AithonPlugin.OPTION_PREFIX + "gcc-filepath");
+      jEdit.unsetProperty(AithonPlugin.OPTION_PREFIX + "library-filepath");
+      jEdit.unsetProperty(AithonPlugin.OPTION_PREFIX + "programmer-filepath");
       //scroll the area
       console_area.setCaretPosition (console_area.getDocument().getLength());
     } else if (src == compileButton) { //check if compile clicked
