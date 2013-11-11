@@ -172,10 +172,12 @@ implements ActionListener, EBComponent, AithonActions,
   //invoked when the buttons are clicked
   public void actionPerformed(ActionEvent evt) {
     Process compile;
-    String line;
+    String line, path;
     //Location of makefile and main.c - make general with working directory somehow
-    File dir = new File("C:\\Users\\Justine Dunham\\Documents\\GitHub\\aithon\\ProjectTemplate");
+    path = jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "library-filepath") + "\\..\\ProjectTemplate\\";
+    //File dir = new File("C:\\Users\\Justine Dunham\\Documents\\GitHub\\aithon\\ProjectTemplate");
     //File dir = new File("/Users/jseng/Desktop/jEdit.app/Contents/Resources/Java/ProjectTemplate");
+    File dir = new File(path);
     Object src = evt.getSource();
     
     if (src == uploadButton) { //check if upload clicked
@@ -198,7 +200,7 @@ implements ActionListener, EBComponent, AithonActions,
       try {
       	//Path environment variables - required for mac/linux, use null for windows
         //String env[] = {"PATH=/usr/bin:/bin:/usr/sbin:/Users/jseng/gccarm/bin"};
-        String env[] = {null};
+        String env[] = null;
       	compile = r.exec("make", env, dir);
       	inputStreamToOutputStream(compile.getInputStream());
       	inputStreamToOutputStream(compile.getErrorStream());
