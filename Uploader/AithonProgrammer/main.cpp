@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <unistd.h>
 #include <qmath.h>
+#include <QObject>
 
 #ifdef Q_OS_WIN32
 #include <windows.h>
@@ -21,7 +22,7 @@
 
 #define USB_ST_VID      0x0483
 #define USB_STM32F4_PID 0x5740
-#define PACKET_LEN      4096
+#define PACKET_LEN      1024
 #define MAX_RETRIES     5
 #define SYNC_RETRIES    100
 
@@ -58,7 +59,8 @@ typedef enum {
 } error_t;
 
 typedef enum {
-    FSM_INIT,
+    FSM_RESET,
+    FSM_SYNC,
     FSM_ERASE_FLASH,
     FSM_SET_ADDR,
     FSM_FILL_BUFFER,
@@ -93,6 +95,25 @@ void error(QString msg)
 void printStatus(int current, int total)
 {
     std::cout << "\b\b\b" << std::setfill('0') << std::setw(2) << current*100 / total << "%";
+}
+
+QString getCOMPort()
+{
+    foreach (QextPortInfo info, QextSerialEnumerator::getPorts())
+    {
+        debug(QString::number(info.vendorID));
+        debug(QString::number((info.productID)));
+        if (info.vendorID == USB_ST_VID && info.productID == USB_STM32F4_PID)
+        {
+            return info.portName;
+        }
+    }
+    return QString("");
+}
+
+bool isAithonCDC()
+{
+    return _port->portName() == getCOMPort();
 }
 
 
@@ -204,6 +225,36 @@ bool doSync(int attempts = SYNC_RETRIES)
     return false;
 }
 
+state_t resetChip()
+{
+    if (isAithonCDC())
+    {
+        // set both rts and dtr to signal a software reset of the board
+        _port->setRts(true);
+        _port->setDtr(true);
+        debug("Reset board.");
+
+        // reopen the port
+        QString port = _port->portName();
+        _port->close();
+        delete _port;
+        debug("Deleted port.");
+        SLEEP(1000);
+        _port = new QextSerialPort(port);
+        _port->setBaudRate(BAUD115200);
+        _port->setTimeout(5000);
+        if (!_port->open(QextSerialPort::ReadWrite))
+            error("Could not open serial port.");
+        debug("Opened port.");
+    }
+    else
+    {
+        SLEEP(1000);
+        return FSM_RESET;
+    }
+    return FSM_SYNC;
+}
+
 state_t initChip()
 {
     if (doSync())
@@ -216,11 +267,6 @@ state_t eraseFlash()
 {
     // send command
     writeByte(ERASE_FLASH);
-
-    // wait for ACK of command
-    waitForACK();
-    debugPrintError("ERASE_FLASH");
-    CHECK_FOR_ERROR(FSM_ERASE_FLASH);
 
     // wait for ACK signaling that we're done erasing the flash
     waitForACK(FLASH_TIMEOUT);
@@ -334,8 +380,8 @@ state_t startProgram()
 
 void doProgramFSM()
 {
-    state_t state = FSM_INIT;
-    state_t nextState = FSM_INIT;
+    state_t state = FSM_RESET;
+    state_t nextState = FSM_RESET;
     int packetNum = 0;
     int retries = MAX_RETRIES;
 
@@ -343,7 +389,13 @@ void doProgramFSM()
     {
         switch (state)
         {
-        case FSM_INIT:
+        case FSM_RESET:
+            std::cout << "Resetting Aithon...\t\t   ";
+            nextState = resetChip();
+            if (nextState != state)
+                std::cout << "\b\b\bDone\n";
+            break;
+        case FSM_SYNC:
             std::cout << "\rSyncing with Aithon...\t\t   ";
             nextState = initChip();
             if (nextState != state)
@@ -391,28 +443,17 @@ void doProgramFSM()
             {
                 error("No more retries!");
             }
-            // Best effort attempt to resync.
-            doSync(1);
+            if (state != FSM_RESET)
+            {
+                // Best effort attempt to resync.
+                doSync(1);
+            }
         }
         else
         {
             retries = MAX_RETRIES;
         }
     }
-}
-
-QString getCOMPort()
-{
-    foreach (QextPortInfo info, QextSerialEnumerator::getPorts())
-    {
-        debug(QString(info.vendorID));
-        debug(QString(info.productID));
-        if (info.vendorID == USB_ST_VID && info.productID == USB_STM32F4_PID)
-        {
-            return info.portName;
-        }
-    }
-    return QString("");
 }
 
 void displayUsage()
