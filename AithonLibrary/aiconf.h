@@ -15,10 +15,6 @@
 #define AI_USE_SERVOS                  FALSE
 #endif
 
-#if !defined(AI_USE_USB_CDC) || defined(__DOXYGEN__)
-#define AI_USE_USB_CDC                 TRUE
-#endif
-
 #if !defined(AI_USE_MUSIC) || defined(__DOXYGEN__)
 #define AI_USE_MUSIC                   FALSE
 #endif

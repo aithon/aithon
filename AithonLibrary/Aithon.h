@@ -6,14 +6,13 @@
 #include "hal.h"
 #include "music.h"
 #include "aiconf.h"
+#include "serial_usb.h"
+#include "aithon_private.h"
 
 #if AI_USE_LCD
 #include "chprintf.h"
 #endif
 
-#if AI_USE_USB_CDC
-#include "usb_cdc.h"
-#endif
 
 
 // general Aithon functions / definitions
@@ -117,13 +116,12 @@ void aiMusicPlayNotesAsync(MusicNote *notes, int numNotes);
 #endif
 
 
-#if AI_USE_USB_CDC
 // USB device - virtual COM port functions / definitions
 extern SerialUSBDriver SDU1;
 void aiUSBCDCInit(void);
+void aiUSBCDCUninit(void);
 #define aiUSBCDCGet() chSequentialStreamGet(&SDU1)
 #define aiUSBCDCPut(b) chSequentialStreamPut(&SDU1, b)
 #define aiUSBCDCPrintf(fmt, ...) chprintf((BaseSequentialStream *)&SDU1, fmt, ##__VA_ARGS__)
-#endif
 
 #endif

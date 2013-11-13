@@ -1,6 +1,13 @@
 #include "Aithon.h"
 
-#if AI_USE_USB_CDC
+/*
+ * Endpoints to be used for USBD1.
+ */
+#define USBD1_DATA_REQUEST_EP           1
+#define USBD1_DATA_AVAILABLE_EP         1
+#define USBD1_INTERRUPT_REQUEST_EP      2
+
+SerialUSBDriver SDU1;
 
 /*
  * USB Device Descriptor.
@@ -78,7 +85,7 @@ static const uint8_t vcom_configuration_descriptor_data[67] = {
   USB_DESC_BYTE         (0x01),         /* bSlaveInterface0 (Data Class
                                            Interface).                      */
   /* Endpoint 2 Descriptor.*/
-  USB_DESC_ENDPOINT     (USB_CDC_INTERRUPT_REQUEST_EP|0x80,
+  USB_DESC_ENDPOINT     (USBD1_INTERRUPT_REQUEST_EP|0x80,
                          0x03,          /* bmAttributes (Interrupt).        */
                          0x0008,        /* wMaxPacketSize.                  */
                          0xFF),         /* bInterval.                       */
@@ -94,12 +101,12 @@ static const uint8_t vcom_configuration_descriptor_data[67] = {
                                            4.7).                            */
                          0x00),         /* iInterface.                      */
   /* Endpoint 3 Descriptor.*/
-  USB_DESC_ENDPOINT     (USB_CDC_DATA_AVAILABLE_EP,     /* bEndpointAddress.*/
+  USB_DESC_ENDPOINT     (USBD1_DATA_AVAILABLE_EP,       /* bEndpointAddress.*/
                          0x02,          /* bmAttributes (Bulk).             */
                          0x0040,        /* wMaxPacketSize.                  */
                          0x00),         /* bInterval.                       */
   /* Endpoint 1 Descriptor.*/
-  USB_DESC_ENDPOINT     (USB_CDC_DATA_REQUEST_EP|0x80,  /* bEndpointAddress.*/
+  USB_DESC_ENDPOINT     (USBD1_DATA_REQUEST_EP|0x80,    /* bEndpointAddress.*/
                          0x02,          /* bmAttributes (Bulk).             */
                          0x0040,        /* wMaxPacketSize.                  */
                          0x00)          /* bInterval.                       */
@@ -240,34 +247,51 @@ static const USBEndpointConfig ep2config = {
  * Handles the USB driver global events.
  */
 static void usb_event(USBDriver *usbp, usbevent_t event) {
+	switch (event) {
+	case USB_EVENT_CONFIGURED:
+		chSysLockFromIsr();
 
-  switch (event) {
-  case USB_EVENT_RESET:
-    return;
-  case USB_EVENT_ADDRESS:
-    return;
-  case USB_EVENT_CONFIGURED:
-    chSysLockFromIsr();
+		/* Enables the endpoints specified into the configuration.
+		Note, this callback is invoked from an ISR so I-Class functions
+		must be used.*/
+		usbInitEndpointI(usbp, USBD1_DATA_REQUEST_EP, &ep1config);
+		usbInitEndpointI(usbp, USBD1_INTERRUPT_REQUEST_EP, &ep2config);
 
-    /* Enables the endpoints specified into the configuration.
-       Note, this callback is invoked from an ISR so I-Class functions
-       must be used.*/
-    usbInitEndpointI(usbp, USB_CDC_DATA_REQUEST_EP, &ep1config);
-    usbInitEndpointI(usbp, USB_CDC_INTERRUPT_REQUEST_EP, &ep2config);
+		/* Resetting the state of the CDC subsystem.*/
+		sduConfigureHookI(&SDU1);
 
-    /* Resetting the state of the CDC subsystem.*/
-    sduConfigureHookI(usbp);
+		chSysUnlockFromIsr();
+		return;
+	case USB_EVENT_RESET:
+	case USB_EVENT_ADDRESS:
+	case USB_EVENT_SUSPEND:
+	case USB_EVENT_WAKEUP:
+	case USB_EVENT_STALLED:
+		return;
+	}
+	return;
+}
 
-    chSysUnlockFromIsr();
-    return;
-  case USB_EVENT_SUSPEND:
-    return;
-  case USB_EVENT_WAKEUP:
-    return;
-  case USB_EVENT_STALLED:
-    return;
-  }
-  return;
+/*
+ * Serial over USB driver configuration.
+ */
+const SerialUSBConfig serusbcfg = {
+  &USBD1,
+  USBD1_DATA_REQUEST_EP,
+  USBD1_DATA_AVAILABLE_EP,
+  USBD1_INTERRUPT_REQUEST_EP
+};
+
+static bool_t ai_request_hook(USBDriver *usbp) {
+	if (((usbp->setup[0] & USB_RTYPE_TYPE_MASK) == USB_RTYPE_TYPE_CLASS) &&
+		(usbp->setup[1] == CDC_SET_CONTROL_LINE_STATE) &&
+		((usbp->setup[2] & 0x3) == 0x3)) {
+		// The uploader program will set both the RTS and DTR bits to tell
+		// the board to reset in order to be programmed.
+		aiUSBCDCUninit();
+      _aiResetToBootloader();
+	}
+	return sduRequestsHook(usbp);
 }
 
 /*
@@ -276,18 +300,9 @@ static void usb_event(USBDriver *usbp, usbevent_t event) {
 const USBConfig usbcfg = {
   usb_event,
   get_descriptor,
-  sduRequestsHook,
+  ai_request_hook,
   NULL
 };
-
-/*
- * Serial over USB driver configuration.
- */
-const SerialUSBConfig serusbcfg = {
-  &USBD1
-};
-
-SerialUSBDriver SDU1;
 
 void aiUSBCDCInit(void)
 {
@@ -299,4 +314,9 @@ void aiUSBCDCInit(void)
    usbConnectBus(serusbcfg.usbp);
 }
 
-#endif
+void aiUSBCDCUninit(void)
+{
+	usbDisconnectBus(serusbcfg.usbp);
+	sduStop(&SDU1);
+	usbStop(serusbcfg.usbp);
+}
