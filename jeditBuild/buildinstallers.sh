@@ -6,6 +6,7 @@ svn co -r 23300 https://jedit.svn.sourceforge.net/svnroot/jedit/jEdit/branches/5
 
 cd jedit_temp
 cp -r ../../AithonLibrary .
+cp -r ../../ProjectTemplate .
 #set +e #continue even with error
 ant dist
 cp ../../aithon_plugin/jars/Aithon.jar ./lib/default-plugins

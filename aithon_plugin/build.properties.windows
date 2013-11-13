@@ -10,7 +10,7 @@
 
 # jEdit install directory
 #jedit.install.dir=/Users/jseng/Desktop/jEdit.app/Contents/Resources/Java
-jedit.install.dir="C:\\jEdit"
+jedit.install.dir=C:\\jEdit
 
 # location where your jars are installed
 install.dir=${jedit.install.dir}/jars
@@ -21,11 +21,11 @@ install.dir=${jedit.install.dir}/jars
 #   <pathelement location="${jedit.plugins.dir}/ErrorList.jar" />
 # </path>
 #jedit.plugins.dir=/Users/jseng/Library/jEdit/jars
-jedit.plugins.dir="C:\\jEdit\\jars"
+jedit.plugins.dir=C:\\jEdit\\jars
 
 # Location to find built jars (for dependencies)
 #jedit.jars.dir=/Users/jseng/Library/jEdit/jars
-jedit.jars.dir="C:\\jEdit\\jars"
+jedit.jars.dir=C:\\jEdit\\jars
 
 # User settings directory
 jedit.user.home=${user.home}/.jedit
