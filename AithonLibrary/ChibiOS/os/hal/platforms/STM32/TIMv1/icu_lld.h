@@ -1,21 +1,17 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
-                 2011,2012 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2006-2013 Giovanni Di Sirio
 
-    This file is part of ChibiOS/RT.
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
 
-    ChibiOS/RT is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 3 of the License, or
-    (at your option) any later version.
+        http://www.apache.org/licenses/LICENSE-2.0
 
-    ChibiOS/RT is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
 */
 
 /**
@@ -28,6 +24,8 @@
 
 #ifndef _ICU_LLD_H_
 #define _ICU_LLD_H_
+
+#include "stm32_tim.h"
 
 #if HAL_USE_ICU || defined(__DOXYGEN__)
 
@@ -98,6 +96,15 @@
 #endif
 
 /**
+ * @brief   ICUD9 driver enable switch.
+ * @details If set to @p TRUE the support for ICUD9 is included.
+ * @note    The default is @p TRUE.
+ */
+#if !defined(STM32_ICU_USE_TIM9) || defined(__DOXYGEN__)
+#define STM32_ICU_USE_TIM9                  FALSE
+#endif
+
+/**
  * @brief   ICUD1 interrupt priority level setting.
  */
 #if !defined(STM32_ICU_TIM1_IRQ_PRIORITY) || defined(__DOXYGEN__)
@@ -138,6 +145,13 @@
 #if !defined(STM32_ICU_TIM8_IRQ_PRIORITY) || defined(__DOXYGEN__)
 #define STM32_ICU_TIM8_IRQ_PRIORITY         7
 #endif
+
+/**
+ * @brief   ICUD9 interrupt priority level setting.
+ */
+#if !defined(STM32_ICU_TIM9_IRQ_PRIORITY) || defined(__DOXYGEN__)
+#define STM32_ICU_TIM9_IRQ_PRIORITY         7
+#endif
 /** @} */
 
 /*===========================================================================*/
@@ -168,9 +182,14 @@
 #error "TIM8 not present in the selected device"
 #endif
 
+#if STM32_ICU_USE_TIM9 && !STM32_HAS_TIM9
+#error "TIM9 not present in the selected device"
+#endif
+
 #if !STM32_ICU_USE_TIM1 && !STM32_ICU_USE_TIM2 &&                           \
     !STM32_ICU_USE_TIM3 && !STM32_ICU_USE_TIM4 &&                           \
-    !STM32_ICU_USE_TIM5 && !STM32_ICU_USE_TIM8
+    !STM32_ICU_USE_TIM5 && !STM32_ICU_USE_TIM8 &&                           \
+    !STM32_ICU_USE_TIM9
 #error "ICU driver activated but no TIM peripheral assigned"
 #endif
 
@@ -204,6 +223,11 @@
 #error "Invalid IRQ priority assigned to TIM8"
 #endif
 
+#if STM32_ICU_USE_TIM9 &&                                                   \
+    !CORTEX_IS_VALID_KERNEL_PRIORITY(STM32_ICU_TIM9_IRQ_PRIORITY)
+#error "Invalid IRQ priority assigned to TIM9"
+#endif
+
 /*===========================================================================*/
 /* Driver data structures and types.                                         */
 /*===========================================================================*/
@@ -222,7 +246,7 @@ typedef enum {
 typedef uint32_t icufreq_t;
 
 /**
- * @brief   ICU channel.
+ * @brief   ICU channel type.
  */
 typedef enum {
   ICU_CHANNEL_1 = 0,              /**< Use TIMxCH1.      */
@@ -267,6 +291,12 @@ typedef struct {
    * @note    Only inputs TIMx 1 and 2 are supported.
    */
   icuchannel_t              channel;
+  /**
+   * @brief TIM DIER register initialization data.
+   * @note  The value of this field should normally be equal to zero.
+   * @note  Only the DMA-related bits can be specified in this field.
+   */
+  uint32_t                  dier;
 } ICUConfig;
 
 /**
@@ -357,6 +387,10 @@ extern ICUDriver ICUD5;
 
 #if STM32_ICU_USE_TIM8 && !defined(__DOXYGEN__)
 extern ICUDriver ICUD8;
+#endif
+
+#if STM32_ICU_USE_TIM9 && !defined(__DOXYGEN__)
+extern ICUDriver ICUD9;
 #endif
 
 #ifdef __cplusplus

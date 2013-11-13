@@ -1,7 +1,12 @@
 # ARM Cortex-Mx common makefile scripts and rules.
 
 # Output directory and files
-BUILDDIR = build
+ifeq ($(BUILDDIR),)
+  BUILDDIR = build
+endif
+ifeq ($(BUILDDIR),.)
+  BUILDDIR = build
+endif
 OUTFILES = $(BUILDDIR)/$(PROJECT).elf $(BUILDDIR)/$(PROJECT).hex \
            $(BUILDDIR)/$(PROJECT).bin $(BUILDDIR)/$(PROJECT).dmp
 
@@ -119,7 +124,7 @@ ifeq ($(USE_VERBOSE_COMPILE),yes)
 	@echo
 	$(CPPC) -c $(CPPFLAGS) $(AOPT) -I. $(IINCDIR) $< -o $@
 else
-	@echo Compiling $<
+	@echo Compiling $(<F)
 	@$(CPPC) -c $(CPPFLAGS) $(AOPT) -I. $(IINCDIR) $< -o $@
 endif
 
@@ -128,7 +133,7 @@ ifeq ($(USE_VERBOSE_COMPILE),yes)
 	@echo
 	$(CPPC) -c $(CPPFLAGS) $(TOPT) -I. $(IINCDIR) $< -o $@
 else
-	@echo Compiling $<
+	@echo Compiling $(<F)
 	@$(CPPC) -c $(CPPFLAGS) $(TOPT) -I. $(IINCDIR) $< -o $@
 endif
 
@@ -137,7 +142,7 @@ ifeq ($(USE_VERBOSE_COMPILE),yes)
 	@echo
 	$(CC) -c $(CFLAGS) $(AOPT) -I. $(IINCDIR) $< -o $@
 else
-	@echo Compiling $<
+	@echo Compiling $(<F)
 	@$(CC) -c $(CFLAGS) $(AOPT) -I. $(IINCDIR) $< -o $@
 endif
 
@@ -146,7 +151,7 @@ ifeq ($(USE_VERBOSE_COMPILE),yes)
 	@echo
 	$(CC) -c $(CFLAGS) $(TOPT) -I. $(IINCDIR) $< -o $@
 else
-	@echo Compiling $<
+	@echo Compiling $(<F)
 	@$(CC) -c $(CFLAGS) $(TOPT) -I. $(IINCDIR) $< -o $@
 endif
 
@@ -155,7 +160,7 @@ ifeq ($(USE_VERBOSE_COMPILE),yes)
 	@echo
 	$(AS) -c $(ASFLAGS) -I. $(IINCDIR) $< -o $@
 else
-	@echo Compiling $<
+	@echo Compiling $(<F)
 	@$(AS) -c $(ASFLAGS) -I. $(IINCDIR) $< -o $@
 endif
 
@@ -164,7 +169,7 @@ ifeq ($(USE_VERBOSE_COMPILE),yes)
 	@echo 
 	$(CC) -c $(ASXFLAGS) $(TOPT) -I. $(IINCDIR) $< -o $@
 else
-	@echo Compiling $<
+	@echo Compiling $(<F)
 	@$(CC) -c $(ASXFLAGS) $(TOPT) -I. $(IINCDIR) $< -o $@
 endif
 
@@ -191,7 +196,6 @@ ifeq ($(USE_VERBOSE_COMPILE),yes)
 else
 	@echo Creating $@
 	@$(BIN) $< $@
-	@echo
 endif
 
 %.dmp: %.elf $(LDSCRIPT)
@@ -201,17 +205,12 @@ else
 	@echo Creating $@
 	@$(OD) $(ODFLAGS) $< > $@
 	@echo Done
-	@echo
 endif
 
 clean:
 	@echo Cleaning
 	-rm -fR .dep $(BUILDDIR)
 	@echo Done
-	
-program: $(BUILDDIR)/$(PROJECT).bin
-	@echo Programming...
-	@$(AITHON_LIBRARY)/Programmer/AithonProgrammer.exe program $(BUILDDIR)/$(PROJECT).bin $(COM_PORT)
 
 #
 # Include the dependency files, should be the last of the makefile
