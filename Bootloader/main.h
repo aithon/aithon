@@ -2,8 +2,8 @@
 #include "flash_if.h"
 
 // general constants
-#define PACKET_LEN      4096
-#define BOOT_TIMEOUT    30000
+#define PACKET_LEN      1024
+#define BOOT_TIMEOUT    5000
 #define DEFAULT_TIMEOUT 100
 
 // control characters
@@ -21,8 +21,8 @@
 typedef void (*funcPtr)(void);
 
 // all the interfaces that programming is supported over
-#define NUM_INTERFACES  2
-SerialDriver *_interfaces[NUM_INTERFACES] = {&SD1, &SD2};
+#define NUM_INTERFACES  3
+SerialDriver *_interfaces[NUM_INTERFACES] = {&SD1, &SD2, (SerialDriver *)&SDU1};
 SerialDriver *_interface;
 
 uint8_t _buffer[PACKET_LEN];

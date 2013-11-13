@@ -77,6 +77,7 @@ CSRC = $(PORTSRC) \
        $(CHIBIOS)/os/various/chprintf.c \
        $(AITHON_LIBRARY)/Board/board.c \
        $(AITHON_LIBRARY)/Aithon.c \
+       $(AITHON_LIBRARY)/aithon_private.c \
        $(AITHON_LIBRARY)/usbCDC.c \
        $(AITHON_LIBRARY)/lcd.c \
        $(USER_SRC_FILES)
