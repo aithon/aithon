@@ -1,7 +1,5 @@
-TOP ?= $(pwd)
-
 # List of all the board related files.
-BOARDSRC = $(BOARD_INC_DIR)/board.c
+BOARDSRC = ${AITHON_LIBRARY}/Board/board.c
 
 # Required include directories
-BOARDINC = $(BOARD_INC_DIR)/
+BOARDINC = ${AITHON_LIBRARY}/Board/
