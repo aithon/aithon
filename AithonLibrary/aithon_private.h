@@ -3,6 +3,12 @@
 
 // Private Aithon functions / definitions
 
+
+void _aiPrivateInit(void);
+
+// Used for resetting the board for programming over UART
+#define _AI_RESET_CMD 0xA5
+
 // We use the last byte of the backup SRAM to store temporary data across a software reset
 // for the bootloader. The bits are used for:
 // 0 		- 	Reserved

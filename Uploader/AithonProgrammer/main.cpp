@@ -249,8 +249,8 @@ state_t resetChip()
     }
     else
     {
-        SLEEP(1000);
-        return FSM_RESET;
+        // it's probably going to one of the UARTs so use SYNC bytes to reset
+        debug("Skipping reset for UART.");
     }
     return FSM_SYNC;
 }

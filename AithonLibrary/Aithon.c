@@ -48,6 +48,8 @@ void aiInit(void)
 
    sdStart(&SD1, NULL);
    sdStart(&SD2, NULL);
+
+   _aiPrivateInit();
 }
 
 

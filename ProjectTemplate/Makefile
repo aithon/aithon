@@ -1,6 +1,3 @@
-# Specify the COM port for programming
-COM_PORT = COM5
-
 # Path to Aithon library
 AITHON_LIBRARY = ../AithonLibrary
 
