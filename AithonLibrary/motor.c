@@ -48,7 +48,8 @@ static const PWMConfig pwmcfg1 = {
 		{PWM_OUTPUT_DISABLED, NULL},
 		{PWM_OUTPUT_DISABLED, NULL},
 	},
-	0
+	0,
+   0
 };
 
 void aiMotorInit(void)

@@ -19,6 +19,7 @@ static PWMConfig pwmcfg2 = {
 		{PWM_OUTPUT_DISABLED, NULL},
 		{PWM_OUTPUT_DISABLED, NULL},
 	},
+	0,
 	0
 };
 
