@@ -7,7 +7,7 @@ int main(void)
    aiInit();
    
    // print something to the LCD screen
-   aiLCDPrintf("Aithon 1.0\nCP Robotics Club");
+   aiLCDPrintf("Aithon Board");
    
    // start with led 1 on
    aiLEDOn(0);
