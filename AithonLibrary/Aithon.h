@@ -4,6 +4,10 @@
 // ChibiOS includes
 #include "ch.h"
 #include "hal.h"
+
+#include <string.h>
+#include "ff.h"
+
 #include "music.h"
 #include "aiconf.h"
 #include "serial_usb.h"
@@ -123,5 +127,10 @@ void aiUSBCDCUninit(void);
 #define aiUSBCDCGet() chSequentialStreamGet(&SDU1)
 #define aiUSBCDCPut(b) chSequentialStreamPut(&SDU1, b)
 #define aiUSBCDCPrintf(fmt, ...) chprintf((BaseSequentialStream *)&SDU1, fmt, ##__VA_ARGS__)
+
+
+// microSD functions / definitions
+extern FATFS sdFS;
+bool_t aiSDInit(void);
 
 #endif

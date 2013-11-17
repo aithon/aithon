@@ -71,6 +71,7 @@ include $(CHIBIOS)/os/hal/hal.mk
 include $(CHIBIOS)/os/ports/GCC/ARMCMx/STM32F4xx/port.mk
 include $(CHIBIOS)/os/kernel/kernel.mk
 include $(AITHON_LIBRARY)/Board/Board.mk
+include $(CHIBIOS)/os/various/fatfs_bindings/fatfs.mk
 
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
@@ -79,7 +80,8 @@ CSRC = $(PORTSRC) \
        $(KERNSRC) \
        $(HALSRC) \
        $(PLATFORMSRC) \
-		 $(BOARDSRC) \
+       $(BOARDSRC) \
+       $(FATFSSRC) \
        $(CHIBIOS)/os/various/chprintf.c \
        $(wildcard $(AITHON_LIBRARY)/*.c) \
        $(USERSRC)
@@ -114,10 +116,11 @@ ASMSRC = $(PORTASM)
 INCDIR = $(PORTINC) $(KERNINC) \
          $(HALINC) $(PLATFORMINC) \
          $(BOARDINC) \
+         $(FATFSINC) \
          $(CHIBIOS)/os/various/ \
          $(AITHON_LIBRARY)/ChibiOS/ \
          $(AITHON_LIBRARY)/ \
-			$(USERINC)
+         $(USERINC)
 
 #
 # Project, sources and paths
