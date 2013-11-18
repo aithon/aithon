@@ -33,6 +33,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JLabel;
 import javax.swing.ImageIcon;
 
+import org.gjt.sp.jedit.Buffer;
 import org.gjt.sp.jedit.EBComponent;
 import org.gjt.sp.jedit.EBMessage;
 import org.gjt.sp.jedit.EditBus;
@@ -171,13 +172,14 @@ implements ActionListener, EBComponent, AithonActions,
 
   //invoked when the buttons are clicked
   public void actionPerformed(ActionEvent evt) {
+    Buffer curr_buffer = jEdit.getLastBuffer();
     Process compile;
     String line, path;
     //Location of makefile and main.c - make general with working directory somehow
-    path = jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "library-filepath") + "\\..\\ProjectTemplate\\";
-    //File dir = new File("C:\\Users\\Justine Dunham\\Documents\\GitHub\\aithon\\ProjectTemplate");
+    //path = jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "library-filepath") + "\\..\\ProjectTemplate\\";
+    File dir = new File("C:\\Users\\Justine Dunham\\Documents\\GitHub\\aithon\\ProjectTemplate");
     //File dir = new File("/Users/jseng/Desktop/jEdit.app/Contents/Resources/Java/ProjectTemplate");
-    File dir = new File(path);
+    //File dir = new File(path);    
     Object src = evt.getSource();
     
     if (src == uploadButton) { //check if upload clicked
@@ -190,10 +192,10 @@ implements ActionListener, EBComponent, AithonActions,
     } else if (src == detectButton) { //check if detect clicked
       
       //Using for testing - resets directory properties
-      console_area.append("Unset properties:\n");
-      jEdit.unsetProperty(AithonPlugin.OPTION_PREFIX + "gcc-filepath");
-      jEdit.unsetProperty(AithonPlugin.OPTION_PREFIX + "library-filepath");
-      jEdit.unsetProperty(AithonPlugin.OPTION_PREFIX + "programmer-filepath");
+      console_area.append("Current directory: " + curr_buffer.getDirectory() + "\n");
+      //jEdit.unsetProperty(AithonPlugin.OPTION_PREFIX + "gcc-filepath");
+      //jEdit.unsetProperty(AithonPlugin.OPTION_PREFIX + "library-filepath");
+      //jEdit.unsetProperty(AithonPlugin.OPTION_PREFIX + "programmer-filepath");
       //scroll the area
       console_area.setCaretPosition (console_area.getDocument().getLength());
     } else if (src == compileButton) { //check if compile clicked
@@ -201,10 +203,15 @@ implements ActionListener, EBComponent, AithonActions,
       	//Path environment variables - required for mac/linux, use null for windows
         //String env[] = {"PATH=/usr/bin:/bin:/usr/sbin:/Users/jseng/gccarm/bin"};
         String env[] = null;
-      	compile = r.exec("make", env, dir);
+        String user_src = "USERFOLDER=\"" + curr_buffer.getDirectory().replace(" ", "\\s") + "\"";
+        //String user_src = "USERFOLDER=\"" + curr_buffer.getDirectory() + "\"";
+        //String user_src = "USERSRC=\"" + curr_buffer.getDirectory().replace(" ", "\\s") + "$(wildcard\\s*.c)\"";
+        //String user_src = "USERSRC=\"C:\\Users\\Justine Dunham\\Documents\\GitHub\\aithon\\aithon_plugin\\main.c\"";
+        String make_cmd[] = {"make", user_src};
+        console_area.append(user_src);
+      	compile = r.exec(make_cmd, env, dir);
       	inputStreamToOutputStream(compile.getInputStream());
       	inputStreamToOutputStream(compile.getErrorStream());
-        
         //scroll the area
         console_area.setCaretPosition (console_area.getDocument().getLength());
       } catch (IOException e) {

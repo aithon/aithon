@@ -2,7 +2,8 @@
 AITHON_LIBRARY = ../AithonLibrary
 
 # User source files
-USERSRC = $(wildcard *.c)
+USERFOLDER = ./
+USERSRC = $(USERFOLDER)/$(wildcard *.c)
 
 # User include paths
 USERINC = ./
