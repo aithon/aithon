@@ -10,8 +10,6 @@
  * @{
  */
 
-#if AI_USE_ANALOG || defined(__DOXYGEN__)
-
 /**
  * @brief   How many ADC channels are in use
  * @note    This should not be changed unless all impacted code is
@@ -105,7 +103,5 @@ uint16_t aiAnalogInput(AnalogPin pin)
    }
    return (uint16_t) (total/NUM_SAMPLES);
 }
-
-#endif
 
 /** @} */

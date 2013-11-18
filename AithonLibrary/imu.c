@@ -1,7 +1,5 @@
 #include "Aithon.h"
 
-#if AI_USE_IMU || defined(__DOXYGEN__)
-
 #define ACCEL_ADDR   0b00011001
 #define GYRO_ADDR    0b01101010
 #define CTRL_REG1    0x20
@@ -80,5 +78,3 @@ int8_t aiIMUGetTemp(void)
 {
    return (int8_t) imuReadReg(GYRO, OUT_TEMP_G);
 }
-
-#endif

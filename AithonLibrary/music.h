@@ -1,10 +1,6 @@
 #ifndef _MUSIC_H
 #define _MUSIC_H
 
-#include "aiconf.h"
-
-#if AI_USE_MUSIC
-
 typedef struct
 {
 	uint16_t frequency;
@@ -183,7 +179,5 @@ typedef enum
                                {G3, 500}, {E3, 375}, {G3, 125}, {B3, 1000}}
 
 #define BUZZER_DEMO           (MusicNote[]) {{G5, 167}, {D5, 167}, {C5, 167}, {E5, 167}, {G4, 167}, {E4, 167}}
-
-#endif
 
 #endif

@@ -6,6 +6,8 @@ ifndef AITHON_LIBRARY
 $(error Aithon library path was not specified.)
 endif
 
+MAKEFLAGS += -j
+
 
 ##############################################################################
 # Build global options

@@ -1,7 +1,5 @@
 #include "Aithon.h"
 
-#if AI_USE_MOTORS
-
 volatile int count = 0;
 volatile int values[2] = {0, 0};
 volatile int braking[2] = {0, 0};
@@ -101,5 +99,3 @@ float aiMotorCurrent(int num)
       
    return -1;
 }
-
-#endif

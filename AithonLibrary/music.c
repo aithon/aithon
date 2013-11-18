@@ -1,7 +1,5 @@
 #include "Aithon.h"
 
-#if AI_USE_MUSIC
-
 #define TICKS_PER_SECOND 1000000
 
 Mutex buzzer;
@@ -89,5 +87,3 @@ void aiMusicInit(void)
    chMtxInit(&buzzer);
    asyncMusicThread = chThdCreateStatic(waMusicThread, sizeof(waMusicThread), HIGHPRIO, MusicThread, NULL);
 }
-
-#endif

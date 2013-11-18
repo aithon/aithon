@@ -40,7 +40,7 @@
 #define _CHCONF_H_
 
 #ifdef USE_IAP
-#define CORTEX_VTOR_INIT 0x00008000
+#define CORTEX_VTOR_INIT 0x00010000
 #endif
 
 /*===========================================================================*/

@@ -1,7 +1,5 @@
 #include "Aithon.h"
 
-#if AI_USE_LCD
-
 #define HOME         0x80
 #define SECOND_LINE  0XC0
 
@@ -138,5 +136,3 @@ void aiLCDBottomLine()
 {
 	writeControl(SECOND_LINE);
 }
-
-#endif

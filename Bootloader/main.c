@@ -3,7 +3,6 @@
 void sendByte(uint8_t byte)
 {
    sdPut(_interface, byte);
-   // while (chOQGetFullI(&(_interface->oqueue)) > 0) chThdSleepMilliseconds(5);
 }
 
 int getByte(void)
@@ -129,23 +128,23 @@ void updateProgram(void)
 
 int main(void)
 {
+   aiInit();
+   
    bool_t isUserRun = FALSE;
-   halInit();
-   _aiBKSRAMInit();
+   uint16_t bootByte;
+   _aiEEReadReserved(_AI_EE_RES_ADDR_BOOT, &bootByte);
    if (aiGetButton(0) && aiGetButton(1))
    {
       // Both buttons are pressed so the user
       // wants to run the bootloader.
       isUserRun = TRUE;
    }
-   else if ((_AI_RESERVED_BYTE & 0x02) == 0)
+   else if (bootByte != _AI_EE_RES_VAL_BOOT_RUN)
    {
       startProgram();
    }
-   _AI_RESERVED_BYTE &= ~0x02; // clear bootloader bit
+   _aiEEWriteReserved(_AI_EE_RES_ADDR_BOOT, _AI_EE_RES_VAL_DEfAULT);
 
-   chSysInit();
-   aiInit();
    aiLEDOn(0);
    aiLEDOn(1);
 

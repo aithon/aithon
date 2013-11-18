@@ -1,7 +1,5 @@
 #include "Aithon.h"
 
-#if AI_USE_SERVOS
-
 static const PWMConfig pwmcfg4 = {
 	1000000,
 	20000,
@@ -65,5 +63,3 @@ void aiServoOutput(int pin, int position)
       pwmEnableChannel(&PWMD8, pin-4, (position+75)*10);
    }
 }
-
-#endif

@@ -4,19 +4,18 @@
 // ChibiOS includes
 #include "ch.h"
 #include "hal.h"
+#include "chprintf.h"
 
+// ext includes
 #include <string.h>
 #include "ff.h"
 
+// local includes
+#include "aithon_private.h"
 #include "music.h"
 #include "aiconf.h"
-#include "serial_usb.h"
-#include "aithon_private.h"
-
-#if AI_USE_LCD
-#include "chprintf.h"
-#endif
-
+#include "flash_if.h"
+#include "ee.h"
 
 
 // general Aithon functions / definitions
@@ -34,7 +33,6 @@ void aiButtonWait(int num);
 #define aiDelayUs(us) halPolledDelay(US2RTT(us)) // must use busy loops for <1ms delays
 
 
-#if AI_USE_LCD
 // LCD functions / definitions
 void aiLCDInit(void);
 void aiLCDClear(void);
@@ -43,10 +41,8 @@ void aiLCDBottomLine(void);
 extern BaseSequentialStream LCD;
 #define aiLCDPrintf(fmt, ...) chprintf(&LCD, fmt, ##__VA_ARGS__)
 void aiLCDPrintChar(const char data);
-#endif
 
 
-#if AI_USE_IMU
 // IMU functions / definitions
 typedef enum {
    ACCEL,
@@ -62,16 +58,13 @@ typedef struct {
 void aiIMUInit(void);
 IMUReading aiIMUGetReading(IMUDevice dev);
 int8_t aiIMUGetTemp(void);
-#endif
 
 
-#if AI_USE_MOTORS
 // motor functions / definitions
 void aiMotorInit(void);
 void aiMotorSet(int num, int power);
 void aiMotorBrake(int num, int power);
 float aiMotorCurrent(int num);
-#endif
 
 
 // digital pin functions / definitions
@@ -100,16 +93,13 @@ void aiAnalogInit(void);
 uint16_t aiAnalogInput(AnalogPin pin);
 
 
-#if AI_USE_SERVOS
 // servo pin funtions / definitions
 void aiServoInit(void);
 void aiServosOn(void);
 void aiServosOff(void);
 void aiServoOutput(int pin, int position);
-#endif
 
 
-#if AI_USE_MUSIC
 // music functions / definitions
 void aiMusicInit(void);
 void aiMusicPlayNote(MusicNote note);
@@ -117,7 +107,6 @@ void aiMusicPlayNotes(MusicNote *notes, int numNotes);
 void aiMusicPlayNotesAsync(MusicNote *notes, int numNotes);
 #define aiMusicPlaySong(song) aiMusicPlayNotes(song, sizeof(song)/sizeof(MusicNote))
 #define aiMusicPlaySongAsync(song) aiMusicPlayNotesAsync(song, sizeof(song)/sizeof(MusicNote))
-#endif
 
 
 // USB device - virtual COM port functions / definitions
@@ -132,5 +121,11 @@ void aiUSBCDCUninit(void);
 // microSD functions / definitions
 extern FATFS sdFS;
 bool_t aiSDInit(void);
+
+
+// emulated EEPROM functions
+uint16_t aiEEInit(void);
+uint16_t aiEERead(uint8_t virtAddr, uint16_t* data);
+uint16_t aiEEWrite(uint8_t virtAddr, uint16_t data);
 
 #endif

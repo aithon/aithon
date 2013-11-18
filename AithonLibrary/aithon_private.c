@@ -6,17 +6,10 @@
  */
 
 
-void _aiBKSRAMInit(void)
-{
-   RCC->AHB1ENR |= RCC_AHB1ENR_BKPSRAMEN;
-   PWR->CSR |= PWR_CSR_BRE;
-   while ((PWR->CSR & PWR_CSR_BRR) == 0);
-}
 
 void _aiResetToBootloader(void)
 {
-   _aiBKSRAMInit();
-   _AI_RESERVED_BYTE |= 0x02; // the bootloader should be run
+   _aiEEWriteReserved(_AI_EE_RES_ADDR_BOOT, _AI_EE_RES_VAL_BOOT_RUN);
    NVIC_SystemReset();
 }
 

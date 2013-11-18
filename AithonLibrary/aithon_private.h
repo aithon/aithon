@@ -6,16 +6,20 @@
 
 void _aiPrivateInit(void);
 
-// Used for resetting the board for programming over UART
-#define _AI_RESET_CMD 0xA5
 
-// We use the last byte of the backup SRAM to store temporary data across a software reset
-// for the bootloader. The bits are used for:
-// 0 		- 	Reserved
-// 1 		- 	Whether we should run the bootloader or not
-// 2-7	- 	Reserved
-#define _AI_RESERVED_BYTE (*((uint8_t *)((BKPSRAM_BASE+4095))))
-void _aiBKSRAMInit(void);
+// reserved EEPROM addresses
+#define _AI_EE_RES_ADDR_BOOT			0x00 // should bootloader run
+
+// reserved EEPROM values
+#define _AI_EE_RES_VAL_BOOT_RUN		0xABCD // bootloader should run
+#define _AI_EE_RES_VAL_DEfAULT		0x00 // default value
+
+
+#define _AI_RESET_CMD					0xA5 // reset command if programming over UART
+
+
 void _aiResetToBootloader(void);
+uint16_t _aiEEWriteReserved(uint8_t resAddr, uint16_t data);
+uint16_t _aiEEReadReserved(uint8_t resAddr, uint16_t *data);
 
 #endif

@@ -20,36 +20,28 @@ void aiInit(void)
    chSysInit();
 
    // initialize the various Aithon library functions
-#if AI_USE_LCD
-   aiLCDInit();
-#endif
-#if AI_USE_MOTORS
+#ifndef _AI_IS_BOOTLOADER
    aiMotorInit();
-#endif
-#if AI_USE_SERVOS
    aiServoInit();
-#endif
-#if AI_USE_MUSIC
    aiMusicInit();
-#endif
-#if AI_USE_IMU
    aiIMUInit();
-#endif
-#if AI_USE_ANALOG
    aiAnalogInit();
 #endif
-
-   // we always need USB CDC enabled for programming
+   aiLCDInit();
+   aiEEInit();
    aiUSBCDCInit();
 
    // setup LEDs as off
    aiLEDOff(0);
    aiLEDOff(1);
 
+   // setup serial drivers for UART1 and UART2
    sdStart(&SD1, NULL);
    sdStart(&SD2, NULL);
 
+#ifndef _AI_IS_BOOTLOADER
    _aiPrivateInit();
+#endif
 }
 
 
