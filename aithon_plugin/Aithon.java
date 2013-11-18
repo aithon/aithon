@@ -176,10 +176,10 @@ implements ActionListener, EBComponent, AithonActions,
     Process compile;
     String line, path;
     //Location of makefile and main.c - make general with working directory somehow
-    //path = jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "library-filepath") + "\\..\\ProjectTemplate\\";
-    File dir = new File("C:\\Users\\Justine Dunham\\Documents\\GitHub\\aithon\\ProjectTemplate");
+    path = jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "library-filepath") + "\\..\\ProjectTemplate\\";
+    //File dir = new File("C:\\Users\\Justine Dunham\\Documents\\GitHub\\aithon\\ProjectTemplate");
     //File dir = new File("/Users/jseng/Desktop/jEdit.app/Contents/Resources/Java/ProjectTemplate");
-    //File dir = new File(path);    
+    File dir = new File(path);    
     Object src = evt.getSource();
     
     if (src == uploadButton) { //check if upload clicked
