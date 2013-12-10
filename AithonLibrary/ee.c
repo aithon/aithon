@@ -174,7 +174,7 @@ uint16_t _pageTransfer(uint16_t VirtAddress, uint16_t Data)
       {
          /* In case variable corresponding to the virtual address was found */
          uint16_t val;
-         if (aiEERead(i, &val) != 1)
+         if (ee_get(i, &val) != 1)
          {
             /* Transfer the variable to the new active page */
             WRITE_VAR(i, val);
@@ -191,7 +191,7 @@ uint16_t _pageTransfer(uint16_t VirtAddress, uint16_t Data)
    return FLASH_COMPLETE;
 }
 
-uint16_t _init(void)
+uint16_t _ee_init(void)
 {
    FLASH_Unlock();
    // Initialize cached page state members
@@ -255,7 +255,7 @@ uint16_t _init(void)
             /* Read the last variables' updates */
             /* In case variable corresponding to the virtual address was found */
             uint16_t val;
-            if (aiEERead(i, &val) != 1)
+            if (ee_get(i, &val) != 1)
                WRITE_VAR(i, val); // Transfer the variable to the new page
          }
       }
@@ -315,44 +315,24 @@ uint16_t _write(uint16_t virtAddr, uint16_t data)
 // These function can be used interally by the Aithon library and bootloader
 // to access reserved EEPROM addresses and should never be called in any user
 // program.
-uint16_t _aiEEReadReserved(uint8_t resAddr, uint16_t *data)
+uint16_t _ee_getReserved(uint8_t resAddr, uint16_t *data)
 {
-   // FLASH_Unlock();
-   uint16_t status = _read((uint16_t)resAddr+USER_ADDRESSES, data);
-   // FLASH_Lock();
-   return status;
+   return _read((uint16_t)resAddr+USER_ADDRESSES, data);
 }
-uint16_t _aiEEWriteReserved(uint8_t resAddr, uint16_t data)
+uint16_t _ee_putReserved(uint8_t resAddr, uint16_t data)
 {
-   // FLASH_Unlock();
-   uint16_t status = _write((uint16_t)resAddr+USER_ADDRESSES, data);
-   // FLASH_Lock();
-   return status;
+   return _write((uint16_t)resAddr+USER_ADDRESSES, data);
 }
 
 
 // Public Exported EEPROM Functions
 
-uint16_t aiEEInit(void)
+uint16_t ee_get(uint8_t virtAddr, uint16_t *data)
 {
-   // FLASH_Unlock();
-   uint16_t status = _init();
-   // FLASH_Lock();
-   return status;
+   return _read(virtAddr, data);
 }
 
-uint16_t aiEERead(uint8_t virtAddr, uint16_t *data)
+uint16_t ee_put(uint8_t virtAddr, uint16_t data)
 {
-   // FLASH_Unlock();
-   uint16_t status =_read(virtAddr, data);
-   // FLASH_Lock();
-   return status;
-}
-
-uint16_t aiEEWrite(uint8_t virtAddr, uint16_t data)
-{
-   // FLASH_Unlock();
-   uint16_t status = _write(virtAddr, data);
-   // FLASH_Lock();
-   return status;
+   return _write(virtAddr, data);
 }

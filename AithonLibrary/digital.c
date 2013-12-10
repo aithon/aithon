@@ -58,7 +58,7 @@ int _pads[17] = {
  * @param[in] pin    Which digital pin to set the mode for (0-14).
  * @param[in] mode   The DigitalMode to configure this pin as.
  */
-void aiDigitalMode(int pin, DigitalMode mode)
+void digital_mode(int pin, DigitalMode mode)
 {
    palSetPadMode(_ports[pin], _pads[pin], mode);
 }
@@ -69,11 +69,11 @@ void aiDigitalMode(int pin, DigitalMode mode)
  * @note    The behavior is undefined if the pin is not configured as an input
  *          pin.
  *
- * @param[in] pin    Which digital pin to get the value of (0-14).
- * @retval PAL_LOW   The pin is in the low state.
- * @retval PAL_HIGH  The pin is in the high state.
+ * @param[in] pin          Which digital pin to get the value of (0-14).
+ * @retval DIGITAL_LOW     The pin is in the low state.
+ * @retval DIGITAL_HIGH    The pin is in the high state.
  */
-int aiDigitalIn(int pin)
+int digital_get(int pin)
 {
    return palReadPad(_ports[pin], _pads[pin]);
 }
@@ -85,9 +85,9 @@ int aiDigitalIn(int pin)
  *          pin.
  *
  * @param[in] pin    Which digital pin to get the value of (0-14).
- * @param[in] value  Which digital pin to get the value of (0-14).
+ * @param[in] value  DIGITAL_LOW (0) or DIGITAL_HIGH (1)
  */
-void aiDigitalOut(int pin, int value)
+void digital_set(int pin, int value)
 {
    palWritePad(_ports[pin], _pads[pin], value);
 }
@@ -100,7 +100,7 @@ void aiDigitalOut(int pin, int value)
  *
  * @param[in] pin    Which digital pin to toggle (0-14).
  */
-void aiDigitalToggle(int pin)
+void digital_toggle(int pin)
 {
    palTogglePad(_ports[pin], _pads[pin]);
 }

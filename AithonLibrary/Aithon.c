@@ -8,44 +8,6 @@
 
 
 /**
- * @brief   Aithon initialization.
- * @details This function initializes all Aithon libraries as well as ChibiOS.
- *          It should be called before any other code in your main function
- *          and should only be called once.
- */
-void aiInit(void)
-{
-   // initialize ChibiOS
-   halInit();
-   chSysInit();
-
-   // initialize the various Aithon library functions
-#ifndef _AI_IS_BOOTLOADER
-   aiMotorInit();
-   aiServoInit();
-   aiMusicInit();
-   aiIMUInit();
-   aiAnalogInit();
-#endif
-   aiLCDInit();
-   aiEEInit();
-   aiUSBCDCInit();
-
-   // setup LEDs as off
-   aiLEDOff(0);
-   aiLEDOff(1);
-
-   // setup serial drivers for UART1 and UART2
-   sdStart(&SD1, NULL);
-   sdStart(&SD2, NULL);
-
-#ifndef _AI_IS_BOOTLOADER
-   _aiPrivateInit();
-#endif
-}
-
-
-/**
  * @addtogroup LED
  * @brief   Functions for controlling the on-boad LEDs
  * @{
@@ -57,7 +19,7 @@ void aiInit(void)
  *
  * @param[in] num    Which LED to turn on. Either 0 or 1.
  */
-void aiLEDOn(int num)
+void led_on(int num)
 {
    if (num == 0)
    {
@@ -75,7 +37,7 @@ void aiLEDOn(int num)
  *
  * @param[in] num    Which LED to turn off. Either 0 or 1.
  */
-void aiLEDOff(int num)
+void led_off(int num)
 {
    if (num == 0)
    {
@@ -93,7 +55,7 @@ void aiLEDOff(int num)
  *
  * @param[in] num    Which LED to toggle. Either 0 or 1.
  */
-void aiLEDToggle(int num)
+void led_toggle(int num)
 {
    if (num == 0)
    {
@@ -114,7 +76,7 @@ void aiLEDToggle(int num)
  * @{
  */
 
-static const int buttons[2] = {GPIOD_BTN0, GPIOD_BTN1};
+static const int _buttons[2] = {GPIOD_BTN0, GPIOD_BTN1};
 
 
 /**
@@ -124,9 +86,17 @@ static const int buttons[2] = {GPIOD_BTN0, GPIOD_BTN1};
  * @retval TRUE      The button is pressed.
  * @retval FALSE     The button is not pressed.
  */
-bool_t aiGetButton(int num)
+bool_t button_get(int num)
 {
-   return !palReadPad(GPIOD, buttons[num]);
+   switch (num)
+   {
+   case 0:
+      return !palReadPad(GPIOD, GPIOD_BTN0);
+   case 1:
+      return !palReadPad(GPIOD, GPIOD_BTN1);
+   default:
+      return FALSE;
+   }
 }
 
 /**
@@ -134,15 +104,15 @@ bool_t aiGetButton(int num)
  *
  * @param[in] num    Which button to wait for. Either 0 or 1.
  */
-void aiButtonWait(int num)
+void button_wait(int num)
 {
    // wait for button to be pushed down
-   while (!aiGetButton(num))
+   while (!button_get(num))
       chThdSleepMilliseconds(1);
    // delay 30 ms for button debouncing
    chThdSleepMilliseconds(30);
    // wait for button to be released, if it is still down
-   while (aiGetButton(num))
+   while (button_get(num))
       chThdSleepMilliseconds(1);
    // delay 30 ms for button debouncing
    chThdSleepMilliseconds(30);

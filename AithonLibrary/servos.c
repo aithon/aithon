@@ -1,6 +1,6 @@
 #include "Aithon.h"
 
-static const PWMConfig pwmcfg4 = {
+static const PWMConfig _pwmcfg4 = {
 	1000000,
 	20000,
 	NULL,
@@ -14,7 +14,7 @@ static const PWMConfig pwmcfg4 = {
 	0
 };
 
-static const PWMConfig pwmcfg8 = {
+static const PWMConfig _pwmcfg8 = {
 	1000000,
 	20000,
 	NULL,
@@ -28,24 +28,24 @@ static const PWMConfig pwmcfg8 = {
 	0
 };
 
-void aiServoInit(void)
+void _servo_init(void)
 {
-   aiServosOn();
+   servo_enableAll();
 }
 
-void aiServosOn(void)
+void servo_enableAll(void)
 {
-   pwmStart(&PWMD4, &pwmcfg4);
-   pwmStart(&PWMD8, &pwmcfg8);
+   pwmStart(&PWMD4, &_pwmcfg4);
+   pwmStart(&PWMD8, &_pwmcfg8);
 }
 
-void aiServosOff(void)
+void servo_disableAll(void)
 {
    pwmStop(&PWMD4);
    pwmStop(&PWMD8);
 }
 
-void aiServoOutput(int pin, int position)
+void servo_set(int servoNum, int position)
 {
    // if (position < 0 || position > 150)
    // {
@@ -54,12 +54,12 @@ void aiServoOutput(int pin, int position)
    // }
    
    
-   if (pin > 0 && pin < 4)
+   if (servoNum > 0 && servoNum < 4)
    {
-      pwmEnableChannel(&PWMD4, pin, (position+75)*10);
+      pwmEnableChannel(&PWMD4, servoNum, (position+75)*10);
    }
-   else if (pin < 8)
+   else if (servoNum < 8)
    {
-      pwmEnableChannel(&PWMD8, pin-4, (position+75)*10);
+      pwmEnableChannel(&PWMD8, servoNum-4, (position+75)*10);
    }
 }

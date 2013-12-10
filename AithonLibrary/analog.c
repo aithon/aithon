@@ -15,14 +15,14 @@
  * @note    This should not be changed unless all impacted code is
  *          appropriately changed.
  */
-#define NUM_CHANNELS   12
+#define _NUM_CHANNELS   12
 
 /**
  * @brief   How many ADC samples per channel
  * @note    This determines how many samples are stored for each
  *          channel and later averaged together.
  */
-#define NUM_SAMPLES    100
+#define _NUM_SAMPLES    100
 
 /*
    How the analog pins are connected to the ADC inputs:
@@ -41,16 +41,16 @@
 */
 
 
-static adcsample_t samples[NUM_CHANNELS*NUM_SAMPLES];
+static adcsample_t _samples[_NUM_CHANNELS*_NUM_SAMPLES];
 
 /*
  * ADC conversion group.
  * Mode:        Continuous, 100 samples of 10 channels.
  * Channels:    IN3, IN2, IN1, IN0, IN13, IN12, IN11, IN10, IN14, IN15, IN8, IN9
  */
-static const ADCConversionGroup adcConfig = {
+static const ADCConversionGroup _config = {
    TRUE,
-   NUM_CHANNELS,
+   _NUM_CHANNELS,
    NULL,
    NULL,
    0,                        /* CR1 */
@@ -61,7 +61,7 @@ static const ADCConversionGroup adcConfig = {
    ADC_SMPR2_SMP_AN0(ADC_SAMPLE_56) | ADC_SMPR2_SMP_AN1(ADC_SAMPLE_56) |
    ADC_SMPR2_SMP_AN2(ADC_SAMPLE_56) | ADC_SMPR2_SMP_AN3(ADC_SAMPLE_56) |
    ADC_SMPR2_SMP_AN8(ADC_SAMPLE_56) | ADC_SMPR2_SMP_AN9(ADC_SAMPLE_56),
-   ADC_SQR1_NUM_CH(NUM_CHANNELS),
+   ADC_SQR1_NUM_CH(_NUM_CHANNELS),
    ADC_SQR2_SQ7_N(ADC_CHANNEL_IN11) | ADC_SQR2_SQ8_N(ADC_CHANNEL_IN10) |
    ADC_SQR2_SQ9_N(ADC_CHANNEL_IN14) | ADC_SQR2_SQ10_N(ADC_CHANNEL_IN15) |
    ADC_SQR2_SQ11_N(ADC_CHANNEL_IN8) | ADC_SQR2_SQ12_N(ADC_CHANNEL_IN9),
@@ -80,10 +80,10 @@ static const ADCConversionGroup adcConfig = {
  * @note    This function is called by aiInit() and does not need to be called
  *          again by the user after aiInit() is called.
  */
-void aiAnalogInit(void)
+void _analog_init(void)
 {
    adcStart(&ADCD1, NULL);
-   adcStartConversion(&ADCD1, &adcConfig, samples, NUM_SAMPLES);
+   adcStartConversion(&ADCD1, &_config, _samples, _NUM_SAMPLES);
 }
 
 /**
@@ -94,14 +94,14 @@ void aiAnalogInit(void)
  * @param[in] pin    Which pin to get the reading of.
  * @return           The 12-bit (0-4095) value of the average ADC reading.
  */
-uint16_t aiAnalogInput(AnalogPin pin)
+uint16_t analog_get(AnalogPin pin)
 {
    int i, total = 0;
-   for (i = 0; i < NUM_SAMPLES; i++)
+   for (i = 0; i < _NUM_SAMPLES; i++)
    {
-      total += samples[i*NUM_CHANNELS+pin];
+      total += _samples[i*_NUM_CHANNELS+pin];
    }
-   return (uint16_t) (total/NUM_SAMPLES);
+   return (uint16_t) (total/_NUM_SAMPLES);
 }
 
 /** @} */

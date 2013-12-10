@@ -49,10 +49,8 @@ void updateProgram(void)
    int cmdByte, i, temp;
    uint32_t addr;
 
-   aiLCDTopLine();
-   aiLCDPrintf("Aithon Board");
-   aiLCDBottomLine();
-   aiLCDPrintf("Programming...");
+   lcd_cursor(0, 0);
+   lcd_printf("Aithon Board\nProgramming...");
 
    // Unlock the Flash Program Erase controller
    FLASH_If_Init();
@@ -128,12 +126,10 @@ void updateProgram(void)
 
 int main(void)
 {
-   aiInit();
-   
    bool_t isUserRun = FALSE;
    uint16_t bootByte;
-   _aiEEReadReserved(_AI_EE_RES_ADDR_BOOT, &bootByte);
-   if (aiGetButton(0) && aiGetButton(1))
+   _ee_getReserved(_AI_EE_RES_ADDR_BOOT, &bootByte);
+   if (button_get(0) && button_get(1))
    {
       // Both buttons are pressed so the user
       // wants to run the bootloader.
@@ -143,11 +139,10 @@ int main(void)
    {
       startProgram();
    }
-   _aiEEWriteReserved(_AI_EE_RES_ADDR_BOOT, _AI_EE_RES_VAL_DEfAULT);
+   _ee_putReserved(_AI_EE_RES_ADDR_BOOT, _AI_EE_RES_VAL_DEfAULT);
 
-   aiLEDOn(0);
-   aiLEDOn(1);
-
+   led_on(0);
+   led_on(1);
 
    int i, j;
    for (i = 0; i < BOOT_TIMEOUT; i++)
@@ -155,10 +150,8 @@ int main(void)
       // update the countdown
       if (isUserRun && i % 1000 == 0)
       {
-         aiLCDTopLine();
-         aiLCDPrintf("Aithon Board");
-         aiLCDBottomLine();
-         aiLCDPrintf("%d ", (BOOT_TIMEOUT-i)/1000);
+         lcd_cursor(0, 0);
+         lcd_printf("Aithon Board\n%d ", (BOOT_TIMEOUT-i)/1000);
       }
 
       // check all the interfaces for a SYNC

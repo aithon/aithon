@@ -2,22 +2,18 @@
 
 int main(void)
 {
-   // setup the board
-   // must be called first
-   aiInit();
-   
    // print something to the LCD screen
-   aiLCDPrintf("Aithon Board");
+   lcd_printf("Hello Aithon!");
    
-   // start with led 1 on
-   aiLEDOn(0);
-   aiLEDOff(1);
+   // start with led 0 on
+   led_on(0);
    
+   // main should never return, so enter infinite loop
    while (1)
 	{
       // main thread code here
-      aiLEDToggle(0);
-      aiLEDToggle(1);
-      aiDelayS(1);
+      led_toggle(0);
+      led_toggle(1);
+      delayS(1);
    }
 }

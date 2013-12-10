@@ -50,52 +50,52 @@ static const PWMConfig pwmcfg1 = {
    0
 };
 
-void aiMotorInit(void)
+void _motor_init(void)
 {
    pwmStart(&PWMD1, &pwmcfg1);
 }
 
-void aiMotorSet(int num, int power)
+void motor_set(int motor, int power)
 {
    if (power > 0)
    {
-      palWritePad(GPIOE, motorPins[num][0], 1);
-      palWritePad(GPIOE, motorPins[num][1], 0);
-      palSetPad(GPIOE, motorPins[num][2]);
-      values[num] = power;
+      palWritePad(GPIOE, motorPins[motor][0], 1);
+      palWritePad(GPIOE, motorPins[motor][1], 0);
+      palSetPad(GPIOE, motorPins[motor][2]);
+      values[motor] = power;
    }
    else if (power < 0)
    {
-      palWritePad(GPIOE, motorPins[num][0], 0);
-      palWritePad(GPIOE, motorPins[num][1], 1);
-      palSetPad(GPIOE, motorPins[num][2]);
-      values[num] = power;
+      palWritePad(GPIOE, motorPins[motor][0], 0);
+      palWritePad(GPIOE, motorPins[motor][1], 1);
+      palSetPad(GPIOE, motorPins[motor][2]);
+      values[motor] = power;
    }
    else
    {
-      palWritePad(GPIOE, motorPins[num][0], 0);
-      palWritePad(GPIOE, motorPins[num][1], 0);
-      palClearPad(GPIOE, motorPins[num][2]);
-      values[num] = 100;
+      palWritePad(GPIOE, motorPins[motor][0], 0);
+      palWritePad(GPIOE, motorPins[motor][1], 0);
+      palClearPad(GPIOE, motorPins[motor][2]);
+      values[motor] = 100;
    }
-   braking[num] = 0;
+   braking[motor] = 0;
 }
 
-void aiMotorBrake(int num, int power)
+void motor_brake(int motor, int power)
 {
-   palWritePad(GPIOE, motorPins[num][0], 0);
-   palWritePad(GPIOE, motorPins[num][1], 0);
-   palSetPad(GPIOE, motorPins[num][2]);
-   braking[num] = 1;
-   values[num] = power;
+   palWritePad(GPIOE, motorPins[motor][0], 0);
+   palWritePad(GPIOE, motorPins[motor][1], 0);
+   palSetPad(GPIOE, motorPins[motor][2]);
+   braking[motor] = 1;
+   values[motor] = power;
 }
 
-float aiMotorCurrent(int num)
+float motor_getCurrent(int motor)
 {
-   if (num == 0)
-      return aiAnalogInput(M0_SENSE)*1.0/585.0;
-   else if (num == 1)
-      return aiAnalogInput(M1_SENSE)*1.0/585.0;
+   if (motor == 0)
+      return analog_get(M0_SENSE)*1.0/585.0;
+   else if (motor == 1)
+      return analog_get(M1_SENSE)*1.0/585.0;
       
    return -1;
 }

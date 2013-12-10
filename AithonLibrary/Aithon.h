@@ -15,32 +15,29 @@
 #include "music.h"
 #include "aiconf.h"
 #include "flash_if.h"
-#include "ee.h"
 
 
 // general Aithon functions / definitions
-void aiInit(void);
-void aiLEDOn(int num);
-void aiLEDOff(int num);
-void aiLEDToggle(int num);
-bool_t aiGetButton(int num);
-void aiButtonWait(int num);
+void led_on(int num);
+void led_off(int num);
+void led_toggle(int num);
+bool_t button_get(int num);
+void button_wait(int num);
 
 
 // wrappers around the appropriate ChibiOS delay/sleep functions
-#define aiDelayS(s) chThdSleepSeconds(s)  
-#define aiDelayMs(ms) chThdSleepMicroseconds(ms)
-#define aiDelayUs(us) halPolledDelay(US2RTT(us)) // must use busy loops for <1ms delays
+#define delayS(s) chThdSleepSeconds(s)  
+#define delayMs(ms) chThdSleepMicroseconds(ms)
+#define delayUs(us) halPolledDelay(US2RTT(us)) // must use busy loops for <1ms delays
 
 
 // LCD functions / definitions
-void aiLCDInit(void);
-void aiLCDClear(void);
-void aiLCDTopLine(void);
-void aiLCDBottomLine(void);
-extern BaseSequentialStream LCD;
-#define aiLCDPrintf(fmt, ...) chprintf(&LCD, fmt, ##__VA_ARGS__)
-void aiLCDPrintChar(const char data);
+void lcd_on(void);
+void lcd_off(void);
+void lcd_clear(void);
+void lcd_cursor(uint8_t row, uint8_t col);
+void lcd_printChar(char data);
+#define lcd_printf(fmt, ...) chprintf(&LCD, fmt, ##__VA_ARGS__)
 
 
 // IMU functions / definitions
@@ -55,16 +52,14 @@ typedef struct {
    int16_t z;
 } IMUReading;
 
-void aiIMUInit(void);
-IMUReading aiIMUGetReading(IMUDevice dev);
-int8_t aiIMUGetTemp(void);
+IMUReading imu_getReading(IMUDevice device);
+int8_t imu_getTemp(void);
 
 
 // motor functions / definitions
-void aiMotorInit(void);
-void aiMotorSet(int num, int power);
-void aiMotorBrake(int num, int power);
-float aiMotorCurrent(int num);
+void motor_set(int motor, int power);
+void motor_brake(int motor, int power);
+float motor_getCurrent(int motor);
 
 
 // digital pin functions / definitions
@@ -75,11 +70,13 @@ typedef enum {
    OUTPUT            = PAL_MODE_OUTPUT_PUSHPULL,
    OUTPUT_OPENDRAIN  = PAL_MODE_OUTPUT_OPENDRAIN,
 } DigitalMode;
+#define DIGITAL_LOW 		PAL_LOW
+#define DIGITAL_HIGH 	PAL_HIGH
 
-void aiDigitalMode(int pin, DigitalMode mode);
-int aiDigitalIn(int pin);
-void aiDigitalOut(int pin, int value);
-void aiDigitalToggle(int pin);
+void digital_mode(int pin, DigitalMode mode);
+int digital_get(int pin);
+void digital_set(int pin, int value);
+void digital_toggle(int pin);
 
 
 // analog pin functions / definitions
@@ -89,33 +86,28 @@ typedef enum {
    M0_SENSE = 10,
    M1_SENSE = 11,
 } AnalogPin;
-void aiAnalogInit(void);
-uint16_t aiAnalogInput(AnalogPin pin);
+uint16_t analog_get(AnalogPin pin);
 
 
 // servo pin funtions / definitions
-void aiServoInit(void);
-void aiServosOn(void);
-void aiServosOff(void);
-void aiServoOutput(int pin, int position);
+void servo_enableAll(void);
+void servo_disableAll(void);
+void servo_set(int pin, int position);
 
 
 // music functions / definitions
-void aiMusicInit(void);
-void aiMusicPlayNote(MusicNote note);
-void aiMusicPlayNotes(MusicNote *notes, int numNotes);
-void aiMusicPlayNotesAsync(MusicNote *notes, int numNotes);
-#define aiMusicPlaySong(song) aiMusicPlayNotes(song, sizeof(song)/sizeof(MusicNote))
-#define aiMusicPlaySongAsync(song) aiMusicPlayNotesAsync(song, sizeof(song)/sizeof(MusicNote))
+void music_playNote(MusicNote note);
+void music_playNotes(MusicNote *notes, int numNotes);
+void music_playNotesAsync(MusicNote *notes, int numNotes);
+#define music_playSong(song) aiMusicPlayNotes(song, sizeof(song)/sizeof(MusicNote))
+#define music_playSongAsync(song) aiMusicPlayNotesAsync(song, sizeof(song)/sizeof(MusicNote))
 
 
 // USB device - virtual COM port functions / definitions
-extern SerialUSBDriver SDU1;
-void aiUSBCDCInit(void);
-void aiUSBCDCUninit(void);
-#define aiUSBCDCGet() chSequentialStreamGet(&SDU1)
-#define aiUSBCDCPut(b) chSequentialStreamPut(&SDU1, b)
-#define aiUSBCDCPrintf(fmt, ...) chprintf((BaseSequentialStream *)&SDU1, fmt, ##__VA_ARGS__)
+void _usbcdc_init(void);
+#define usbcdc_get() chSequentialStreamGet(&SDU1)
+#define usbcdc_put(b) chSequentialStreamPut(&SDU1, b)
+#define usbcdc_printf(fmt, ...) chprintf((BaseSequentialStream *)&SDU1, fmt, ##__VA_ARGS__)
 
 
 // microSD functions / definitions
@@ -124,8 +116,7 @@ bool_t aiSDInit(void);
 
 
 // emulated EEPROM functions
-uint16_t aiEEInit(void);
-uint16_t aiEERead(uint8_t virtAddr, uint16_t* data);
-uint16_t aiEEWrite(uint8_t virtAddr, uint16_t data);
+uint16_t ee_get(uint8_t virtAddr, uint16_t* data);
+uint16_t ee_put(uint8_t virtAddr, uint16_t data);
 
 #endif

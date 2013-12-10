@@ -1,138 +1,148 @@
 #include "Aithon.h"
 
-#define HOME         0x80
-#define SECOND_LINE  0XC0
+// LCD Commands
+#define _CLEAR_CMD      0x01
+#define _ON_CMD         0x0C
+#define _OFF_CMD        0x08
+#define _FUNC_SET_CMD   0x38
+#define _ENTRY_MODE_CMD 0x06
+
+// Other Constants
+#define _HOME_ADDR      0x80
+#define _LINE_INCR      0x80
+
+// LCD Pin Control Macros
+#define _SET_CLK() palSetPad(GPIOA, GPIOA_LCD_CLK)
+#define _CLR_CLK() palClearPad(GPIOA, GPIOA_LCD_CLK)
+#define _SET_DATA() palSetPad(GPIOA, GPIOA_LCD_DATA)
+#define _CLR_DATA() palClearPad(GPIOA, GPIOA_LCD_DATA)
+#define _SET_EN() palClearPad(GPIOD, GPIOD_LCD_E)
+#define _CLR_EN() palClearPad(GPIOD, GPIOD_LCD_E)
+#define _SET_RS() palClearPad(GPIOD, GPIOD_LCD_RS)
+#define _CLR_RS() palClearPad(GPIOD, GPIOD_LCD_RS)
+
 
 BaseSequentialStream LCD;
-static msg_t putt(void *instance, uint8_t b)
+static msg_t _put(void *instance, uint8_t b)
 {
-  (void)instance;
-  aiLCDPrintChar(b);
-  return RDY_OK;
+   (void)instance;
+   lcd_printChar(b);
+   return RDY_OK;
 }
-static const struct BaseSequentialStreamVMT vmt = {
-  NULL, NULL, putt, NULL
-};
+static struct BaseSequentialStreamVMT _vmt = {NULL, NULL, _put, NULL};
 
-void shiftOutByte(uint8_t data)
+
+// Writes a byte of data to the LCD.
+void _write_byte(uint8_t data)
 {
+	//set the LCD's E (Enable) line high, so it can fall later
+   _SET_EN();
+	//write the data to the shift register
    int i;
    for (i = 0; i < 8; i++)
    {
-      palClearPad(GPIOA, GPIOA_LCD_CLK);
+      _CLR_CLK();
       if (data & (0x80 >> i))
-      {
-         palSetPad(GPIOA, GPIOA_LCD_DATA);
-      }
+         _SET_DATA();
       else
-      {
-         palClearPad(GPIOA, GPIOA_LCD_DATA);
-      }
-      palSetPad(GPIOA, GPIOA_LCD_CLK);
+         _CLR_DATA();
+      _SET_CLK();
    }
+	//set the LCD's E (Enable) line low to latch in the data
+   _CLR_EN();
 }
 
-// Writes a byte of data to the LCD.
-void writeLcd(uint8_t data)
+void _write_data(uint8_t data)
 {
-	//set the LCD's E (Enable) line high, so it can fall later
-   palSetPad(GPIOD, GPIOD_LCD_E);
-	//write the data to the bus
-   shiftOutByte(data);
-	//set the LCD's E (Enable) line low to latch in the data
-   palClearPad(GPIOD, GPIOD_LCD_E);
+	//set RS (Register Select) line high to select data register
+   _SET_RS();
+   _write_byte(data);
+   delayUs(50);
 }
 
 // Writes a command byte to the LCD.
-void writeControl(const uint8_t data)
+void _write_control(uint8_t data)
 {
 	//set RS (Register Select) line low to select command register
-   palClearPad(GPIOD, GPIOD_LCD_RS);
-	writeLcd(data);
+   _CLR_RS();
+	_write_byte(data);
 	//wait for the instruction to be executed
-	aiDelayUs(100);
+	delayUs(100);
 }
 
-// Clears all characters on the display and resets the cursor to the home position.
-void aiLCDClear(void)
+// Initializes the LCD as described in the HD44780 datasheet.
+void _lcd_init(void)
 {
-	writeControl(0x01);
-	aiDelayUs(3300);
+   LCD.vmt = &_vmt;
+  
+	//set LCD E (Enable) line low inititally, so it can rise later
+   _CLR_EN();
+
+	//wait 15ms after power on
+	delayMs(15);
+
+	//Issue 'Function Set' commands to initialize LCD for 8-bit interface mode
+	_write_control(_FUNC_SET_CMD);
+	delayUs(4900); //+100us in _write_control = 5000us or 5ms total
+	_write_control(_FUNC_SET_CMD);
+	delayUs(50); //+100us in _write_control = 150us total
+	_write_control(_FUNC_SET_CMD);
+
+	//Function Set command to specify 2 display lines and character font
+	_write_control(_FUNC_SET_CMD);
+
+	//Display off
+	lcd_off();
+
+	//Clear display
+	lcd_clear();
+
+	//Set entry mode
+	_write_control(_ENTRY_MODE_CMD);
+
+	//Display on
+	lcd_on();
+}
+
+
+// Clears all characters on the display and resets the cursor to the home position.
+void lcd_clear(void)
+{
+	_write_control(_CLEAR_CMD);
+	delayUs(3300);
 }
 
 // Shows the characters on the screen, if they were hidden with lcdOff().
-void lcdOn(void)
+void lcd_on(void)
 {
-	writeControl(0x0C);
+	_write_control(_ON_CMD);
 }
 
 // Hides the characters on the screen. Can be unhidden again with lcdOn().
-void lcdOff(void)
+void lcd_off(void)
 {
-	writeControl(0x08);
+	_write_control(_OFF_CMD);
 }
 
-/* Initializes the LCD as described in the HD44780 datasheet.
-   Normally called only by the initialize() function in utility.c.
- */
-void aiLCDInit(void)
+// Sets the cursor position on the screen.
+void lcd_cursor(uint8_t col, uint8_t row)
 {
-   LCD.vmt = &vmt;
-  
-	//set LCD E (Enable) line low inititally, so it can rise later
-   palClearPad(GPIOD, GPIOD_LCD_E);
-
-	//wait 15ms after power on
-	aiDelayMs(15);
-
-	//Issue 'Function Set' commands to initialize LCD for 8-bit interface mode
-	writeControl(0x38);
-	aiDelayUs(4900); //+100us in writeControl = 5000us or 5ms total
-	writeControl(0x38);
-	aiDelayUs(50); //+100us in writeControl = 150us total
-	writeControl(0x38);
-
-	//Function Set command to specify 2 display lines and character font
-	writeControl(0x38);
-
-	//Display off
-	lcdOff();
-
-	//Clear display
-	aiLCDClear();
-
-	//Set entry mode
-	writeControl(0x06);
-
-	//Display on
-	lcdOn();
-}
-
-/* Prints a single character specified by its ASCII code to the display.
-    Most LCDs can also print some special characters, such as those in LCDSpecialChars.h.
- */
-void aiLCDPrintChar(const char data)
-{
-   if (data == '\n')
+   if (col >= 16 || row >= 2)
    {
-      aiLCDBottomLine();
       return;
    }
    
-	//set RS (Register Select) line high to select data register
-   palSetPad(GPIOD, GPIOD_LCD_RS);
-	writeLcd(data);
-	aiDelayUs(50);
+   uint8_t addr = _HOME_ADDR + row * _LINE_INCR + col;
+   _write_control(addr);
 }
 
-// Moves the LCD cursor to the beginning of the first line of the display (row 0, col 0).
-void aiLCDTopLine()
+// Prints a character at the current cursor position on the screen.
+void lcd_printChar(char data)
 {
-	writeControl(HOME);
-}
-
-// Moves the LCD cursor to the beginning of the second line of the display (row 1, col 0).
-void aiLCDBottomLine()
-{
-	writeControl(SECOND_LINE);
+   if (data == '\n')
+   {
+      lcd_cursor(0, 1);
+      return;
+   }
+   _write_data(data);
 }

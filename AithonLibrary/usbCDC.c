@@ -12,7 +12,7 @@ SerialUSBDriver SDU1;
 /*
  * USB Device Descriptor.
  */
-static const uint8_t vcom_device_descriptor_data[18] = {
+static const uint8_t _vcom_device_descriptor_data[18] = {
   USB_DESC_DEVICE       (0x0110,        /* bcdUSB (1.1).                    */
                          0x02,          /* bDeviceClass (CDC).              */
                          0x00,          /* bDeviceSubClass.                 */
@@ -30,13 +30,13 @@ static const uint8_t vcom_device_descriptor_data[18] = {
 /*
  * Device Descriptor wrapper.
  */
-static const USBDescriptor vcom_device_descriptor = {
-  sizeof vcom_device_descriptor_data,
-  vcom_device_descriptor_data
+static const USBDescriptor _vcom_device_descriptor = {
+  sizeof _vcom_device_descriptor_data,
+  _vcom_device_descriptor_data
 };
 
 /* Configuration Descriptor tree for a CDC.*/
-static const uint8_t vcom_configuration_descriptor_data[67] = {
+static const uint8_t _vcom_configuration_descriptor_data[67] = {
   /* Configuration Descriptor.*/
   USB_DESC_CONFIGURATION(67,            /* wTotalLength.                    */
                          0x02,          /* bNumInterfaces.                  */
@@ -115,15 +115,15 @@ static const uint8_t vcom_configuration_descriptor_data[67] = {
 /*
  * Configuration Descriptor wrapper.
  */
-static const USBDescriptor vcom_configuration_descriptor = {
-  sizeof vcom_configuration_descriptor_data,
-  vcom_configuration_descriptor_data
+static const USBDescriptor _vcom_configuration_descriptor = {
+  sizeof _vcom_configuration_descriptor_data,
+  _vcom_configuration_descriptor_data
 };
 
 /*
  * U.S. English language identifier.
  */
-static const uint8_t vcom_string0[] = {
+static const uint8_t _vcom_string0[] = {
   USB_DESC_BYTE(4),                     /* bLength.                         */
   USB_DESC_BYTE(USB_DESCRIPTOR_STRING), /* bDescriptorType.                 */
   USB_DESC_WORD(0x0409)                 /* wLANGID (U.S. English).          */
@@ -132,7 +132,7 @@ static const uint8_t vcom_string0[] = {
 /*
  * Vendor string.
  */
-static const uint8_t vcom_string1[] = {
+static const uint8_t _vcom_string1[] = {
   USB_DESC_BYTE(38),                    /* bLength.                         */
   USB_DESC_BYTE(USB_DESCRIPTOR_STRING), /* bDescriptorType.                 */
   'S', 0, 'T', 0, 'M', 0, 'i', 0, 'c', 0, 'r', 0, 'o', 0, 'e', 0,
@@ -143,7 +143,7 @@ static const uint8_t vcom_string1[] = {
 /*
  * Device Description string.
  */
-static const uint8_t vcom_string2[] = {
+static const uint8_t _vcom_string2[] = {
   USB_DESC_BYTE(56),                    /* bLength.                         */
   USB_DESC_BYTE(USB_DESCRIPTOR_STRING), /* bDescriptorType.                 */
   'C', 0, 'h', 0, 'i', 0, 'b', 0, 'i', 0, 'O', 0, 'S', 0, '/', 0,
@@ -155,7 +155,7 @@ static const uint8_t vcom_string2[] = {
 /*
  * Serial Number string.
  */
-static const uint8_t vcom_string3[] = {
+static const uint8_t _vcom_string3[] = {
   USB_DESC_BYTE(8),                     /* bLength.                         */
   USB_DESC_BYTE(USB_DESCRIPTOR_STRING), /* bDescriptorType.                 */
   '0' + CH_KERNEL_MAJOR, 0,
@@ -166,34 +166,31 @@ static const uint8_t vcom_string3[] = {
 /*
  * Strings wrappers array.
  */
-static const USBDescriptor vcom_strings[] = {
-  {sizeof vcom_string0, vcom_string0},
-  {sizeof vcom_string1, vcom_string1},
-  {sizeof vcom_string2, vcom_string2},
-  {sizeof vcom_string3, vcom_string3}
+static const USBDescriptor _vcom_strings[] = {
+  {sizeof _vcom_string0, _vcom_string0},
+  {sizeof _vcom_string1, _vcom_string1},
+  {sizeof _vcom_string2, _vcom_string2},
+  {sizeof _vcom_string3, _vcom_string3}
 };
 
 /*
  * Handles the GET_DESCRIPTOR callback. All required descriptors must be
  * handled here.
  */
-static const USBDescriptor *get_descriptor(USBDriver *usbp,
-                                           uint8_t dtype,
-                                           uint8_t dindex,
-                                           uint16_t lang) {
-
-  (void)usbp;
-  (void)lang;
-  switch (dtype) {
-  case USB_DESCRIPTOR_DEVICE:
-    return &vcom_device_descriptor;
-  case USB_DESCRIPTOR_CONFIGURATION:
-    return &vcom_configuration_descriptor;
-  case USB_DESCRIPTOR_STRING:
-    if (dindex < 4)
-      return &vcom_strings[dindex];
-  }
-  return NULL;
+static const USBDescriptor *_get_descriptor(USBDriver *usbp, uint8_t dtype, uint8_t dindex, uint16_t lang)
+{
+   (void)usbp;
+   (void)lang;
+   switch (dtype) {
+   case USB_DESCRIPTOR_DEVICE:
+      return &_vcom_device_descriptor;
+   case USB_DESCRIPTOR_CONFIGURATION:
+      return &_vcom_configuration_descriptor;
+   case USB_DESCRIPTOR_STRING:
+   if (dindex < 4)
+      return &_vcom_strings[dindex];
+   }
+   return NULL;
 }
 
 /**
@@ -246,7 +243,7 @@ static const USBEndpointConfig ep2config = {
 /*
  * Handles the USB driver global events.
  */
-static void usb_event(USBDriver *usbp, usbevent_t event) {
+static void _usb_event(USBDriver *usbp, usbevent_t event) {
 	switch (event) {
 	case USB_EVENT_CONFIGURED:
 		chSysLockFromIsr();
@@ -275,21 +272,24 @@ static void usb_event(USBDriver *usbp, usbevent_t event) {
 /*
  * Serial over USB driver configuration.
  */
-const SerialUSBConfig serusbcfg = {
+const SerialUSBConfig _serusbcfg = {
   &USBD1,
   USBD1_DATA_REQUEST_EP,
   USBD1_DATA_AVAILABLE_EP,
   USBD1_INTERRUPT_REQUEST_EP
 };
 
-static bool_t ai_request_hook(USBDriver *usbp) {
+static bool_t _request_hook(USBDriver *usbp) {
+   // The uploader program will set both the RTS and DTR bits to tell
+   // the board to reset in order to be programmed.
 	if (((usbp->setup[0] & USB_RTYPE_TYPE_MASK) == USB_RTYPE_TYPE_CLASS) &&
 		(usbp->setup[1] == CDC_SET_CONTROL_LINE_STATE) &&
 		((usbp->setup[2] & 0x3) == 0x3)) {
-		// The uploader program will set both the RTS and DTR bits to tell
-		// the board to reset in order to be programmed.
-		aiUSBCDCUninit();
-      _aiResetToBootloader();
+      // Disable the USB and then reset the board.
+      usbDisconnectBus(_serusbcfg.usbp);
+      sduStop(&SDU1);
+      usbStop(_serusbcfg.usbp);
+      _reset_to_bootloader();
 	}
 	return sduRequestsHook(usbp);
 }
@@ -297,26 +297,19 @@ static bool_t ai_request_hook(USBDriver *usbp) {
 /*
  * USB driver configuration.
  */
-const USBConfig usbcfg = {
-  usb_event,
-  get_descriptor,
-  ai_request_hook,
+const USBConfig _usbcfg = {
+  _usb_event,
+  _get_descriptor,
+  _request_hook,
   NULL
 };
 
-void aiUSBCDCInit(void)
+void _usbcdc_init(void)
 {
    sduObjectInit(&SDU1);
-   sduStart(&SDU1, &serusbcfg);
-   usbDisconnectBus(serusbcfg.usbp);
+   sduStart(&SDU1, &_serusbcfg);
+   usbDisconnectBus(_serusbcfg.usbp);
    chThdSleepMilliseconds(10);
-   usbStart(serusbcfg.usbp, &usbcfg);
-   usbConnectBus(serusbcfg.usbp);
-}
-
-void aiUSBCDCUninit(void)
-{
-	usbDisconnectBus(serusbcfg.usbp);
-	sduStop(&SDU1);
-	usbStop(serusbcfg.usbp);
+   usbStart(_serusbcfg.usbp, &_usbcfg);
+   usbConnectBus(_serusbcfg.usbp);
 }
