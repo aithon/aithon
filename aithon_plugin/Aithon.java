@@ -148,6 +148,22 @@ implements ActionListener, EBComponent, AithonActions,
     add(console_scrollbars);
 
     r = Runtime.getRuntime();
+    
+    //If property for any of the paths hasn't been set (is null or empty string)
+    //Calls functions to find a default directory and sets the property
+    String prop = jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "gcc-filepath");
+    if (prop == null || prop.equals("")) {
+      autoDetectGcc();
+    }
+    prop = jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "library-filepath");
+    if (prop == null || prop.equals("")) {
+      aithonLibraryPath();
+    }
+    prop = jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "programmer-filepath");
+    if (prop == null || prop.equals("")) {
+      aithonProgrammerPath();
+    }
+    
   }
 
   //starts a thread that reads an OutputStream and displays it to the console
@@ -201,8 +217,7 @@ implements ActionListener, EBComponent, AithonActions,
         //String env[] = {"PATH=/usr/bin:/bin:/usr/sbin:/Users/jseng/gccarm/bin"};
         String env[] = null;
         String user_src = "USERFOLDER=\"" + curr_buffer.getDirectory().replace(" ", "\\s") + "\"";
-        //String user_src = "USERSRC=\"" + curr_buffer.getDirectory().replace(" ", "\\s") + "$(wildcard\\s*.c)\"";
-        //String user_src = "USERSRC=\"C:\\Users\\Justine Dunham\\Documents\\GitHub\\aithon\\aithon_plugin\\main.c\"";
+        
         String make_cmd[] = {"make", user_src};
         console_area.append(user_src + "\n");
       	compile = r.exec(make_cmd, env, dir);
@@ -216,6 +231,37 @@ implements ActionListener, EBComponent, AithonActions,
     }
   }
 
+    //Finds default directory for compiler
+  private String autoDetectGcc() {
+    String path = "";
+    String os = System.getProperty("os.name").toLowerCase();
+    String userDir = System.getProperty("user.dir");
+
+    if (os.indexOf("win") >= 0) {
+      path = userDir + "/Windows";
+    } else if (os.indexOf("mac") >= 0) {
+      path = userDir + "/MacOSX";
+    } else if (os.indexOf("nux") >= 0) {
+      path = userDir + "/Linux";
+    }
+
+    jEdit.setProperty(AithonPlugin.OPTION_PREFIX + "gcc-filepath", path);
+    return path;
+  }
+
+  //Finds default directory for library
+  private String aithonLibraryPath() {
+    String path = jEdit.getJEditHome() + "/AithonLibrary/";
+    jEdit.setProperty(AithonPlugin.OPTION_PREFIX + "library-filepath", path);
+    return path;
+  }
+
+  //Finds default directory for programmer/uploader
+  private String aithonProgrammerPath() {
+    String path = jEdit.getJEditHome() + "/AithonLibrary/Programmer";
+    jEdit.setProperty(AithonPlugin.OPTION_PREFIX + "programmer-filepath", path);    
+    return path;
+  }
   // }}}
 
     // {{{ Member Functions

@@ -78,21 +78,6 @@ ActionListener {
     font = new FontSelector(makeFont());
     addComponent(jEdit.getProperty(AithonPlugin.OPTION_PREFIX
           + "choose-font"), font);
-    
-    //If property for any of the paths hasn't been set (is null or empty string)
-    //Calls functions to find a default directory and sets the property
-    prop = jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "gcc-filepath");
-    if (prop == "" || prop == null) {
-      gccPath.setText(autoDetectGcc());
-    }
-    prop = jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "library-filepath");
-    if (prop == "" || prop == null) {
-      libPath.setText(aithonLibraryPath());
-    }
-    prop = jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "programmer-filepath");
-    if (prop == "" || prop == null) {
-      progPath.setText(aithonProgrammerPath());
-    }
   }
 
   //Set properties of fields
@@ -114,61 +99,7 @@ ActionListener {
         String.valueOf(showPath.isSelected()));
   }
 
-  //Finds default directory for compiler
-  private String autoDetectGcc() {
-    String path = "";
-    String os = System.getProperty("os.name").toLowerCase();
-    String userDir = System.getProperty("user.dir");
 
-    if (os.indexOf("win") >= 0) {
-      path = userDir + "/Windows";
-    } else if (os.indexOf("mac") >= 0) {
-      path = userDir + "/MacOSX";
-    } else if (os.indexOf("nux") >= 0) {
-      path = userDir + "/Linux";
-    }
-
-    jEdit.setProperty(AithonPlugin.OPTION_PREFIX + "gcc-filepath", path);
-    return path;
-  }
-
-  //Finds default directory for library
-  private String aithonLibraryPath() {
-    String path = "";
-    String os = System.getProperty("os.name").toLowerCase();
-    String userDir = System.getProperty("user.dir") + "/AithonLibrary/";
-
-    if (os.indexOf("win") >= 0) {
-      path = userDir + "Windows";
-    } else if (os.indexOf("mac") >= 0) {
-      path = userDir + "MacOSX";
-    } else if (os.indexOf("nux") >= 0) {
-      path = userDir + "Linux";
-    }
-
-    jEdit.setProperty(AithonPlugin.OPTION_PREFIX + "library-filepath", path);
-    
-    return path;
-  }
-
-  //Finds default directory for programmer/uploader
-  private String aithonProgrammerPath() {
-    String path = "";
-    String os = System.getProperty("os.name").toLowerCase();
-    String userDir = System.getProperty("user.dir") + "/AithonLibrary/Programmer/";
-
-    if (os.indexOf("win") >= 0) {
-      path = userDir + "Windows";
-    } else if (os.indexOf("mac") >= 0) {
-      path = userDir + "MacOSX";
-    } else if (os.indexOf("nux") >= 0) {
-      path = userDir + "Linux";
-    }
-
-    jEdit.setProperty(AithonPlugin.OPTION_PREFIX + "programmer-filepath", path);
-    
-    return path;
-  }
 
   // end AbstractOptionPane implementation
 
