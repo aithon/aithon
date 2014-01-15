@@ -207,16 +207,16 @@ static USBOutEndpointState ep1outstate;
  * @brief   EP1 initialization structure (both IN and OUT).
  */
 static const USBEndpointConfig ep1config = {
-  USB_EP_MODE_TYPE_BULK,
-  NULL,
-  sduDataTransmitted,
-  sduDataReceived,
-  0x0040,
-  0x0040,
-  &ep1instate,
-  &ep1outstate,
-  2,
-  NULL
+   USB_EP_MODE_TYPE_BULK,
+   NULL,
+   sduDataTransmitted,
+   sduDataReceived,
+   0x0040,
+   0x0040,
+   &ep1instate,
+   &ep1outstate,
+   2,
+   NULL
 };
 
 /**
@@ -228,16 +228,16 @@ static USBInEndpointState ep2instate;
  * @brief   EP2 initialization structure (IN only).
  */
 static const USBEndpointConfig ep2config = {
-  USB_EP_MODE_TYPE_INTR,
-  NULL,
-  sduInterruptTransmitted,
-  NULL,
-  0x0010,
-  0x0000,
-  &ep2instate,
-  NULL,
-  1,
-  NULL
+   USB_EP_MODE_TYPE_INTR,
+   NULL,
+   sduInterruptTransmitted,
+   NULL,
+   0x0010,
+   0x0000,
+   &ep2instate,
+   NULL,
+   1,
+   NULL
 };
 
 /*
@@ -273,10 +273,10 @@ static void _usb_event(USBDriver *usbp, usbevent_t event) {
  * Serial over USB driver configuration.
  */
 const SerialUSBConfig _serusbcfg = {
-  &USBD1,
-  USBD1_DATA_REQUEST_EP,
-  USBD1_DATA_AVAILABLE_EP,
-  USBD1_INTERRUPT_REQUEST_EP
+   &USBD1,
+   USBD1_DATA_REQUEST_EP,
+   USBD1_DATA_AVAILABLE_EP,
+   USBD1_INTERRUPT_REQUEST_EP
 };
 
 static bool_t _request_hook(USBDriver *usbp) {
@@ -298,10 +298,10 @@ static bool_t _request_hook(USBDriver *usbp) {
  * USB driver configuration.
  */
 const USBConfig _usbcfg = {
-  _usb_event,
-  _get_descriptor,
-  _request_hook,
-  NULL
+   _usb_event,
+   _get_descriptor,
+   _request_hook,
+   NULL
 };
 
 void _usbcdc_init(void)
