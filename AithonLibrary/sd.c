@@ -36,7 +36,7 @@ bool_t aiSDInit(void)
    if (mmcConnect(&MMCD1))
       return TRUE;
 
-   if (f_mount(&sdFS, ".", 0) != FR_OK)
+   if (f_mount(0, &sdFS) != FR_OK)
    {
       mmcDisconnect(&MMCD1);
       return TRUE;
