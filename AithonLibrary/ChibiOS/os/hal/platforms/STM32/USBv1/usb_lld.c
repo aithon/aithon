@@ -378,7 +378,6 @@ CH_IRQ_HANDLER(STM32_USB1_LP_HANDLER) {
     if (epr & EPR_CTR_RX) {
       EPR_CLEAR_CTR_RX(ep);
       /* OUT endpoint, receive.*/
-		
       if (epr & EPR_SETUP) {
         /* Setup packets handling, setup packets are handled using a
            specific callback.*/

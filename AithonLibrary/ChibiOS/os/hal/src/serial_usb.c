@@ -300,6 +300,7 @@ void sduConfigureHookI(SerialUSBDriver *sdup) {
  * @retval FALSE        Message not handled.
  */
 bool_t sduRequestsHook(USBDriver *usbp) {
+
   if ((usbp->setup[0] & USB_RTYPE_TYPE_MASK) == USB_RTYPE_TYPE_CLASS) {
     switch (usbp->setup[1]) {
     case CDC_GET_LINE_CODING:

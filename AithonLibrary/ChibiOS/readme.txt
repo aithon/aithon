@@ -71,6 +71,42 @@
 *** Releases                                                              ***
 *****************************************************************************
 
+*** 2.6.2 ***
+- FIX: Fixed wrong vector names for STM32Lxx.
+- FIX: Fixed wrong STM32_TIM_CCMR2_OCxM macros on STM32F30x (bug #449).
+- FIX: Fixed STM32F30x TIM1/TIM8 alternate clock source setting not
+  recognized (bug #448).
+- FIX: Fixed wrong MCO2 check in STM32F4xx HAL driver (bug #447).
+- FIX: Fixed spurious half buffer callback in STM32 ADC drivers (bug #446).
+- FIX: Fixed callbacks changes to the ADC high level driver (bug #445).
+- FIX: Fixed wrong definition in STM32F37x ADC driver (bug #444).
+- FIX: Fixed wrong CORTEX_PRIORITY_PENDSV value (bug #443).
+- FIX: Fixed lost incoming characters in STM32 USARTv1 driver (bug #442).
+- FIX: Fixed STM32 OTG-FS wrong upper memory limit (bug #437).
+- FIX: Fixed race condition in STM32 DMA interrupt (bug #439).
+- FIX: Fixed timing issue in the STM32 OTGv1 USB driver (bug #436).
+- FIX: Fixed STM32L1 remove reset flag (bug #435).
+- FIX: Fixed unaligned data access in USB LLD (bug #434).
+- FIX: Fixed add RTC to STM32L1 (bug #433).
+- FIX: Fixed support 10-bit addresses in STM32 I2C driver (bug #432).
+- FIX: Fixed duplicate STM32_GPT_USE_TIM8 definition in some mcuconf.h files
+  (bug #431).
+- FIX: Fixed possible unalignment in GCC Cortex-M scatter files (bug #430).
+- NEW: Added support for STM32F030xx/050xx/060xx devices.
+- NEW: Added BOARD_OTG_NOVBUSSENS board option for STM32 OTG.
+- NEW: Added SPI4/SPI5/SPI6 support to the STM32v1 SPIv1 low level driver.
+- NEW: Added chvprintf() and chsnprintf() functions to the chprintf module.
+- NEW: Added a new function shellExit() to the shell. It allows to exit the
+  shell from any command handler.
+- NEW: Added support for STM32F401/STM32F42x/STM32F43x devices.
+- NEW: Improved time range check in the kernel, new API chTimeElapsedSince()
+  introduced. The API chTimeIsWithin() is now a macro.
+- NEW: Added support for STM32F0xx platform in RTCv2 driver.
+- NEW: Improvements to the STM32F4xx backup domain initialization.
+- NEW: Added support for STM32F4xx backup RAM.
+- NEW: Added support of UART4 and UART5 (STM32F4xx and STM32F2xx platforms)
+  (feature request #28).
+
 *** 2.6.1 ***
 - FIX: Fixed PAL driver documentation error (bug #427).
 - FIX: Fixed UART4 and 5 marked as not present in STM32F30x devices (bug #426).

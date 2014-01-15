@@ -11,5 +11,3 @@ PORTINC = ${CHIBIOS}/os/ports/common/ARMCMx/CMSIS/include \
           ${CHIBIOS}/os/ports/common/ARMCMx \
           ${CHIBIOS}/os/ports/GCC/ARMCMx \
           ${CHIBIOS}/os/ports/GCC/ARMCMx/STM32F4xx
-
-PORTLD  = ${CHIBIOS}/os/ports/GCC/ARMCMx/STM32F4xx/ld
