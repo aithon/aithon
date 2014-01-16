@@ -38,7 +38,7 @@ USE_VERBOSE_COMPILE = no
 #
 
 # Enables the use of FPU on Cortex-M4.
-USE_FPU = no
+USE_FPU = yes
 
 
 #
@@ -62,7 +62,6 @@ ifndef IS_BOOTLOADER
    USE_COPT += -DUSE_IAP
 else
    LDSCRIPT = $(AITHON_LIBRARY)/Board/AithonBootloader.ld
-   LDSCRIPT = $(CHIBIOS)/os/ports/GCC/ARMCMx/STM32F4xx/ld/STM32F407xG.ld
 endif
 
 # Imported source files and paths

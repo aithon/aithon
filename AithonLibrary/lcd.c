@@ -9,16 +9,16 @@
 
 // Other Constants
 #define _HOME_ADDR      0x80
-#define _LINE_INCR      0x80
+#define _LINE_INCR      0x40
 
 // LCD Pin Control Macros
 #define _SET_CLK() palSetPad(GPIOA, GPIOA_LCD_CLK)
 #define _CLR_CLK() palClearPad(GPIOA, GPIOA_LCD_CLK)
 #define _SET_DATA() palSetPad(GPIOA, GPIOA_LCD_DATA)
 #define _CLR_DATA() palClearPad(GPIOA, GPIOA_LCD_DATA)
-#define _SET_EN() palClearPad(GPIOD, GPIOD_LCD_E)
+#define _SET_EN() palSetPad(GPIOD, GPIOD_LCD_E)
 #define _CLR_EN() palClearPad(GPIOD, GPIOD_LCD_E)
-#define _SET_RS() palClearPad(GPIOD, GPIOD_LCD_RS)
+#define _SET_RS() palSetPad(GPIOD, GPIOD_LCD_RS)
 #define _CLR_RS() palClearPad(GPIOD, GPIOD_LCD_RS)
 
 
