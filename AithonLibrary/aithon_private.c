@@ -57,7 +57,8 @@ static msg_t _resetThread(void *p)
 #if AI_USE_UART2_PROGRAMMING
    chEvtRegister(chnGetEventSource(&SD2), &evtListener, 2);
 #endif
-   while (TRUE) {
+   while (TRUE)
+   {
       eventmask_t evt = chEvtWaitAny(EVENT_MASK(1) | EVENT_MASK(2));
 #if AI_USE_UART1_PROGRAMMING
       if (evt == EVENT_MASK(1) &&

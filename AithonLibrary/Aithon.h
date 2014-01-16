@@ -99,8 +99,8 @@ void servo_set(int pin, int position);
 void music_playNote(MusicNote note);
 void music_playNotes(MusicNote *notes, int numNotes);
 void music_playNotesAsync(MusicNote *notes, int numNotes);
-#define music_playSong(song) aiMusicPlayNotes(song, sizeof(song)/sizeof(MusicNote))
-#define music_playSongAsync(song) aiMusicPlayNotesAsync(song, sizeof(song)/sizeof(MusicNote))
+#define music_playSong(song) music_playNotes(song, sizeof(song)/sizeof(MusicNote))
+#define music_playSongAsync(song) music_playNotesAsync(song, sizeof(song)/sizeof(MusicNote))
 
 
 // USB device - virtual COM port functions / definitions

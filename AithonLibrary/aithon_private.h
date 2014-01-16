@@ -22,7 +22,7 @@ void _aiPrivateInit(void);
 
 // reserved EEPROM values
 #define _AI_EE_RES_VAL_BOOT_RUN		0xABCD // bootloader should run
-#define _AI_EE_RES_VAL_DEfAULT		0x00 // default value
+#define _AI_EE_RES_VAL_DEFAULT		0x00 // default value
 
 
 #define _AI_RESET_CMD					0xA5 // reset command if programming over UART

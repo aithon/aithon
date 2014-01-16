@@ -139,7 +139,7 @@ int main(void)
    {
       startProgram();
    }
-   _ee_putReserved(_AI_EE_RES_ADDR_BOOT, _AI_EE_RES_VAL_DEfAULT);
+   _ee_putReserved(_AI_EE_RES_ADDR_BOOT, _AI_EE_RES_VAL_DEFAULT);
 
    led_on(0);
    led_on(1);
@@ -147,11 +147,18 @@ int main(void)
    int i, j;
    for (i = 0; i < BOOT_TIMEOUT; i++)
    {
-      // update the countdown
-      if (isUserRun && i % 1000 == 0)
+      if (isUserRun)
       {
-         lcd_cursor(0, 0);
-         lcd_printf("Aithon Board\n%d ", (BOOT_TIMEOUT-i)/1000);
+         // flash LED1
+         if (i % 100 == 0)
+            led_toggle(1);
+         
+         // update the countdown
+         if (i % 1000 == 0)
+         {
+            lcd_cursor(0, 0);
+            lcd_printf("Aithon Board\n%d ", (BOOT_TIMEOUT-i)/1000);
+         }
       }
 
       // check all the interfaces for a SYNC
