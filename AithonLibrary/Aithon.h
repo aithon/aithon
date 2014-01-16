@@ -17,6 +17,10 @@
 #include "flash_if.h"
 
 
+// Global constants and macros
+#define NUM_DIGITAL_PINS	17
+
+
 // general Aithon functions / definitions
 void led_on(int num);
 void led_off(int num);
@@ -59,7 +63,9 @@ int8_t imu_getTemp(void);
 // motor functions / definitions
 void motor_set(int motor, int power);
 void motor_brake(int motor, int power);
+#ifdef AITHON_r4
 float motor_getCurrent(int motor);
+#endif
 
 
 // digital pin functions / definitions
@@ -81,10 +87,12 @@ void digital_toggle(int pin);
 
 // analog pin functions / definitions
 typedef enum {
-   MAIN_PWR = 8,
-   SERVO_PWR = 9,
-   M0_SENSE = 10,
-   M1_SENSE = 11,
+#ifdef AITHON_r4
+   M0_SENSE = 8,
+   M1_SENSE = 9,
+#endif
+   MAIN_PWR = 10,
+   SERVO_PWR = 11,
 } AnalogPin;
 uint16_t analog_get(AnalogPin pin);
 
@@ -112,7 +120,7 @@ void _usbcdc_init(void);
 
 // microSD functions / definitions
 extern FATFS sdFS;
-bool_t aiSDInit(void);
+bool_t sd_init(void);
 
 
 // emulated EEPROM functions

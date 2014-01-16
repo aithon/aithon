@@ -10,7 +10,7 @@
  * @{
  */
 
-GPIO_TypeDef *_ports[17] = {
+GPIO_TypeDef *_ports[NUM_DIGITAL_PINS] = {
    GPIOC, // 0
    GPIOC, // 1
    GPIOC, // 2
@@ -30,7 +30,7 @@ GPIO_TypeDef *_ports[17] = {
    GPIOE, // 16
 };
 
-int _pads[17] = {
+int _pads[NUM_DIGITAL_PINS] = {
    GPIOC_DIGITAL0,
    GPIOC_DIGITAL1,
    GPIOC_DIGITAL2,

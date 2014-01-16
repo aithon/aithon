@@ -33,7 +33,7 @@ void __late_init(void)
    sdStart(&SD2, NULL);
 
 #ifndef _AI_IS_BOOTLOADER
-   _aiPrivateInit();
+   _aithon_private_init();
 #endif
 }
 
@@ -81,7 +81,7 @@ static msg_t _resetThread(void *p)
 }
 #endif
 
-void _aiPrivateInit(void)
+void _aithon_private_init(void)
 {
 #if AI_USE_UART1_PROGRAMMING || AI_USE_UART2_PROGRAMMING
    (void)chThdCreateStatic(_waResetThread, sizeof(_waResetThread), HIGHPRIO, _resetThread, NULL);

@@ -6,6 +6,15 @@ ifndef AITHON_LIBRARY
 $(error Aithon library path was not specified.)
 endif
 
+ifndef BOARD_REV
+$(error Aithon board revision not specified.)
+endif
+ifneq ($(BOARD_REV),r4)
+ifneq ($(BOARD_REV),v01)
+$(error Invalid Aithon board revision. Expected r4 or v01)
+endif
+endif
+
 
 ##############################################################################
 # Build global options
@@ -56,20 +65,26 @@ CHIBIOS = $(AITHON_LIBRARY)/ChibiOS
 # Define project name here (defines name of output binaries)
 PROJECT = ch
 
+# Directory containing board-specific files
+BOARDDIR = $(AITHON_LIBRARY)/Board_$(BOARD_REV)
+
 # use the appropriate linker script based on whether or not we're using an IAP
-ifndef IS_BOOTLOADER
-   LDSCRIPT = $(AITHON_LIBRARY)/Board/AithonIAP.ld
-   USE_COPT += -DUSE_IAP
+ifdef IS_BOOTLOADER
+   LDSCRIPT = $(BOARDDIR)/AithonBootloader.ld
 else
-   LDSCRIPT = $(AITHON_LIBRARY)/Board/AithonBootloader.ld
+   LDSCRIPT = $(BOARDDIR)/AithonIAP.ld
+   USE_COPT += -DUSE_IAP
 endif
+
+
+USE_COPT += -DAITHON_$(BOARD_REV)
 
 # Imported source files and paths
 include $(CHIBIOS)/os/hal/platforms/STM32F4xx/platform.mk
 include $(CHIBIOS)/os/hal/hal.mk
 include $(CHIBIOS)/os/ports/GCC/ARMCMx/STM32F4xx/port.mk
 include $(CHIBIOS)/os/kernel/kernel.mk
-include $(AITHON_LIBRARY)/Board/Board.mk
+include $(BOARDDIR)/Board.mk
 include $(CHIBIOS)/os/various/fatfs_bindings/fatfs.mk
 
 

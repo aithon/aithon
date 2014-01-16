@@ -12,9 +12,10 @@ void _servo_init(void);
 void _music_init(void);
 extern SerialUSBDriver SDU1;
 void _usb_init(void);
+void _sd_init(void);
 uint16_t _ee_init(void);
 void __late_init(void);
-void _aiPrivateInit(void);
+void _aithon_private_init(void);
 
 
 // reserved EEPROM addresses

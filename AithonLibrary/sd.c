@@ -27,7 +27,7 @@ static MMCConfig mmccfg = {&SPID3, &ls_spicfg, &hs_spicfg};
  * @retval TRUE      There was an error.
  * @retval FALSE     No error
  */
-bool_t aiSDInit(void)
+bool_t sd_init(void)
 {
    // TODO: Check that there is a card in the microSD socket
 

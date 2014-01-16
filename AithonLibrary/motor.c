@@ -90,6 +90,7 @@ void motor_brake(int motor, int power)
    values[motor] = power;
 }
 
+#ifdef AITHON_r4
 float motor_getCurrent(int motor)
 {
    if (motor == 0)
@@ -99,3 +100,4 @@ float motor_getCurrent(int motor)
       
    return -1;
 }
+#endif

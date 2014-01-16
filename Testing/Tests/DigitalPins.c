@@ -45,7 +45,7 @@ int test_digital_pins()
 {
    int failed = 0;
    int i;
-   for (i = 0; i < 15; i++)
+   for (i = 0; i < NUM_DIGITAL_PINS; i++)
    {
       if (test_digital_pin(i))
          failed++;
