@@ -8,7 +8,7 @@ USERSRC = $(wildcard ./*.c) $(wildcard Tests/*.c)
 USERINC = ./ Tests/
 
 # Target board revision. Either r4 or v01
-BOARD_REV = v01
+BOARD_REV = r4
 
 # Include the primary Aithon makefile
 include $(AITHON_LIBRARY)/Aithon.mk
