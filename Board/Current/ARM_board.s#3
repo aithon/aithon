@@ -10017,8 +10017,8 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <part name="SUPPLY14" library="supply2" deviceset="GND" device=""/>
 <part name="U16" library="r_cubed" deviceset="STL85N6F3" device=""/>
 <part name="JP3" library="SparkFun" deviceset="M08" device="1X08" value="MISC"/>
-<part name="R37" library="SparkFun-Resistors" deviceset="RESISTOR" device="0603-RES" value="2k"/>
-<part name="R38" library="SparkFun-Resistors" deviceset="RESISTOR" device="0603-RES" value="2k"/>
+<part name="R37" library="SparkFun-Resistors" deviceset="RESISTOR" device="0603-RES" value="3k"/>
+<part name="R38" library="SparkFun-Resistors" deviceset="RESISTOR" device="0603-RES" value="3k"/>
 </parts>
 <sheets>
 <sheet>
