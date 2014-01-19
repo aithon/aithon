@@ -47,6 +47,7 @@ void _write_byte(uint8_t data)
       else
          _CLR_DATA();
       _SET_CLK();
+      delayUs(1);
    }
 	//set the LCD's E (Enable) line low to latch in the data
    _CLR_EN();

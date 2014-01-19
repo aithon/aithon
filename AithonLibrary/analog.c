@@ -26,10 +26,10 @@
 
 /*
    How the analog pins are connected to the ADC inputs:
-   M1_SENSE    IN9
-   M0_SENSE    IN8
    SERVO_PWR   IN15
    MAIN_PWR    IN14
+   A9          IN9
+   A8          IN8
    A7          IN10
    A6          IN11
    A5          IN12
@@ -46,7 +46,7 @@ static adcsample_t _samples[_NUM_CHANNELS*_NUM_SAMPLES];
 /*
  * ADC conversion group.
  * Mode:        Continuous, 100 samples of 10 channels.
- * Channels:    IN3, IN2, IN1, IN0, IN13, IN12, IN11, IN10, IN14, IN15, IN8, IN9
+ * Channels:    IN3, IN2, IN1, IN0, IN13, IN12, IN11, IN10, IN8, IN9, IN14, IN15
  */
 static const ADCConversionGroup _config = {
    TRUE,

@@ -20,9 +20,9 @@ void __late_init(void)
    _imu_init();
    _analog_init();
 #endif
-   _lcd_init();
    _ee_init();
    _usbcdc_init();
+   _lcd_init();
 
    // setup LEDs as off
    led_off(0);

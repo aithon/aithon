@@ -89,15 +89,3 @@ void motor_brake(int motor, int power)
    braking[motor] = 1;
    values[motor] = power;
 }
-
-#ifdef AITHON_r4
-float motor_getCurrent(int motor)
-{
-   if (motor == 0)
-      return analog_get(M0_SENSE)*1.0/585.0;
-   else if (motor == 1)
-      return analog_get(M1_SENSE)*1.0/585.0;
-      
-   return -1;
-}
-#endif

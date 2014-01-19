@@ -6,15 +6,6 @@ ifndef AITHON_LIBRARY
 $(error Aithon library path was not specified.)
 endif
 
-ifndef BOARD_REV
-$(error Aithon board revision not specified.)
-endif
-ifneq ($(BOARD_REV),r4)
-ifneq ($(BOARD_REV),v01)
-$(error Invalid Aithon board revision. Expected r4 or v01)
-endif
-endif
-
 
 ##############################################################################
 # Build global options
@@ -64,6 +55,10 @@ CHIBIOS = $(AITHON_LIBRARY)/ChibiOS
 
 # Define project name here (defines name of output binaries)
 PROJECT = ch
+
+ifndef BOARD_REV
+BOARD_REV = v01
+endif
 
 # Directory containing board-specific files
 BOARDDIR = $(AITHON_LIBRARY)/Board_$(BOARD_REV)

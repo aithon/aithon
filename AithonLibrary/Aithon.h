@@ -31,7 +31,7 @@ void button_wait(int num);
 
 // wrappers around the appropriate ChibiOS delay/sleep functions
 #define delayS(s) chThdSleepSeconds(s)  
-#define delayMs(ms) chThdSleepMicroseconds(ms)
+#define delayMs(ms) chThdSleepMilliseconds(ms)
 #define delayUs(us) halPolledDelay(US2RTT(us)) // must use busy loops for <1ms delays
 
 
@@ -63,9 +63,6 @@ int8_t imu_getTemp(void);
 // motor functions / definitions
 void motor_set(int motor, int power);
 void motor_brake(int motor, int power);
-#ifdef AITHON_r4
-float motor_getCurrent(int motor);
-#endif
 
 
 // digital pin functions / definitions
@@ -87,10 +84,6 @@ void digital_toggle(int pin);
 
 // analog pin functions / definitions
 typedef enum {
-#ifdef AITHON_r4
-   M0_SENSE = 8,
-   M1_SENSE = 9,
-#endif
    MAIN_PWR = 10,
    SERVO_PWR = 11,
 } AnalogPin;
