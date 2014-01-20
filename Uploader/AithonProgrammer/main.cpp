@@ -14,7 +14,7 @@
 #include <windows.h>
 #define SLEEP(x) Sleep(uint(x))
 #else
-#define SLEEP(x) sleep(uint(x))
+#define SLEEP(x) usleep(uint(1000*x))
 #endif
 
 // uncomment to enable debug printing
@@ -384,7 +384,7 @@ void doProgramFSM()
     state_t nextState = FSM_RESET;
     int packetNum = 0;
     int retries = MAX_RETRIES;
-
+    
     while (true)
     {
         switch (state)
