@@ -28,7 +28,7 @@
 
 // timeouts
 #define DEFAULT_TIMEOUT 1000
-#define SYNC_TIMEOUT    500
+#define SYNC_TIMEOUT    50
 #define FLASH_TIMEOUT   15000
 
 // control characters
