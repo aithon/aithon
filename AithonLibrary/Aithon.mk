@@ -49,7 +49,6 @@ USE_FPU = yes
 # Project, sources and paths
 #
 
-
 # Path to ChibiOS
 CHIBIOS = $(AITHON_LIBRARY)/ChibiOS
 
@@ -175,3 +174,21 @@ else
 endif
 
 include $(CHIBIOS)/os/ports/GCC/ARMCMx/rules.mk
+
+
+# Detect the OS
+UNAME := $(shell uname)
+
+program: all
+ifeq ($(UNAME), windows32)
+	# Run Windows programmer
+	@$(AITHON_LIBRARY)/Programmer/Windows/AithonProgrammer.exe program build/$(PROJECT).bin
+endif
+ifeq ($(UNAME), darwin)
+	# Run Mac programmer
+	@$(AITHON_LIBRARY)/Programmer/MacOSX/AithonProgrammer program build/$(PROJECT).bin
+endif
+ifeq ($(UNAME), linux)
+	# Run Linux programmer
+	@$(AITHON_LIBRARY)/Programmer/Linux/AithonProgrammer program build/$(PROJECT).bin
+endif
