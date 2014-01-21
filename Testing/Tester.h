@@ -12,6 +12,7 @@ extern AithonTest tests[];
 
 // Test function prototypes
 int test_digital_pins(void);
+int test_sd_init(void);
 int test_buzzer(void);
 
 #endif
