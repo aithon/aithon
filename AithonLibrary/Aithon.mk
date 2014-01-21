@@ -181,14 +181,11 @@ UNAME := $(shell uname)
 
 program: all
 ifeq ($(UNAME), windows32)
-	# Run Windows programmer
 	@$(AITHON_LIBRARY)/Programmer/Windows/AithonProgrammer.exe program build/$(PROJECT).bin
 endif
 ifeq ($(UNAME), darwin)
-	# Run Mac programmer
 	@$(AITHON_LIBRARY)/Programmer/MacOSX/AithonProgrammer program build/$(PROJECT).bin
 endif
 ifeq ($(UNAME), linux)
-	# Run Linux programmer
 	@$(AITHON_LIBRARY)/Programmer/Linux/AithonProgrammer program build/$(PROJECT).bin
 endif
