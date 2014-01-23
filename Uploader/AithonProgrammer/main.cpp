@@ -73,15 +73,13 @@ QextSerialPort *_port = NULL;
 QByteArray _programData;
 error_t _error;
 int _numPackets;
+bool _debug = false;
 
 
 void debug(QString msg)
 {
-#ifdef DEBUG
-    std::cout << "\nDEBUG: " << msg.toStdString() << "\n";
-#else
-    (void)msg;
-#endif
+	 if (_debug)
+	     std::cout << "\nDEBUG: " << msg.toStdString() << "\n";
 }
 
 void error(QString msg)
@@ -459,8 +457,8 @@ void doProgramFSM()
 void displayUsage()
 {
     std::cout << "Usage:\n";
-    std::cout << "       AithonProgrammer.exe detect\n";
-    std::cout << "       AithonProgrammer.exe program <BINARY_FILE_PATH> [COM_PORT]\n";
+    std::cout << "       AithonProgrammer.exe [-d] detect\n";
+    std::cout << "       AithonProgrammer.exe [-d] program <BINARY_FILE_PATH> [COM_PORT]\n";
 }
 
 int main(int argc, char *argv[])
@@ -475,6 +473,17 @@ int main(int argc, char *argv[])
 
     QString cmd = argv[1];
     QString comPort = getCOMPort();
+    if (!cmd.compare("-d", Qt::CaseInsensitive))
+    {
+        _debug = true;
+        cmd = argv[2];
+        if (argc > 3)
+        {
+            argv[2] = argv[3];
+            argc--;
+        }
+
+    }
     if (!cmd.compare("detect", Qt::CaseInsensitive))
     {
         if (comPort.length() == 0)
@@ -487,7 +496,8 @@ int main(int argc, char *argv[])
             std::cout << comPort.toStdString() << "\n";
         }
     }
-    else if (!cmd.compare("program", Qt::CaseInsensitive))
+    else if (!cmd.compare("program", Qt::CaseInsensitive) ||
+             !cmd.compare("program_debug", Qt::CaseInsensitive))
     {
         if (argc == 4)
         {
