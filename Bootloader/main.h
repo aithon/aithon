@@ -3,7 +3,7 @@
 
 // general constants
 #define PACKET_LEN      1024
-#define BOOT_TIMEOUT    5000
+#define BOOT_TIMEOUT    30000
 #define DEFAULT_TIMEOUT 100
 
 // control characters
