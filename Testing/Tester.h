@@ -14,5 +14,6 @@ extern AithonTest tests[];
 int test_digital_pins(void);
 int test_sd_init(void);
 int test_buzzer(void);
+int test_motors(void);
 
 #endif

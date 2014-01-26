@@ -3,9 +3,10 @@
 #define NUM_TESTS (int)(sizeof tests / sizeof tests[0])
 
 AithonTest tests[] = {
-	{test_digital_pins, "Digital Pins"},
-	{test_sd_init, "SD Init"},
-	{test_buzzer, "Buzzer"},
+   {test_digital_pins, "Digital Pins"},
+   // {test_sd_init, "SD Init"},
+   // {test_buzzer, "Buzzer"},
+   // {test_motors, "Motors"},
 };
 
 int main(void)
@@ -28,7 +29,7 @@ int main(void)
       if (numErrors == 0)
          lcd_printf("Passed!");
       else
-         lcd_printf("%d failures.", numErrors);
+         lcd_printf("Failure: %d", numErrors);
          
       // Wait for button 0 to be pressed before moving on
       button_wait(0);
@@ -38,7 +39,7 @@ int main(void)
    lcd_printf("Done!");
    
    while (1)
-	{
+   {
       delayS(100);
    }
 }

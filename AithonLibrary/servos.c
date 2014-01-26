@@ -11,6 +11,7 @@ static const PWMConfig _pwmcfg4 = {
 		{PWM_OUTPUT_ACTIVE_HIGH, NULL},
 	},
 	0,
+	0,
 	0
 };
 
@@ -24,6 +25,7 @@ static const PWMConfig _pwmcfg8 = {
 		{PWM_OUTPUT_ACTIVE_HIGH, NULL},
 		{PWM_OUTPUT_ACTIVE_HIGH, NULL},
 	},
+	0,
 	0,
 	0
 };

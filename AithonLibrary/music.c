@@ -18,7 +18,8 @@ static PWMConfig _pwmcfg2 = {
 		{PWM_OUTPUT_DISABLED, NULL},
 	},
 	0,
-	0
+	0,
+   0
 };
 
 void _play_note(uint16_t frequency, uint16_t duration)

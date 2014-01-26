@@ -18,7 +18,8 @@
 
 
 // Global constants and macros
-#define NUM_DIGITAL_PINS	17
+#define NUM_DIGITAL_PINS   17
+#define NUM_MOTORS         2
 
 
 // general Aithon functions / definitions

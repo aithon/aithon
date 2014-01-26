@@ -99,8 +99,8 @@ QString getCOMPort()
 {
     foreach (QextPortInfo info, QextSerialEnumerator::getPorts())
     {
-        debug(QString::number(info.vendorID));
-        debug(QString::number((info.productID)));
+        debug(QString("VendorID: ")+QString::number(info.vendorID));
+        debug(QString("Product ID: ")+QString::number((info.productID)));
         if (info.vendorID == USB_ST_VID && info.productID == USB_STM32F4_PID)
         {
             return info.portName;
@@ -237,7 +237,7 @@ state_t resetChip()
         _port->close();
         delete _port;
         debug("Deleted port.");
-        SLEEP(1000);
+        SLEEP(4000);
         _port = new QextSerialPort(port);
         _port->setBaudRate(BAUD115200);
         _port->setTimeout(5000);
