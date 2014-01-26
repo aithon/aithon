@@ -363,7 +363,6 @@
                             PIN_MODE_INPUT(GPIOE_DIGITAL5) | \
                             PIN_MODE_INPUT(GPIOE_DIGITAL4) | \
                             PIN_MODE_INPUT(GPIOE_DIGITAL3) | \
-                            PIN_MODE_INPUT(GPIOE_DIGITAL3) | \
                             PIN_MODE_OUTPUT(GPIOE_MOTOR0_A) | \
                             PIN_MODE_OUTPUT(GPIOE_MOTOR0_B) | \
                             PIN_MODE_ALTERNATE(GPIOE_MOTOR0_EN) | \
@@ -377,9 +376,9 @@
 #define VAL_GPIOE_OSPEEDR  0xFFFFFFFF
 #define VAL_GPIOE_PUPDR    0x00000000
 #define VAL_GPIOE_ODR      0xFFFFFFFF
-#define VAL_GPIOE_AFRL     0x00000000
-#define VAL_GPIOE_AFRH     (PIN_AFIO_AF(GPIOE_MOTOR0_EN, 1) | \
+#define VAL_GPIOE_AFRL     (PIN_AFIO_AF(GPIOE_MOTOR0_EN, 1) | \
                             PIN_AFIO_AF(GPIOE_MOTOR1_EN, 1))
+#define VAL_GPIOE_AFRH     0x00000000
 
 /*
  * Port H setup.
