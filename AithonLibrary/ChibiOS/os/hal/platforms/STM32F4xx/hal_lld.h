@@ -403,6 +403,9 @@
 /* DAC attributes.*/
 #define STM32_HAS_DAC           TRUE
 
+/* DAC attributes.*/
+#define STM32_HAS_DAC           TRUE
+
 /* DMA attributes.*/
 #define STM32_ADVANCED_DMA      TRUE
 #define STM32_HAS_DMA1          TRUE

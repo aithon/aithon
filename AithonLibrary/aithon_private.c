@@ -5,7 +5,6 @@
  * @brief   Private Aithon library functions - should NOT be called by user-applications.
  */
 
-
 void __late_init(void)
 {
    // initialize ChibiOS
@@ -45,45 +44,26 @@ void _reset_to_bootloader(void)
 }
 
 
-#if AI_USE_UART1_PROGRAMMING || AI_USE_UART2_PROGRAMMING
-static WORKING_AREA(_waResetThread, 128);
-static msg_t _resetThread(void *p)
+Thread *_aithon_thd = 0;
+static WORKING_AREA(_waAithonThread, 128);
+static msg_t aithon_thread(void *p)
 {
    (void)p;
-   EventListener evtListener;
-#if AI_USE_UART1_PROGRAMMING
-   chEvtRegister(chnGetEventSource(&SD1), &evtListener, 1);
-#endif
-#if AI_USE_UART2_PROGRAMMING
-   chEvtRegister(chnGetEventSource(&SD2), &evtListener, 2);
-#endif
-   while (TRUE)
+   eventmask_t evt = chEvtWaitAny(ALL_EVENTS);
+   if (evt == 1)
    {
-      eventmask_t evt = chEvtWaitAny(EVENT_MASK(1) | EVENT_MASK(2));
-#if AI_USE_UART1_PROGRAMMING
-      if (evt == EVENT_MASK(1) &&
-          (chEvtGetAndClearFlags(&evtListener) & CHN_INPUT_AVAILABLE) &&
-          (*(SD1.iqueue.q_rdptr) == _AI_RESET_CMD))
-      {
-         _reset_to_bootloader();
-      }
-#endif
-#if AI_USE_UART2_PROGRAMMING
-      if (evt == EVENT_MASK(2) &&
-          (chEvtGetAndClearFlags(&evtListener) & CHN_INPUT_AVAILABLE) &&
-          (*(SD2.iqueue.q_rdptr) == _AI_RESET_CMD))
-      {
-         _reset_to_bootloader();
-      }
-#endif
+      // Run USB cleanup code here
+      _usb_stop();
    }
+   else
+   {
+      // Run UART cleanup code here
+   }
+   _reset_to_bootloader();
    return 0;
 }
-#endif
 
 void _aithon_private_init(void)
 {
-#if AI_USE_UART1_PROGRAMMING || AI_USE_UART2_PROGRAMMING
-   (void)chThdCreateStatic(_waResetThread, sizeof(_waResetThread), HIGHPRIO, _resetThread, NULL);
-#endif
+   _aithon_thd = chThdCreateStatic(_waAithonThread, sizeof(_waAithonThread), ABSPRIO, aithon_thread, NULL);
 }

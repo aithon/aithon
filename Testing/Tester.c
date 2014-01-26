@@ -5,7 +5,7 @@
 AithonTest tests[] = {
    {test_digital_pins, "Digital Pins"},
    // {test_sd_init, "SD Init"},
-   // {test_buzzer, "Buzzer"},
+   {test_buzzer, "Buzzer"},
    // {test_motors, "Motors"},
 };
 

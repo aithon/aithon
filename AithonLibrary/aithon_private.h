@@ -17,6 +17,8 @@ uint16_t _ee_init(void);
 void __late_init(void);
 void _aithon_private_init(void);
 
+void _usb_stop(void);
+
 
 // reserved EEPROM addresses
 #define _AI_EE_RES_ADDR_BOOT			0x00 // should bootloader run
@@ -32,5 +34,7 @@ void _aithon_private_init(void);
 void _reset_to_bootloader(void);
 uint16_t _ee_putReserved(uint8_t resAddr, uint16_t data);
 uint16_t _ee_getReserved(uint8_t resAddr, uint16_t *data);
+
+extern Thread *_aithon_thd;
 
 #endif
