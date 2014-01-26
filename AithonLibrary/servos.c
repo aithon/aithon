@@ -56,7 +56,7 @@ void servo_set(int servoNum, int position)
    // }
    
    
-   if (servoNum > 0 && servoNum < 4)
+   if (servoNum >= 0 && servoNum < 4)
    {
       pwmEnableChannel(&PWMD4, servoNum, (position+75)*10);
    }
