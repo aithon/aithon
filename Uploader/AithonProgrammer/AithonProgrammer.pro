@@ -12,8 +12,8 @@ CONFIG   += console
 TEMPLATE = app
 
 
-SOURCES += main.cpp listener.cpp
+SOURCES += main.cpp
 
 include(../qextserialport-1.2rc/src/qextserialport.pri)
 
-HEADERS += listener.h
+HEADERS +=
