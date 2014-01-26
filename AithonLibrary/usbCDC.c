@@ -286,9 +286,7 @@ static bool_t _request_hook(USBDriver *usbp) {
 		(usbp->setup[1] == CDC_SET_CONTROL_LINE_STATE) &&
 		((usbp->setup[2] & 0x3) == 0x3)) {
       // Disable the USB and then reset the board.
-      chSysLockFromIsr();
-      chEvtSignalI(_aithon_thd, (eventmask_t)1);
-      chSysUnlockFromIsr();
+      chEvtSignal(_aithon_thd, (eventmask_t)1);
 	}
 	return sduRequestsHook(usbp);
 }
@@ -316,7 +314,7 @@ void _usbcdc_init(void)
 void _usb_stop(void)
 {
    usbDisconnectBus(_serusbcfg.usbp);
-   delayS(1);
+   // delayS(1);
    sduStop(&SDU1);
    usbStop(_serusbcfg.usbp);
 }
