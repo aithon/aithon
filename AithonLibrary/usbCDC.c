@@ -279,14 +279,19 @@ const SerialUSBConfig _serusbcfg = {
    USBD1_INTERRUPT_REQUEST_EP
 };
 
+uint8_t _resetSequence[3] = {0, 2, 3};
+uint8_t _resetIndex = 0;
 static bool_t _request_hook(USBDriver *usbp) {
    // The uploader program will set both the RTS and DTR bits to tell
    // the board to reset in order to be programmed.
 	if (((usbp->setup[0] & USB_RTYPE_TYPE_MASK) == USB_RTYPE_TYPE_CLASS) &&
-		(usbp->setup[1] == CDC_SET_CONTROL_LINE_STATE) &&
-		((usbp->setup[2] & 0x3) == 0x3)) {
-      // Disable the USB and then reset the board.
-      chEvtSignal(_aithon_thd, (eventmask_t)1);
+		(usbp->setup[1] == CDC_SET_CONTROL_LINE_STATE)) {
+      if (_resetSequence[_resetIndex] == (usbp->setup[2] & 0x3))
+         _resetIndex++;
+      else
+         _resetIndex = 0;
+      if (_resetIndex == 3)
+         chEvtSignal(_aithon_thd, (eventmask_t)1);
 	}
 	return sduRequestsHook(usbp);
 }

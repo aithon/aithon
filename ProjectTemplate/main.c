@@ -2,8 +2,6 @@
 
 int main(void)
 {
-   int i;
-   
    // print something to the LCD screen
    lcd_printf("Hello Aithon!");
    

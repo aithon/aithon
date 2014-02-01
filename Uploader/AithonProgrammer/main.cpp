@@ -114,6 +114,18 @@ bool isAithonCDC()
     return _port->portName() == getCOMPort();
 }
 
+bool isPortActive(QString port)
+{
+    foreach (QextPortInfo info, QextSerialEnumerator::getPorts())
+    {
+        if (info.portName == port)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 
 void writeByte(uint8_t byte)
 {
@@ -227,8 +239,11 @@ state_t resetChip()
 {
     if (isAithonCDC())
     {
-        // set both rts and dtr to signal a software reset of the board
+        // send a 0x023 seqeunce using RTS/DTR to do a software reset of the board
+        _port->setRts(false);
+        _port->setDtr(false);
         _port->setRts(true);
+        _port->setDtr(false);
         _port->setDtr(true);
         debug("Reset board.");
 
@@ -237,7 +252,23 @@ state_t resetChip()
         _port->close();
         delete _port;
         debug("Deleted port.");
-        SLEEP(4000);
+
+        QTime time;
+        time.start();
+        bool state = true;
+        while (time.elapsed() < 4000)
+        {
+            bool newState = isPortActive(port);
+            if (state != newState)
+            {
+                if (newState)
+                    break;
+                else
+                    state = newState;
+            }
+            SLEEP(50);
+        }
+
         _port = new QextSerialPort(port);
         _port->setBaudRate(BAUD115200);
         _port->setTimeout(5000);
