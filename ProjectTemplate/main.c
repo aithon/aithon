@@ -17,18 +17,6 @@ int main(void)
       led_toggle(0);
       led_toggle(1);
       
-      for (i = 0; i < 8; i++)
-      {
-         while (!button_get(0))
-         {
-            lcd_clear();
-            lcd_printf("A%d = %d", i, analog_get(i));
-            
-            
-            delayMs(200);
-            
-         }
-         delayMs(500);
-      }
+      delayS(1);
    }
 }
