@@ -36,6 +36,11 @@ void __late_init(void)
 #endif
 }
 
+void _default_exit(void)
+{
+   chThdSleep(TIME_INFINITE);
+}
+
 
 void _reset_to_bootloader(void)
 {
