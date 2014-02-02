@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<grid distance="0.1" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.025" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="yes"/>
@@ -543,38 +543,38 @@
 <text x="-2.54" y="-4.32" size="0.9" layer="27" font="vector">&gt;VALUE</text>
 </package>
 <package name="VFQFPN-32">
-<smd name="28" x="0.25" y="2.55" dx="0.35" dy="0.8" layer="1"/>
-<smd name="29" x="-0.25" y="2.55" dx="0.35" dy="0.8" layer="1"/>
-<smd name="30" x="-0.75" y="2.55" dx="0.35" dy="0.8" layer="1"/>
-<smd name="32" x="-1.75" y="2.55" dx="0.35" dy="0.8" layer="1"/>
-<smd name="31" x="-1.25" y="2.55" dx="0.35" dy="0.8" layer="1"/>
-<smd name="27" x="0.75" y="2.55" dx="0.35" dy="0.8" layer="1"/>
-<smd name="26" x="1.25" y="2.55" dx="0.35" dy="0.8" layer="1"/>
-<smd name="25" x="1.75" y="2.55" dx="0.35" dy="0.8" layer="1"/>
-<smd name="13" x="0.25" y="-2.55" dx="0.35" dy="0.8" layer="1"/>
-<smd name="14" x="0.75" y="-2.55" dx="0.35" dy="0.8" layer="1"/>
-<smd name="15" x="1.25" y="-2.55" dx="0.35" dy="0.8" layer="1"/>
-<smd name="16" x="1.75" y="-2.55" dx="0.35" dy="0.8" layer="1"/>
-<smd name="12" x="-0.25" y="-2.55" dx="0.35" dy="0.8" layer="1"/>
-<smd name="11" x="-0.75" y="-2.55" dx="0.35" dy="0.8" layer="1"/>
-<smd name="10" x="-1.25" y="-2.55" dx="0.35" dy="0.8" layer="1"/>
-<smd name="9" x="-1.75" y="-2.55" dx="0.35" dy="0.8" layer="1"/>
-<smd name="20" x="2.55" y="-0.25" dx="0.35" dy="0.8" layer="1" rot="R90"/>
-<smd name="21" x="2.55" y="0.25" dx="0.35" dy="0.8" layer="1" rot="R90"/>
-<smd name="22" x="2.55" y="0.75" dx="0.35" dy="0.8" layer="1" rot="R90"/>
-<smd name="23" x="2.55" y="1.25" dx="0.35" dy="0.8" layer="1" rot="R90"/>
-<smd name="24" x="2.55" y="1.75" dx="0.35" dy="0.8" layer="1" rot="R90"/>
-<smd name="19" x="2.55" y="-0.75" dx="0.35" dy="0.8" layer="1" rot="R90"/>
-<smd name="18" x="2.55" y="-1.25" dx="0.35" dy="0.8" layer="1" rot="R90"/>
-<smd name="17" x="2.55" y="-1.75" dx="0.35" dy="0.8" layer="1" rot="R90"/>
-<smd name="5" x="-2.55" y="-0.25" dx="0.35" dy="0.8" layer="1" rot="R90"/>
-<smd name="4" x="-2.55" y="0.25" dx="0.35" dy="0.8" layer="1" rot="R90"/>
-<smd name="3" x="-2.55" y="0.75" dx="0.35" dy="0.8" layer="1" rot="R90"/>
-<smd name="2" x="-2.55" y="1.25" dx="0.35" dy="0.8" layer="1" rot="R90"/>
-<smd name="1" x="-2.55" y="1.75" dx="0.35" dy="0.8" layer="1" rot="R90"/>
-<smd name="6" x="-2.55" y="-0.75" dx="0.35" dy="0.8" layer="1" rot="R90"/>
-<smd name="7" x="-2.55" y="-1.25" dx="0.35" dy="0.8" layer="1" rot="R90"/>
-<smd name="8" x="-2.55" y="-1.75" dx="0.35" dy="0.8" layer="1" rot="R90"/>
+<smd name="28" x="0.25" y="2.55" dx="0.32" dy="0.8" layer="1"/>
+<smd name="29" x="-0.25" y="2.55" dx="0.32" dy="0.8" layer="1"/>
+<smd name="30" x="-0.75" y="2.55" dx="0.32" dy="0.8" layer="1"/>
+<smd name="32" x="-1.75" y="2.55" dx="0.32" dy="0.8" layer="1"/>
+<smd name="31" x="-1.25" y="2.55" dx="0.32" dy="0.8" layer="1"/>
+<smd name="27" x="0.75" y="2.55" dx="0.32" dy="0.8" layer="1"/>
+<smd name="26" x="1.25" y="2.55" dx="0.32" dy="0.8" layer="1"/>
+<smd name="25" x="1.75" y="2.55" dx="0.32" dy="0.8" layer="1"/>
+<smd name="13" x="0.25" y="-2.55" dx="0.32" dy="0.8" layer="1"/>
+<smd name="14" x="0.75" y="-2.55" dx="0.32" dy="0.8" layer="1"/>
+<smd name="15" x="1.25" y="-2.55" dx="0.32" dy="0.8" layer="1"/>
+<smd name="16" x="1.75" y="-2.55" dx="0.32" dy="0.8" layer="1"/>
+<smd name="12" x="-0.25" y="-2.55" dx="0.32" dy="0.8" layer="1"/>
+<smd name="11" x="-0.75" y="-2.55" dx="0.32" dy="0.8" layer="1"/>
+<smd name="10" x="-1.25" y="-2.55" dx="0.32" dy="0.8" layer="1"/>
+<smd name="9" x="-1.75" y="-2.55" dx="0.32" dy="0.8" layer="1"/>
+<smd name="20" x="2.55" y="-0.25" dx="0.32" dy="0.8" layer="1" rot="R90"/>
+<smd name="21" x="2.55" y="0.25" dx="0.32" dy="0.8" layer="1" rot="R90"/>
+<smd name="22" x="2.55" y="0.75" dx="0.32" dy="0.8" layer="1" rot="R90"/>
+<smd name="23" x="2.55" y="1.25" dx="0.32" dy="0.8" layer="1" rot="R90"/>
+<smd name="24" x="2.55" y="1.75" dx="0.32" dy="0.8" layer="1" rot="R90"/>
+<smd name="19" x="2.55" y="-0.75" dx="0.32" dy="0.8" layer="1" rot="R90"/>
+<smd name="18" x="2.55" y="-1.25" dx="0.32" dy="0.8" layer="1" rot="R90"/>
+<smd name="17" x="2.55" y="-1.75" dx="0.32" dy="0.8" layer="1" rot="R90"/>
+<smd name="5" x="-2.55" y="-0.25" dx="0.32" dy="0.8" layer="1" rot="R90"/>
+<smd name="4" x="-2.55" y="0.25" dx="0.32" dy="0.8" layer="1" rot="R90"/>
+<smd name="3" x="-2.55" y="0.75" dx="0.32" dy="0.8" layer="1" rot="R90"/>
+<smd name="2" x="-2.55" y="1.25" dx="0.32" dy="0.8" layer="1" rot="R90"/>
+<smd name="1" x="-2.55" y="1.75" dx="0.32" dy="0.8" layer="1" rot="R90"/>
+<smd name="6" x="-2.55" y="-0.75" dx="0.32" dy="0.8" layer="1" rot="R90"/>
+<smd name="7" x="-2.55" y="-1.25" dx="0.32" dy="0.8" layer="1" rot="R90"/>
+<smd name="8" x="-2.55" y="-1.75" dx="0.32" dy="0.8" layer="1" rot="R90"/>
 <wire x1="-2.5" y1="2.5" x2="2.5" y2="2.5" width="0.127" layer="21"/>
 <wire x1="2.5" y1="2.5" x2="2.5" y2="-2.5" width="0.127" layer="21"/>
 <wire x1="2.5" y1="-2.5" x2="-2.5" y2="-2.5" width="0.127" layer="21"/>
@@ -616,45 +616,12 @@
 <text x="-2.6" y="-2.7" size="1" layer="21">&gt;VALUE</text>
 </package>
 <package name="DUAL-MOSFET-STL60N32N3LL">
-<smd name="8" x="-1.905" y="3.35" dx="0.6" dy="0.57" layer="1" rot="R90"/>
-<smd name="S1-D2-9" x="0" y="1.37" dx="2.69" dy="5.1" layer="1" rot="R270"/>
-<smd name="1" x="-1.905" y="-2.151" dx="0.6" dy="0.57" layer="1" rot="R270"/>
-<polygon width="0.02" layer="1">
-<vertex x="2.54" y="-1.1" curve="90"/>
-<vertex x="2.18" y="-1.35"/>
-<vertex x="2.18" y="-2.441"/>
-<vertex x="-0.91" y="-2.441"/>
-<vertex x="-0.91" y="-1.651" curve="90"/>
-<vertex x="-1.02" y="-1.551"/>
-<vertex x="-1.87" y="-1.551"/>
-<vertex x="-2.3" y="-1.1"/>
-</polygon>
-<polygon width="0.02" layer="1">
-<vertex x="-2.3" y="-1.09"/>
-<vertex x="-2.54" y="-1.09"/>
-<vertex x="-2.54" y="-0.42"/>
-<vertex x="-2.54" y="-0.36"/>
-<vertex x="-2.17" y="-0.36"/>
-<vertex x="2.54" y="-0.36"/>
-<vertex x="2.54" y="-0.51"/>
-<vertex x="2.54" y="-1.1"/>
-<vertex x="2.2" y="-1.1"/>
-<vertex x="-2.3" y="-1.1"/>
-</polygon>
-<polygon width="0.02" layer="1">
-<vertex x="-0.91" y="3.64"/>
-<vertex x="2.18" y="3.64"/>
-<vertex x="2.18" y="3.13"/>
-<vertex x="2.18" y="3.06"/>
-<vertex x="1.84" y="3.06"/>
-<vertex x="-0.91" y="3.06"/>
-</polygon>
-<smd name="2" x="-0.635" y="-2.151" dx="0.6" dy="0.57" layer="1" rot="R270"/>
-<smd name="4" x="1.905" y="-2.151" dx="0.6" dy="0.57" layer="1" rot="R270"/>
-<smd name="3" x="0.665" y="-2.151" dx="0.6" dy="0.57" layer="1" rot="R270"/>
-<smd name="7" x="-0.635" y="3.35" dx="0.6" dy="0.57" layer="1" rot="R90"/>
-<smd name="5" x="1.905" y="3.35" dx="0.6" dy="0.57" layer="1" rot="R90"/>
-<smd name="6" x="0.595" y="3.35" dx="0.6" dy="0.57" layer="1" rot="R90"/>
+<smd name="8" x="-1.905" y="3.35" dx="0.57" dy="0.6" layer="1"/>
+<smd name="S1D2" x="0" y="1.37" dx="2.69" dy="5.1" layer="1" rot="R270"/>
+<smd name="1" x="-1.905" y="-2.151" dx="0.57" dy="0.6" layer="1"/>
+<smd name="2/3/4" x="0.635" y="-2" dx="3.11" dy="0.9" layer="1"/>
+<smd name="5/6/7" x="0.635" y="3.35" dx="3.11" dy="0.6" layer="1"/>
+<smd name="D1" x="0" y="-0.95" dx="5.1" dy="1.2" layer="1"/>
 </package>
 </packages>
 <symbols>
@@ -1123,16 +1090,15 @@
 <wire x1="-2.54" y1="3.81" x2="-2.54" y2="-8.89" width="0.254" layer="94"/>
 <wire x1="0" y1="-8.89" x2="0" y2="-7.62" width="0.254" layer="94"/>
 <wire x1="0" y1="2.54" x2="0" y2="3.81" width="0.254" layer="94"/>
-<pin name="P$0" x="5.08" y="-2.54" visible="pad" length="middle" direction="in" rot="R180"/>
-<pin name="P$1" x="0" y="5.08" visible="pad" length="short" direction="out" swaplevel="1" rot="R270"/>
-<pin name="P$2" x="0" y="-10.16" visible="pad" length="short" direction="out" swaplevel="2" rot="R90"/>
+<pin name="P$0" x="5.08" y="-2.54" visible="off" length="middle" direction="in" rot="R180"/>
+<pin name="P$1" x="0" y="5.08" visible="off" length="short" direction="out" swaplevel="1" rot="R270"/>
+<pin name="P$2" x="0" y="-10.16" visible="off" length="short" direction="out" swaplevel="2" rot="R90"/>
 </symbol>
 <symbol name="DUAL-MOSFET">
 <wire x1="-1.27" y1="5.969" x2="-1.27" y2="8.89" width="0.127" layer="94"/>
-<wire x1="-1.27" y1="4.191" x2="-1.27" y2="1.27" width="0.127" layer="94"/>
-<pin name="G" x="-5.08" y="5.08" visible="off" length="point"/>
-<pin name="D" x="-1.27" y="8.89" visible="off" length="point" rot="R270"/>
-<pin name="S" x="-1.27" y="1.27" visible="off" length="point" rot="R90"/>
+<pin name="G1" x="-5.08" y="5.08" visible="off" length="point"/>
+<pin name="D1" x="-1.27" y="8.89" visible="off" length="point" rot="R270"/>
+<pin name="S1" x="-1.27" y="1.27" visible="off" length="point" rot="R90"/>
 <wire x1="-2.54" y1="4.191" x2="-1.27" y2="4.191" width="0.127" layer="94"/>
 <wire x1="-2.54" y1="5.08" x2="-1.27" y2="5.08" width="0.127" layer="94"/>
 <wire x1="-2.54" y1="4.445" x2="-2.54" y2="3.937" width="0.127" layer="94"/>
@@ -1144,19 +1110,18 @@
 <wire x1="-2.54" y1="5.715" x2="-2.54" y2="5.969" width="0.127" layer="94"/>
 <wire x1="-2.54" y1="5.969" x2="-2.54" y2="6.223" width="0.127" layer="94"/>
 <wire x1="-2.54" y1="5.969" x2="-1.27" y2="5.969" width="0.127" layer="94"/>
-<text x="-2.286" y="2.794" size="0.762" layer="97">S</text>
-<text x="-3.81" y="4.064" size="0.762" layer="97">G</text>
-<text x="-2.159" y="6.35" size="0.762" layer="97">D</text>
+<text x="-2.794" y="3.048" size="0.762" layer="97">S1</text>
+<text x="-4.318" y="4.064" size="0.762" layer="97">G1</text>
+<text x="-2.921" y="6.35" size="0.762" layer="97">D1</text>
 <text x="-0.762" y="6.35" size="1.27" layer="95">&gt;NAME</text>
 <text x="-0.762" y="3.81" size="1.27" layer="96">&gt;VALUE</text>
 <wire x1="-2.159" y1="5.334" x2="-2.54" y2="5.08" width="0.127" layer="94"/>
 <wire x1="-2.54" y1="5.08" x2="-2.159" y2="4.826" width="0.127" layer="94"/>
 <wire x1="-1.27" y1="4.191" x2="-1.27" y2="5.08" width="0.127" layer="94"/>
-<wire x1="-1.27" y1="-1.651" x2="-1.27" y2="1.27" width="0.127" layer="94"/>
+<wire x1="-1.27" y1="-1.651" x2="-1.27" y2="4.191" width="0.127" layer="94"/>
 <wire x1="-1.27" y1="-3.429" x2="-1.27" y2="-6.35" width="0.127" layer="94"/>
-<pin name="G1" x="-5.08" y="-2.54" visible="off" length="point"/>
-<pin name="D1" x="-1.27" y="1.27" visible="off" length="point" rot="R270"/>
-<pin name="S1" x="-1.27" y="-6.35" visible="off" length="point" rot="R90"/>
+<pin name="G2" x="-5.08" y="-2.54" visible="off" length="point"/>
+<pin name="S2" x="-1.27" y="-6.35" visible="off" length="point" rot="R90"/>
 <wire x1="-2.54" y1="-3.429" x2="-1.27" y2="-3.429" width="0.127" layer="94"/>
 <wire x1="-2.54" y1="-2.54" x2="-1.27" y2="-2.54" width="0.127" layer="94"/>
 <wire x1="-2.54" y1="-3.175" x2="-2.54" y2="-3.683" width="0.127" layer="94"/>
@@ -1168,11 +1133,9 @@
 <wire x1="-2.54" y1="-1.905" x2="-2.54" y2="-1.651" width="0.127" layer="94"/>
 <wire x1="-2.54" y1="-1.651" x2="-2.54" y2="-1.397" width="0.127" layer="94"/>
 <wire x1="-2.54" y1="-1.651" x2="-1.27" y2="-1.651" width="0.127" layer="94"/>
-<text x="-2.286" y="-4.826" size="0.762" layer="97">S</text>
-<text x="-3.81" y="-3.556" size="0.762" layer="97">G</text>
-<text x="-2.159" y="-1.27" size="0.762" layer="97">D</text>
-<text x="-0.762" y="-1.27" size="1.27" layer="95">&gt;NAME</text>
-<text x="-0.762" y="-3.81" size="1.27" layer="96">&gt;VALUE</text>
+<text x="-2.794" y="-4.826" size="0.762" layer="97">S2</text>
+<text x="-4.318" y="-3.556" size="0.762" layer="97">G2</text>
+<text x="-2.921" y="-1.27" size="0.762" layer="97">D2</text>
 <wire x1="-2.159" y1="-2.286" x2="-2.54" y2="-2.54" width="0.127" layer="94"/>
 <wire x1="-2.54" y1="-2.54" x2="-2.159" y2="-2.794" width="0.127" layer="94"/>
 <wire x1="-1.27" y1="-3.429" x2="-1.27" y2="-2.54" width="0.127" layer="94"/>
@@ -1731,6 +1694,13 @@ http://www.digikey.com/product-detail/en/SX1505I087TRT/SX1505I087CT-ND/2272323</
 </gates>
 <devices>
 <device name="" package="DUAL-MOSFET-STL60N32N3LL">
+<connects>
+<connect gate="G$1" pin="D1" pad="2/3/4 D1"/>
+<connect gate="G$1" pin="G1" pad="1"/>
+<connect gate="G$1" pin="G2" pad="8"/>
+<connect gate="G$1" pin="S1" pad="S1D2"/>
+<connect gate="G$1" pin="S2" pad="5/6/7"/>
+</connects>
 <technologies>
 <technology name=""/>
 </technologies>
