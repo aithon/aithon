@@ -8586,10 +8586,10 @@ design rules under a new name.</description>
 <wire x1="52.5018" y1="44.465" x2="51.7398" y2="45.227" width="0.2032" layer="1"/>
 <wire x1="50.3832" y1="46.5836" x2="51.7398" y2="45.227" width="0.2032" layer="1"/>
 <wire x1="34.178" y1="52.6542" x2="34.2392" y2="52.6542" width="0.2032" layer="1"/>
-<wire x1="36.7538" y1="63.4492" x2="35.6766" y2="63.4492" width="0" layer="19" extent="1-1"/>
-<wire x1="33.6954" y1="59.3344" x2="33.741" y2="59.38" width="0" layer="19" extent="1-1"/>
 <wire x1="34.2392" y1="52.6542" x2="34.2392" y2="52.7154" width="0.2032" layer="1"/>
 <wire x1="34.2392" y1="52.7154" x2="34.4038" y2="52.88" width="0.2032" layer="1"/>
+<wire x1="36.7538" y1="63.4492" x2="35.6766" y2="63.4492" width="0.2032" layer="1"/>
+<wire x1="33.741" y1="59.38" x2="33.6954" y2="59.3344" width="0.2032" layer="1"/>
 </signal>
 <signal name="N$47">
 <contactref element="IC3" pad="13"/>
@@ -10999,7 +10999,7 @@ design rules under a new name.</description>
 <wire x1="90.039" y1="18.104959375" x2="90.039" y2="18.8174" width="0.2032" layer="1"/>
 <wire x1="90.1152" y1="19.4858" x2="89.8652" y2="19.7358" width="0.2032" layer="1"/>
 <wire x1="90.039" y1="18.8174" x2="90.1152" y2="18.8936" width="0.2032" layer="1"/>
-<wire x1="87.8182" y1="20.3858" x2="87.8182" y2="20.701" width="0" layer="19" extent="1-1"/>
+<wire x1="87.8182" y1="20.701" x2="87.8182" y2="20.3858" width="0.2032" layer="1"/>
 </signal>
 <signal name="N$77">
 <contactref element="C57" pad="1"/>

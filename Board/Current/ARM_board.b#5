@@ -6535,7 +6535,7 @@ design rules under a new name.</description>
 <via x="59.5884" y="23.6982" extent="1-16" drill="0.381"/>
 <wire x1="27.4343" y1="25.2222" x2="28.3464" y2="25.2222" width="0.762" layer="1"/>
 <via x="28.3464" y="25.2222" extent="1-16" drill="0.381"/>
-<wire x1="51.2318" y1="44.435" x2="51.7398" y2="43.927" width="0" layer="19" extent="1-1"/>
+<wire x1="51.2318" y1="44.435" x2="51.7398" y2="43.927" width="0.2032" layer="1"/>
 </signal>
 <signal name="5V">
 <contactref element="LCD" pad="VDD"/>
@@ -8583,12 +8583,13 @@ design rules under a new name.</description>
 <wire x1="44.1452" y1="3.9624" x2="43.6118" y2="3.429" width="0.508" layer="1"/>
 <wire x1="43.6118" y1="3.429" x2="40.03788125" y2="3.429" width="0.508" layer="1"/>
 <wire x1="40.03788125" y1="3.429" x2="39.3966" y2="4.07028125" width="0.508" layer="1"/>
+<wire x1="52.5018" y1="44.465" x2="51.7398" y2="45.227" width="0.2032" layer="1"/>
+<wire x1="50.3832" y1="46.5836" x2="51.7398" y2="45.227" width="0.2032" layer="1"/>
+<wire x1="34.178" y1="52.6542" x2="34.2392" y2="52.6542" width="0.2032" layer="1"/>
 <wire x1="36.7538" y1="63.4492" x2="35.6766" y2="63.4492" width="0" layer="19" extent="1-1"/>
 <wire x1="33.6954" y1="59.3344" x2="33.741" y2="59.38" width="0" layer="19" extent="1-1"/>
-<wire x1="34.178" y1="52.6542" x2="34.2392" y2="52.6542" width="0" layer="19" extent="1-1"/>
-<wire x1="34.4038" y1="52.88" x2="34.2392" y2="52.6542" width="0" layer="19" extent="1-1"/>
-<wire x1="51.7398" y1="45.227" x2="50.3832" y2="46.5836" width="0" layer="19" extent="1-1"/>
-<wire x1="52.5018" y1="44.465" x2="51.7398" y2="45.227" width="0" layer="19" extent="1-1"/>
+<wire x1="34.2392" y1="52.6542" x2="34.2392" y2="52.7154" width="0.2032" layer="1"/>
+<wire x1="34.2392" y1="52.7154" x2="34.4038" y2="52.88" width="0.2032" layer="1"/>
 </signal>
 <signal name="N$47">
 <contactref element="IC3" pad="13"/>
