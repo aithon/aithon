@@ -99,8 +99,7 @@ QString getCOMPort()
 {
     foreach (QextPortInfo info, QextSerialEnumerator::getPorts())
     {
-        debug(QString("VendorID: ")+QString::number(info.vendorID));
-        debug(QString("Product ID: ")+QString::number((info.productID)));
+        debug(QString("ID = %1:%2, Port = %3").arg(QString::number(info.vendorID), QString::number(info.productID), info.portName));
         if (info.vendorID == USB_ST_VID && info.productID == USB_STM32F4_PID)
         {
             return info.portName;
@@ -503,7 +502,6 @@ int main(int argc, char *argv[])
     }
 
     QString cmd = argv[1];
-    QString comPort = getCOMPort();
     if (!cmd.compare("-d", Qt::CaseInsensitive))
     {
         _debug = true;
@@ -515,6 +513,7 @@ int main(int argc, char *argv[])
         }
 
     }
+    QString comPort = getCOMPort();
     if (!cmd.compare("detect", Qt::CaseInsensitive))
     {
         if (comPort.length() == 0)
