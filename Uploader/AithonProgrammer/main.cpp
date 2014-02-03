@@ -17,9 +17,6 @@
 #define SLEEP(x) usleep(uint(1000*x))
 #endif
 
-// uncomment to enable debug printing
-//#define DEBUG
-
 #define USB_ST_VID      0x0483
 #define USB_STM32F4_PID 0x5740
 #define PACKET_LEN      1024
@@ -99,10 +96,10 @@ QString getCOMPort()
 {
     foreach (QextPortInfo info, QextSerialEnumerator::getPorts())
     {
-        debug(QString("ID = %1:%2, Port = %3").arg(QString::number(info.vendorID), QString::number(info.productID), info.portName));
+        debug(QString("ID = %1:%2, Port = %3, PhysName = %4").arg(QString::number(info.vendorID), QString::number(info.productID), info.portName, info.physName));
         if (info.vendorID == USB_ST_VID && info.productID == USB_STM32F4_PID)
         {
-            return info.portName;
+            return info.physName;
         }
     }
     return QString("");
@@ -201,8 +198,8 @@ void openPort(QString port)
 {
     std::cout << "Opening serial port...\t\t";
     _port = new QextSerialPort(port);
-    _port->setBaudRate(BAUD115200);
-    _port->setTimeout(5000);
+    _port->setBaudRate(BAUD9600);
+    _port->setTimeout(1000);
     if (!_port->open(QextSerialPort::ReadWrite))
         error("Could not open serial port.");
     std::cout << "Done\n";
@@ -255,6 +252,7 @@ state_t resetChip()
         QTime time;
         time.start();
         bool state = true;
+        SLEEP(5000);
         while (time.elapsed() < 4000)
         {
             bool newState = isPortActive(port);
@@ -269,8 +267,8 @@ state_t resetChip()
         }
 
         _port = new QextSerialPort(port);
-        _port->setBaudRate(BAUD115200);
-        _port->setTimeout(5000);
+        _port->setBaudRate(BAUD9600);
+        _port->setTimeout(1000);
         if (!_port->open(QextSerialPort::ReadWrite))
             error("Could not open serial port.");
         debug("Opened port.");

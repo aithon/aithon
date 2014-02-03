@@ -186,6 +186,6 @@ endif
 ifeq ($(UNAME), darwin)
 	@$(AITHON_LIBRARY)/Programmer/MacOSX/AithonProgrammer program build/$(PROJECT).bin
 endif
-ifeq ($(UNAME), linux)
+ifeq ($(UNAME), Linux)
 	@$(AITHON_LIBRARY)/Programmer/Linux/AithonProgrammer program build/$(PROJECT).bin
 endif

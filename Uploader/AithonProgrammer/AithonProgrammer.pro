@@ -4,12 +4,10 @@
 #
 #-------------------------------------------------
 
-QT       += core
+#QT       += core
 
 TARGET = AithonProgrammer
-CONFIG   += console
-
-TEMPLATE = app
+#CONFIG   += console
 
 
 SOURCES += main.cpp
@@ -17,3 +15,5 @@ SOURCES += main.cpp
 include(../qextserialport-1.2rc/src/qextserialport.pri)
 
 HEADERS +=
+
+CONFIG += static

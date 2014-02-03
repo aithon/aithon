@@ -35,6 +35,7 @@
 #include <QtCore/QDebug>
 #include <QtCore/QStringList>
 #include <QtCore/QDir>
+#include <QFile>
 
 void QextSerialEnumeratorPrivate::platformSpecificInit()
 {
@@ -146,11 +147,57 @@ QList<QextPortInfo> QextSerialEnumeratorPrivate::getPorts_sys()
         if (str.contains(QLatin1String("ttyS"))) {
             inf.friendName = QLatin1String("Serial port ")+str.remove(0, 4);
         }
-        else if (str.contains(QLatin1String("ttyUSB"))) {
-            inf.friendName = QLatin1String("USB-serial adapter ")+str.remove(0, 6);
-        }
         else if (str.contains(QLatin1String("rfcomm"))) {
             inf.friendName = QLatin1String("Bluetooth-serial adapter ")+str.remove(0, 6);
+        }
+        else if (str.contains(QLatin1String("ttyUSB")) || str.contains(QLatin1String("ttyACM"))) {
+            QFileInfo lnk( dir.absoluteFilePath("/sys/class/tty/" + str) );
+            QString lnkPath;
+            if( lnk.isSymLink() )
+                lnkPath = lnk.symLinkTarget();
+            else
+                lnkPath = lnk.canonicalPath();
+
+            // looking for product information
+            QDir prodDir(lnkPath);
+            QStringList prodFilter, prodNameList;
+            prodFilter << "product";
+            while( prodDir.cdUp() ){
+                prodNameList = prodDir.entryList(prodFilter, (QDir::Files), QDir::Name);
+                if( prodNameList.size() > 0 ){ // product found, gather info and exit
+                    QFile infoFile;
+
+                    // friend name information
+                    infoFile.setFileName( prodDir.absolutePath() + "/" + prodNameList.at(0) );
+                    if( infoFile.open(QIODevice::ReadOnly | QIODevice::Text) ){
+                        QTextStream infoStream( &infoFile );
+                        inf.friendName = infoStream.readLine().simplified();
+                        inf.friendName.append( " " + str.remove(0,6) );
+                        infoFile.close();
+                    }
+
+                    // vendor information
+                    infoFile.setFileName( prodDir.absolutePath() + "/idVendor" );
+                    if( infoFile.open(QIODevice::ReadOnly | QIODevice::Text) ){
+                        QTextStream infoStream( &infoFile );
+                        bool ok;
+                        inf.vendorID = infoStream.readLine().simplified().toInt(&ok, 16);
+                        if( !ok ) inf.vendorID = 0;
+                            infoFile.close();
+                    }
+
+                    // product information
+                    infoFile.setFileName( prodDir.absolutePath() + "/idProduct" );
+                    if( infoFile.open(QIODevice::ReadOnly | QIODevice::Text) ){
+                        QTextStream infoStream( &infoFile );
+                        bool ok;
+                        inf.productID = infoStream.readLine().simplified().toInt(&ok, 16);
+                        if( !ok ) inf.productID = 0;
+                            infoFile.close();
+                    }
+                    break;
+                }
+            }
         }
         inf.enumName = QLatin1String("/dev"); // is there a more helpful name for this?
         infoList.append(inf);
