@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.1" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.025" altunitdist="inch" altunit="inch"/>
+<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="yes"/>
@@ -618,11 +618,10 @@
 <package name="DUAL-MOSFET-STL60N32N3LL">
 <smd name="8" x="-1.905" y="3.35" dx="0.57" dy="0.6" layer="1"/>
 <smd name="S1D2" x="0" y="1.37" dx="2.69" dy="5.1" layer="1" rot="R270"/>
-<smd name="1" x="-1.905" y="-2.151" dx="0.6" dy="0.57" layer="1" rot="R270"/>
-<smd name="2" x="-0.635" y="-2.151" dx="0.6" dy="0.57" layer="1" rot="R270"/>
-<smd name="4" x="1.905" y="-2.151" dx="0.6" dy="0.57" layer="1" rot="R270"/>
-<smd name="3" x="0.665" y="-2.151" dx="0.6" dy="0.57" layer="1"/>
-<smd name="P$1" x="0.635" y="3.35" dx="3.11" dy="0.6" layer="1"/>
+<smd name="1" x="-1.905" y="-2.151" dx="0.57" dy="0.6" layer="1"/>
+<smd name="2/3/4" x="0.635" y="-2" dx="3.11" dy="0.9" layer="1"/>
+<smd name="5/6/7" x="0.635" y="3.35" dx="3.11" dy="0.6" layer="1"/>
+<smd name="D1" x="0" y="-0.95" dx="5.1" dy="1.2" layer="1"/>
 </package>
 </packages>
 <symbols>
@@ -1694,7 +1693,14 @@ http://www.digikey.com/product-detail/en/SX1505I087TRT/SX1505I087CT-ND/2272323</
 <gate name="G$1" symbol="DUAL-MOSFET" x="0" y="0"/>
 </gates>
 <devices>
-<device name="">
+<device name="" package="DUAL-MOSFET-STL60N32N3LL">
+<connects>
+<connect gate="G$1" pin="D1" pad="2/3/4 D1"/>
+<connect gate="G$1" pin="G1" pad="1"/>
+<connect gate="G$1" pin="G2" pad="8"/>
+<connect gate="G$1" pin="S1" pad="S1D2"/>
+<connect gate="G$1" pin="S2" pad="5/6/7"/>
+</connects>
 <technologies>
 <technology name=""/>
 </technologies>

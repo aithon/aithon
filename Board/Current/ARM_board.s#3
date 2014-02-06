@@ -8813,8 +8813,8 @@ Based on the datasheets for the following products.&lt;br&gt;
 <wire x1="1.5" y1="0.8" x2="1.5" y2="-0.8" width="0.1" layer="21"/>
 <wire x1="1.5" y1="-0.8" x2="-1.5" y2="-0.8" width="0.1" layer="21"/>
 <wire x1="-1.5" y1="-0.8" x2="-1.5" y2="0.8" width="0.1" layer="21"/>
-<text x="-2.6" y="1.9" size="1" layer="21">&gt;NAME</text>
-<text x="-2.6" y="-2.7" size="1" layer="21">&gt;VALUE</text>
+<text x="-1.33" y="1.9" size="0.762" layer="25" font="vector">&gt;NAME</text>
+<text x="-1.33" y="-2.7" size="0.762" layer="27" font="vector">&gt;VALUE</text>
 </package>
 <package name="DUAL-MOSFET-STL60N32N3LL">
 <smd name="8" x="-1.905" y="3.35" dx="0.57" dy="0.6" layer="1"/>
@@ -10228,8 +10228,8 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <part name="SUPPLY62" library="supply2" deviceset="GND" device=""/>
 <part name="SUPPLY63" library="supply2" deviceset="GND" device=""/>
 <part name="C1" library="SparkFun" deviceset="CAP" device="0402-CAP" value="0.1u"/>
-<part name="C3" library="SparkFun" deviceset="CAP" device="0402-CAP" value="33u"/>
-<part name="C4" library="SparkFun" deviceset="CAP" device="0402-CAP" value="33u"/>
+<part name="C3" library="SparkFun" deviceset="CAP" device="1206" value="33u"/>
+<part name="C4" library="SparkFun" deviceset="CAP" device="1206" value="33u"/>
 <part name="SUPPLY68" library="supply2" deviceset="GND" device=""/>
 <part name="SUPPLY70" library="supply2" deviceset="GND" device=""/>
 <part name="R32" library="SparkFun" deviceset="RESISTOR" device="0402-RES" value="47"/>
@@ -10238,7 +10238,7 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <part name="SUPPLY71" library="supply2" deviceset="GND" device=""/>
 <part name="L3" library="r_cubed" deviceset="INDUCTOR" device="3" value="3.3uH"/>
 <part name="D3" library="r_cubed" deviceset="SOD-23" device=""/>
-<part name="C26" library="SparkFun" deviceset="CAP" device="0402-CAP" value="33u"/>
+<part name="C26" library="SparkFun" deviceset="CAP" device="1206" value="33u"/>
 <part name="C28" library="SparkFun" deviceset="CAP" device="0603-CAP" value="33u"/>
 <part name="C32" library="SparkFun" deviceset="CAP" device="0402-CAP" value="0.1u"/>
 <part name="R33" library="SparkFun" deviceset="RESISTOR" device="0402-RES" value="1k"/>
