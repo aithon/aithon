@@ -3332,7 +3332,7 @@
 <rectangle x1="69.3572375" y1="54.87161875" x2="69.41819375" y2="54.88178125" layer="21"/>
 <rectangle x1="69.3572375" y1="54.88178125" x2="69.4080375" y2="54.8919375" layer="21"/>
 <rectangle x1="69.3572375" y1="54.891940625" x2="69.397875" y2="54.902096875" layer="21"/>
-<text x="3.154671875" y="78.6485625" size="1.27" layer="21" font="vector">v0.1</text>
+<text x="3.154671875" y="78.6485625" size="1.27" layer="21" font="vector">v0.2</text>
 <text x="38.862" y="40.64" size="1.016" layer="21" font="vector" rot="R270">NSS</text>
 <text x="41.402" y="40.64" size="1.016" layer="21" font="vector" rot="R270">SCK</text>
 <text x="43.942" y="40.64" size="1.016" layer="21" font="vector" rot="R270">MISO</text>
