@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<grid distance="0.05" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="no"/>
 <layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="no"/>
@@ -11486,11 +11486,9 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <label x="384.81" y="207.01" size="1.778" layer="95"/>
 </segment>
 <segment>
-<wire x1="168.91" y1="285.75" x2="168.91" y2="298.45" width="0.1524" layer="91"/>
-<pinref part="D3" gate="G$1" pin="P$0"/>
-<wire x1="162.56" y1="298.45" x2="168.91" y2="298.45" width="0.1524" layer="91"/>
+<wire x1="168.91" y1="285.75" x2="168.91" y2="290.83" width="0.1524" layer="91"/>
 <pinref part="U$2" gate="G$1" pin="D1"/>
-<label x="167.64" y="298.45" size="1.778" layer="95"/>
+<label x="167.64" y="290.83" size="1.778" layer="95"/>
 </segment>
 <segment>
 <label x="166.624" y="252.984" size="1.778" layer="95"/>
@@ -13765,6 +13763,11 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <pinref part="R32" gate="G$1" pin="2"/>
 <wire x1="90.17" y1="270.51" x2="91.44" y2="270.51" width="0.1524" layer="91"/>
 <junction x="91.44" y="270.51"/>
+</segment>
+<segment>
+<pinref part="D3" gate="G$1" pin="P$0"/>
+<wire x1="162.56" y1="298.45" x2="168.91" y2="298.45" width="0.1524" layer="91"/>
+<label x="162.56" y="298.45" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="N$82" class="0">

@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<grid distance="0.05" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="no" active="no"/>
 <layer number="16" name="Bottom" color="1" fill="1" visible="no" active="no"/>
@@ -10091,6 +10091,7 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <part name="SUPPLY72" library="supply2" deviceset="GND" device=""/>
 <part name="U$2" library="r_cubed" deviceset="DUAL-MOSFET" device=""/>
 <part name="U$4" library="r_cubed" deviceset="DUAL-MOSFET" device=""/>
+<part name="+3V12" library="supply1" deviceset="+3V3" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -10477,6 +10478,9 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <instance part="SUPPLY72" gate="GND" x="341.63" y="58.42"/>
 <instance part="U$2" gate="G$1" x="170.18" y="276.86"/>
 <instance part="U$4" gate="G$1" x="170.18" y="240.03"/>
+<instance part="+3V12" gate="G$1" x="350.52" y="73.66" smashed="yes">
+<attribute name="VALUE" x="347.98" y="71.12" size="1.778" layer="96" rot="R90"/>
+</instance>
 </instances>
 <busses>
 </busses>
@@ -10840,24 +10844,16 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <segment>
 <pinref part="SD" gate="G$1" pin="SHIELD@3"/>
 <wire x1="363.22" y1="64.77" x2="359.41" y2="64.77" width="0.1524" layer="91"/>
-<wire x1="359.41" y1="64.77" x2="359.41" y2="67.31" width="0.1524" layer="91"/>
 <pinref part="SD" gate="G$1" pin="SHIELD@1"/>
-<wire x1="359.41" y1="67.31" x2="359.41" y2="69.85" width="0.1524" layer="91"/>
+<wire x1="359.41" y1="64.77" x2="359.41" y2="69.85" width="0.1524" layer="91"/>
 <wire x1="359.41" y1="69.85" x2="363.22" y2="69.85" width="0.1524" layer="91"/>
 <wire x1="359.41" y1="69.85" x2="359.41" y2="80.01" width="0.1524" layer="91"/>
 <pinref part="SD" gate="G$1" pin="GND"/>
 <wire x1="359.41" y1="80.01" x2="363.22" y2="80.01" width="0.1524" layer="91"/>
 <junction x="359.41" y="69.85"/>
 <pinref part="SUPPLY30" gate="GND" pin="GND"/>
-<wire x1="359.41" y1="64.77" x2="359.41" y2="62.23" width="0.1524" layer="91"/>
+<wire x1="359.41" y1="64.77" x2="359.41" y2="60.96" width="0.1524" layer="91"/>
 <junction x="359.41" y="64.77"/>
-<pinref part="SD" gate="G$1" pin="SHIELD@2"/>
-<wire x1="359.41" y1="62.23" x2="359.41" y2="60.96" width="0.1524" layer="91"/>
-<wire x1="363.22" y1="67.31" x2="359.41" y2="67.31" width="0.1524" layer="91"/>
-<pinref part="SD" gate="G$1" pin="SHIELD@4"/>
-<wire x1="363.22" y1="62.23" x2="359.41" y2="62.23" width="0.1524" layer="91"/>
-<junction x="359.41" y="67.31"/>
-<junction x="359.41" y="62.23"/>
 </segment>
 <segment>
 <pinref part="IC3" gate="POWER" pin="VSS_5"/>
@@ -12329,6 +12325,12 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <pinref part="+3V9" gate="G$1" pin="+3V3"/>
 <wire x1="341.63" y1="71.12" x2="341.63" y2="69.85" width="0.1524" layer="91"/>
 </segment>
+<segment>
+<pinref part="SD" gate="G$1" pin="SHIELD@2"/>
+<wire x1="363.22" y1="67.31" x2="350.52" y2="67.31" width="0.1524" layer="91"/>
+<pinref part="+3V12" gate="G$1" pin="+3V3"/>
+<wire x1="350.52" y1="71.12" x2="350.52" y2="67.31" width="0.1524" layer="91"/>
+</segment>
 </net>
 <net name="N$47" class="0">
 <segment>
@@ -13213,6 +13215,11 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <pinref part="R43" gate="G$1" pin="2"/>
 <wire x1="191.77" y1="144.78" x2="213.36" y2="144.78" width="0.1524" layer="91"/>
 <label x="194.31" y="144.78" size="1.778" layer="95"/>
+</segment>
+<segment>
+<pinref part="SD" gate="G$1" pin="SHIELD@4"/>
+<wire x1="363.22" y1="62.23" x2="350.52" y2="62.23" width="0.1524" layer="91"/>
+<label x="350.52" y="62.23" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="SPI3_SCK" class="0">

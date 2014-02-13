@@ -9165,7 +9165,7 @@ Based on the datasheets for the following products.&lt;br&gt;
 <devices>
 <device name="" package="SW">
 <connects>
-<connect gate="G$1" pin="P$1" pad="P$1"/>
+<connect gate="G$1" pin="P$1" pad="P$1 P$3"/>
 <connect gate="G$1" pin="P$2" pad="P$2"/>
 </connects>
 <technologies>
