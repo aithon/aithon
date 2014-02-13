@@ -1252,8 +1252,8 @@ http://www.digikey.com/product-detail/en/SX1505I087TRT/SX1505I087CT-ND/2272323</
 <devices>
 <device name="" package="SW">
 <connects>
-<connect gate="G$1" pin="P$1" pad="P$1"/>
-<connect gate="G$1" pin="P$2" pad="P$2 P$3"/>
+<connect gate="G$1" pin="P$1" pad="P$1 P$3"/>
+<connect gate="G$1" pin="P$2" pad="P$2"/>
 </connects>
 <technologies>
 <technology name=""/>

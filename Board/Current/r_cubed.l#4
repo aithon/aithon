@@ -612,8 +612,8 @@
 <wire x1="1.5" y1="0.8" x2="1.5" y2="-0.8" width="0.1" layer="21"/>
 <wire x1="1.5" y1="-0.8" x2="-1.5" y2="-0.8" width="0.1" layer="21"/>
 <wire x1="-1.5" y1="-0.8" x2="-1.5" y2="0.8" width="0.1" layer="21"/>
-<text x="-2.6" y="1.9" size="1" layer="21">&gt;NAME</text>
-<text x="-2.6" y="-2.7" size="1" layer="21">&gt;VALUE</text>
+<text x="-1.33" y="1.9" size="0.762" layer="25" font="vector">&gt;NAME</text>
+<text x="-1.33" y="-2.7" size="0.762" layer="27" font="vector">&gt;VALUE</text>
 </package>
 <package name="DUAL-MOSFET-STL60N32N3LL">
 <smd name="8" x="-1.905" y="3.35" dx="0.57" dy="0.6" layer="1"/>

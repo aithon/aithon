@@ -622,6 +622,10 @@
 <smd name="2/3/4" x="0.635" y="-2" dx="3.11" dy="0.9" layer="1"/>
 <smd name="5/6/7" x="0.635" y="3.35" dx="3.11" dy="0.6" layer="1"/>
 <smd name="D1" x="0" y="-0.95" dx="5.1" dy="1.2" layer="1"/>
+<wire x1="-2.5" y1="3.6" x2="2.5" y2="3.6" width="0.127" layer="21"/>
+<wire x1="2.5" y1="3.6" x2="2.5" y2="-2.4" width="0.127" layer="21"/>
+<wire x1="2.5" y1="-2.4" x2="-2.5" y2="-2.4" width="0.127" layer="21"/>
+<wire x1="-2.5" y1="-2.4" x2="-2.5" y2="3.6" width="0.127" layer="21"/>
 </package>
 </packages>
 <symbols>
