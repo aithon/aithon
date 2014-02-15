@@ -375,6 +375,47 @@ FLASH_Status FLASH_EraseSector(uint32_t FLASH_Sector, uint8_t VoltageRange)
   return status;
 }
 
+// Some functions to erase the flash asynchronously
+FLASH_Status FLASH_EraseSectorStart(uint32_t FLASH_Sector, uint8_t VoltageRange)
+{
+  uint32_t tmp_psize = 0x0;
+  FLASH_Status status = FLASH_COMPLETE;
+
+  if(VoltageRange == VoltageRange_1)
+     tmp_psize = FLASH_PSIZE_BYTE;
+  else if(VoltageRange == VoltageRange_2)
+    tmp_psize = FLASH_PSIZE_HALF_WORD;
+  else if(VoltageRange == VoltageRange_3)
+    tmp_psize = FLASH_PSIZE_WORD;
+  else
+    tmp_psize = FLASH_PSIZE_DOUBLE_WORD;
+
+  /* Wait for last operation to be completed */
+  status = FLASH_WaitForLastOperation();
+  if(status != FLASH_COMPLETE)
+    return status;
+  
+  /* start to erase the sector */
+  FLASH->CR &= CR_PSIZE_MASK;
+  FLASH->CR |= tmp_psize;
+  FLASH->CR &= SECTOR_MASK;
+  FLASH->CR |= FLASH_CR_SER | FLASH_Sector;
+  FLASH->CR |= FLASH_CR_STRT;
+
+  /* We started it successfully */
+  return FLASH_COMPLETE;
+}
+FLASH_Status FLASH_EraseSectorGetStatus()
+{
+  FLASH_Status status = FLASH_GetStatus();
+  if (status != FLASH_BUSY)
+  {
+    /* if the erase operation is completed, disable the MER Bit */
+    FLASH->CR &= (~FLASH_CR_MER);
+  }
+  return status;
+}
+
 /**
   * @brief  Erases all FLASH Sectors.
   *    

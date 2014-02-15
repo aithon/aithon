@@ -47,15 +47,19 @@ uint8_t calcChecksum(uint8_t *bytes, int len)
 void updateProgram(void)
 {
    int cmdByte, i, temp;
-   uint32_t addr;
+   uint32_t addr, maxAddr = 0;
+   uint16_t endSector = 0xFFFF;
+   _ee_getReserved(_AI_EE_RES_ADDR_MAX_SECTOR, &endSector);
+   if (endSector > APPLICATION_END_SECTOR || !IS_FLASH_SECTOR(endSector))
+      endSector = APPLICATION_END_SECTOR;
 
-   lcd_cursor(0, 0);
+   lcd_clear();
    lcd_printf("Aithon Board\nProgramming...");
 
    // Unlock the Flash Program Erase controller
    FLASH_If_Init();
 
-   while(1)
+   while (TRUE)
    {
       cmdByte = getByte();
       switch (cmdByte)
@@ -67,7 +71,16 @@ void updateProgram(void)
          break;
       case ERASE_FLASH:
          // global flash erase
-         sendByte(!FLASH_If_Erase()?ACK:NACK);
+         if (FLASH_If_Erase_Start(endSector) == FLASH_ERASE_ERROR)
+         {
+            sendByte(NACK);
+         }
+         else
+         {
+            FLASH_EraseResult result;
+            while ((result = FLASH_If_Erase_Status(endSector)) == FLASH_ERASE_IN_PROGRESS);
+            sendByte((result == FLASH_ERASE_COMPLETE)?ACK:NACK);
+         }
          break;
       case SET_ADDR:
          // Read in the address, MSB first.
@@ -106,6 +119,7 @@ void updateProgram(void)
          }
          break;
       case COMMIT_BUFFER:
+         maxAddr = addr + PACKET_LEN - 1;
          if (FLASH_If_Write((__IO uint32_t *)&addr, (uint32_t *)_buffer, PACKET_LEN/4))
             sendByte(NACK);
          else
@@ -114,6 +128,7 @@ void updateProgram(void)
       case START_PROGRAM:
          sendByte(ACK);
          flushInterface();
+         _ee_putReserved(_AI_EE_RES_ADDR_MAX_SECTOR, FLASH_Addr_To_Sector(maxAddr));
          startProgram();
          // ...should never get here
          return;

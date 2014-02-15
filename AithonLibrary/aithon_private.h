@@ -21,14 +21,12 @@ void _usb_stop(void);
 
 
 // reserved EEPROM addresses
-#define _AI_EE_RES_ADDR_BOOT			0x00 // should bootloader run
+#define _AI_EE_RES_ADDR_BOOT        0x00 // should bootloader run
+#define _AI_EE_RES_ADDR_MAX_SECTOR  0x01 // how many sectors were previously programmed
 
 // reserved EEPROM values
-#define _AI_EE_RES_VAL_BOOT_RUN		0xABCD // bootloader should run
-#define _AI_EE_RES_VAL_DEFAULT		0x00 // default value
-
-
-#define _AI_RESET_CMD					0xA5 // reset command if programming over UART
+#define _AI_EE_RES_VAL_BOOT_RUN     0xABCD // bootloader should run
+#define _AI_EE_RES_VAL_DEFAULT      0x00 // default value
 
 
 void _reset_to_bootloader(void);

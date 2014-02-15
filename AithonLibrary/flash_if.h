@@ -28,6 +28,12 @@
 #include "stm_flash.h"
 
 /* Exported types ------------------------------------------------------------*/
+typedef enum {
+   FLASH_ERASE_COMPLETE,
+	FLASH_ERASE_IN_PROGRESS,
+	FLASH_ERASE_ERROR
+} FLASH_EraseResult;
+
 /* Exported constants --------------------------------------------------------*/
 /* Base address of the Flash sectors - for reference*/
 #define ADDR_FLASH_SECTOR_0     ((uint32_t)0x08000000) /* Base @ of Sector 0, 16 Kbyte */
@@ -60,7 +66,6 @@
 // 2MB
 #define ADDR_FLASH_SECTOR_24    ((uint32_t)0x08200000) // NOT A REAL FLASH SECTOR
 
-
 #define EEPROM_PAGE0_START_ADDRESS	ADDR_FLASH_SECTOR_2
 #define EEPROM_PAGE0_END_ADDRESS		(ADDR_FLASH_SECTOR_3-1)
 #define EEPROM_PAGE0_SECTOR   		FLASH_Sector_2
@@ -74,10 +79,15 @@
 #define APPLICATION_END_SECTOR   	FLASH_Sector_11 // this is last sector of 1MB of FLASH
 
 /* Exported macro ------------------------------------------------------------*/
+
 /* Exported functions ------------------------------------------------------- */
 void FLASH_If_Init(void);
 uint32_t FLASH_If_Erase(void);
+FLASH_EraseResult FLASH_If_Erase_Start(uint16_t endSector);
+FLASH_EraseResult FLASH_If_Erase_Status(uint16_t endSector);
 uint32_t FLASH_If_Write(__IO uint32_t* FlashAddress, uint32_t* Data, uint32_t DataLength);
+uint16_t FLASH_Addr_To_Sector(uint32_t addr);
+
 
 #endif  /* __FLASH_IF_H */
 

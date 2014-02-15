@@ -272,6 +272,7 @@ state_t resetChip()
             }
             SLEEP(50);
         }
+        debug("Slept for "+QString::number(time.elapsed())+" milliseconds!");
 
         _port = new QextSerialPort(port);
         _port->setBaudRate(BAUD9600);

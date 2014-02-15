@@ -47,11 +47,56 @@ void FLASH_If_Init(void)
                   FLASH_FLAG_PGAERR | FLASH_FLAG_PGPERR|FLASH_FLAG_PGSERR);
 }
 
+// Async erase wrapper function
+static int _nextEraseSector = -1;
+static int _currentEraseSector = 0;
+FLASH_EraseResult FLASH_If_Erase_Start(uint16_t endSector)
+{
+   _nextEraseSector = APPLICATION_START_SECTOR;
+   _currentEraseSector = 0;
+   return FLASH_If_Erase_Status(endSector);
+}
+FLASH_EraseResult FLASH_If_Erase_Status(uint16_t endSector)
+{
+   if (_nextEraseSector == -1)
+   {
+      return FLASH_ERASE_ERROR;
+   }
+   
+   if (_nextEraseSector != _currentEraseSector)
+   {
+      _currentEraseSector = _nextEraseSector;
+      if (FLASH_EraseSectorStart(_currentEraseSector, VoltageRange_3) != FLASH_COMPLETE)
+      {
+         // Error occurred
+         return FLASH_ERASE_COMPLETE;
+      }
+   }
+   
+   FLASH_Status status = FLASH_EraseSectorGetStatus();
+   if (status == FLASH_BUSY)
+   {
+      return FLASH_ERASE_IN_PROGRESS;
+   }
+   else if (status == FLASH_COMPLETE)
+   {
+      _nextEraseSector += (FLASH_Sector_1-FLASH_Sector_0);
+      if (_nextEraseSector > endSector)
+         return FLASH_ERASE_COMPLETE;
+      else
+         return FLASH_If_Erase_Status(endSector);
+   }
+   else
+   {
+      return FLASH_ERASE_COMPLETE;
+   }
+}
+
 /**
   * @brief  This function does an erase of all user flash area
   * @param  StartSector: start of user flash area
   * @retval 0: user flash area successfully erased
-  *         1: error occurred
+  *         1: in progress
   */
 uint32_t FLASH_If_Erase(void)
 {
@@ -107,6 +152,62 @@ uint32_t FLASH_If_Write(__IO uint32_t* FlashAddress, uint32_t* Data ,uint32_t Da
 	}
 
 	return 0;
+}
+
+uint16_t FLASH_Addr_To_Sector(uint32_t addr)
+{
+   if (addr < ADDR_FLASH_SECTOR_0)
+      return 0xFFFF;
+   if (addr < ADDR_FLASH_SECTOR_1)
+      return FLASH_Sector_0;
+   if (addr < ADDR_FLASH_SECTOR_2)
+      return FLASH_Sector_1;
+   if (addr < ADDR_FLASH_SECTOR_3)
+      return FLASH_Sector_2;
+   if (addr < ADDR_FLASH_SECTOR_4)
+      return FLASH_Sector_3;
+   if (addr < ADDR_FLASH_SECTOR_5)
+      return FLASH_Sector_4;
+   if (addr < ADDR_FLASH_SECTOR_6)
+      return FLASH_Sector_5;
+   if (addr < ADDR_FLASH_SECTOR_7)
+      return FLASH_Sector_6;
+   if (addr < ADDR_FLASH_SECTOR_8)
+      return FLASH_Sector_7;
+   if (addr < ADDR_FLASH_SECTOR_9)
+      return FLASH_Sector_8;
+   if (addr < ADDR_FLASH_SECTOR_10)
+      return FLASH_Sector_9;
+   if (addr < ADDR_FLASH_SECTOR_11)
+      return FLASH_Sector_10;
+   if (addr < ADDR_FLASH_SECTOR_12)
+      return FLASH_Sector_11;
+   if (addr < ADDR_FLASH_SECTOR_13)
+      return FLASH_Sector_12;
+   if (addr < ADDR_FLASH_SECTOR_14)
+      return FLASH_Sector_13;
+   if (addr < ADDR_FLASH_SECTOR_15)
+      return FLASH_Sector_14;
+   if (addr < ADDR_FLASH_SECTOR_16)
+      return FLASH_Sector_15;
+   if (addr < ADDR_FLASH_SECTOR_17)
+      return FLASH_Sector_16;
+   if (addr < ADDR_FLASH_SECTOR_18)
+      return FLASH_Sector_17;
+   if (addr < ADDR_FLASH_SECTOR_19)
+      return FLASH_Sector_18;
+   if (addr < ADDR_FLASH_SECTOR_20)
+      return FLASH_Sector_19;
+   if (addr < ADDR_FLASH_SECTOR_21)
+      return FLASH_Sector_20;
+   if (addr < ADDR_FLASH_SECTOR_22)
+      return FLASH_Sector_21;
+   if (addr < ADDR_FLASH_SECTOR_23)
+      return FLASH_Sector_22;
+   if (addr < ADDR_FLASH_SECTOR_24)
+      return FLASH_Sector_23;
+      
+   return 0xFFFF;
 }
 
 /**

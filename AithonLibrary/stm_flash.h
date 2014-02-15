@@ -229,6 +229,8 @@ void FLASH_DataCacheReset(void);
 void FLASH_Unlock(void);
 void FLASH_Lock(void);
 FLASH_Status FLASH_EraseSector(uint32_t FLASH_Sector, uint8_t VoltageRange);
+FLASH_Status FLASH_EraseSectorStart(uint32_t FLASH_Sector, uint8_t VoltageRange);
+FLASH_Status FLASH_EraseSectorGetStatus(void);
 FLASH_Status FLASH_EraseAllSectors(uint8_t VoltageRange);
 FLASH_Status FLASH_ProgramDoubleWord(uint32_t Address, uint64_t Data);
 FLASH_Status FLASH_ProgramWord(uint32_t Address, uint32_t Data);

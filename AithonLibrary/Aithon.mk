@@ -193,3 +193,18 @@ endif
 ifeq ($(UNAME), Linux)
 	@$(AITHON_LIBRARY)/Programmer/Linux/AithonProgrammer program $(BUILDDIR)/$(PROJECT).bin
 endif
+
+program_debug: all
+ifeq ($(UNAME), windows32)
+ifdef IS_BOOTLOADER
+	@$(AITHON_LIBRARY)/Programmer/Windows/ST-LINK_Utility/ST-LINK_CLI.exe -P $(BUILDDIR)/$(PROJECT).bin 0x08000000
+else
+	@$(AITHON_LIBRARY)/Programmer/Windows/AithonProgrammer.exe -d program $(BUILDDIR)/$(PROJECT).bin
+endif
+endif
+ifeq ($(UNAME), darwin)
+	@$(AITHON_LIBRARY)/Programmer/MacOSX/AithonProgrammer -d program $(BUILDDIR)/$(PROJECT).bin
+endif
+ifeq ($(UNAME), Linux)
+	@$(AITHON_LIBRARY)/Programmer/Linux/AithonProgrammer -d program $(BUILDDIR)/$(PROJECT).bin
+endif
