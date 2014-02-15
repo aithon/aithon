@@ -116,97 +116,35 @@ typedef enum
 #define FLASH_Sector_9     ((uint16_t)0x0048) /*!< Sector Number 9 */
 #define FLASH_Sector_10    ((uint16_t)0x0050) /*!< Sector Number 10 */
 #define FLASH_Sector_11    ((uint16_t)0x0058) /*!< Sector Number 11 */
+#define FLASH_Sector_12    ((uint16_t)0x0060) /*!< Sector Number 12 */
+#define FLASH_Sector_13    ((uint16_t)0x0068) /*!< Sector Number 13 */
+#define FLASH_Sector_14    ((uint16_t)0x0070) /*!< Sector Number 14 */
+#define FLASH_Sector_15    ((uint16_t)0x0078) /*!< Sector Number 15 */
+#define FLASH_Sector_16    ((uint16_t)0x0080) /*!< Sector Number 16 */
+#define FLASH_Sector_17    ((uint16_t)0x0088) /*!< Sector Number 17 */
+#define FLASH_Sector_18    ((uint16_t)0x0090) /*!< Sector Number 18 */
+#define FLASH_Sector_19    ((uint16_t)0x0098) /*!< Sector Number 19 */
+#define FLASH_Sector_20    ((uint16_t)0x00A0) /*!< Sector Number 20 */
+#define FLASH_Sector_21    ((uint16_t)0x00A8) /*!< Sector Number 21 */
+#define FLASH_Sector_22    ((uint16_t)0x00B0) /*!< Sector Number 22 */
+#define FLASH_Sector_23    ((uint16_t)0x00B8) /*!< Sector Number 23 */
 #define IS_FLASH_SECTOR(SECTOR) (((SECTOR) == FLASH_Sector_0) || ((SECTOR) == FLASH_Sector_1) ||\
                                  ((SECTOR) == FLASH_Sector_2) || ((SECTOR) == FLASH_Sector_3) ||\
                                  ((SECTOR) == FLASH_Sector_4) || ((SECTOR) == FLASH_Sector_5) ||\
                                  ((SECTOR) == FLASH_Sector_6) || ((SECTOR) == FLASH_Sector_7) ||\
                                  ((SECTOR) == FLASH_Sector_8) || ((SECTOR) == FLASH_Sector_9) ||\
-                                 ((SECTOR) == FLASH_Sector_10) || ((SECTOR) == FLASH_Sector_11))
-#define IS_FLASH_ADDRESS(ADDRESS) ((((ADDRESS) >= 0x08000000) && ((ADDRESS) < 0x080FFFFF)) ||\
+                                 ((SECTOR) == FLASH_Sector_10) || ((SECTOR) == FLASH_Sector_11) ||\
+                                 ((SECTOR) == FLASH_Sector_12) || ((SECTOR) == FLASH_Sector_13) ||\
+                                 ((SECTOR) == FLASH_Sector_14) || ((SECTOR) == FLASH_Sector_15) ||\
+                                 ((SECTOR) == FLASH_Sector_16) || ((SECTOR) == FLASH_Sector_17) ||\
+                                 ((SECTOR) == FLASH_Sector_18) || ((SECTOR) == FLASH_Sector_19) ||\
+                                 ((SECTOR) == FLASH_Sector_20) || ((SECTOR) == FLASH_Sector_21) ||\
+                                 ((SECTOR) == FLASH_Sector_22) || ((SECTOR) == FLASH_Sector_23))
+#define IS_FLASH_ADDRESS(ADDRESS) ((((ADDRESS) >= 0x08000000) && ((ADDRESS) < 0x081FFFFF)) ||\
                                    (((ADDRESS) >= 0x1FFF7800) && ((ADDRESS) < 0x1FFF7A0F)))  
 /**
   * @}
   */ 
-
-/** @defgroup Option_Bytes_Write_Protection 
-  * @{
-  */ 
-#define OB_WRP_Sector_0       ((uint32_t)0x00000001) /*!< Write protection of Sector0 */
-#define OB_WRP_Sector_1       ((uint32_t)0x00000002) /*!< Write protection of Sector1 */
-#define OB_WRP_Sector_2       ((uint32_t)0x00000004) /*!< Write protection of Sector2 */
-#define OB_WRP_Sector_3       ((uint32_t)0x00000008) /*!< Write protection of Sector3 */
-#define OB_WRP_Sector_4       ((uint32_t)0x00000010) /*!< Write protection of Sector4 */
-#define OB_WRP_Sector_5       ((uint32_t)0x00000020) /*!< Write protection of Sector5 */
-#define OB_WRP_Sector_6       ((uint32_t)0x00000040) /*!< Write protection of Sector6 */
-#define OB_WRP_Sector_7       ((uint32_t)0x00000080) /*!< Write protection of Sector7 */
-#define OB_WRP_Sector_8       ((uint32_t)0x00000100) /*!< Write protection of Sector8 */
-#define OB_WRP_Sector_9       ((uint32_t)0x00000200) /*!< Write protection of Sector9 */
-#define OB_WRP_Sector_10      ((uint32_t)0x00000400) /*!< Write protection of Sector10 */
-#define OB_WRP_Sector_11      ((uint32_t)0x00000800) /*!< Write protection of Sector11 */
-#define OB_WRP_Sector_All     ((uint32_t)0x00000FFF) /*!< Write protection of all Sectors */
-
-#define IS_OB_WRP(SECTOR)((((SECTOR) & (uint32_t)0xFFFFF000) == 0x00000000) && ((SECTOR) != 0x00000000))
-/**
-  * @}
-  */
-
-/** @defgroup FLASH_Option_Bytes_Read_Protection 
-  * @{
-  */
-#define OB_RDP_Level_0   ((uint8_t)0xAA)
-#define OB_RDP_Level_1   ((uint8_t)0x55)
-/*#define OB_RDP_Level_2   ((uint8_t)0xCC)*/ /*!< Warning: When enabling read protection level 2 
-                                                  it's no more possible to go back to level 1 or 0 */
-#define IS_OB_RDP(LEVEL) (((LEVEL) == OB_RDP_Level_0)||\
-                          ((LEVEL) == OB_RDP_Level_1))/*||\
-                          ((LEVEL) == OB_RDP_Level_2))*/
-/**
-  * @}
-  */ 
-
-/** @defgroup FLASH_Option_Bytes_IWatchdog 
-  * @{
-  */ 
-#define OB_IWDG_SW                     ((uint8_t)0x20)  /*!< Software IWDG selected */
-#define OB_IWDG_HW                     ((uint8_t)0x00)  /*!< Hardware IWDG selected */
-#define IS_OB_IWDG_SOURCE(SOURCE) (((SOURCE) == OB_IWDG_SW) || ((SOURCE) == OB_IWDG_HW))
-/**
-  * @}
-  */ 
-
-/** @defgroup FLASH_Option_Bytes_nRST_STOP 
-  * @{
-  */ 
-#define OB_STOP_NoRST                  ((uint8_t)0x40) /*!< No reset generated when entering in STOP */
-#define OB_STOP_RST                    ((uint8_t)0x00) /*!< Reset generated when entering in STOP */
-#define IS_OB_STOP_SOURCE(SOURCE) (((SOURCE) == OB_STOP_NoRST) || ((SOURCE) == OB_STOP_RST))
-/**
-  * @}
-  */ 
-
-
-/** @defgroup FLASH_Option_Bytes_nRST_STDBY 
-  * @{
-  */ 
-#define OB_STDBY_NoRST                 ((uint8_t)0x80) /*!< No reset generated when entering in STANDBY */
-#define OB_STDBY_RST                   ((uint8_t)0x00) /*!< Reset generated when entering in STANDBY */
-#define IS_OB_STDBY_SOURCE(SOURCE) (((SOURCE) == OB_STDBY_NoRST) || ((SOURCE) == OB_STDBY_RST))
-/**
-  * @}
-  */
-  
-/** @defgroup FLASH_BOR_Reset_Level 
-  * @{
-  */  
-#define OB_BOR_LEVEL3          ((uint8_t)0x00)  /*!< Supply voltage ranges from 2.70 to 3.60 V */
-#define OB_BOR_LEVEL2          ((uint8_t)0x04)  /*!< Supply voltage ranges from 2.40 to 2.70 V */
-#define OB_BOR_LEVEL1          ((uint8_t)0x08)  /*!< Supply voltage ranges from 2.10 to 2.40 V */
-#define OB_BOR_OFF             ((uint8_t)0x0C)  /*!< Supply voltage ranges from 1.62 to 2.10 V */
-#define IS_OB_BOR(LEVEL) (((LEVEL) == OB_BOR_LEVEL1) || ((LEVEL) == OB_BOR_LEVEL2) ||\
-                          ((LEVEL) == OB_BOR_LEVEL3) || ((LEVEL) == OB_BOR_OFF))
-/**
-  * @}
-  */
 
 /** @defgroup FLASH_Interrupts 
   * @{
@@ -296,19 +234,6 @@ FLASH_Status FLASH_ProgramDoubleWord(uint32_t Address, uint64_t Data);
 FLASH_Status FLASH_ProgramWord(uint32_t Address, uint32_t Data);
 FLASH_Status FLASH_ProgramHalfWord(uint32_t Address, uint16_t Data);
 FLASH_Status FLASH_ProgramByte(uint32_t Address, uint8_t Data);
-
-/* Option Bytes Programming functions *****************************************/ 
-void FLASH_OB_Unlock(void);
-void FLASH_OB_Lock(void);
-void FLASH_OB_WRPConfig(uint32_t OB_WRP, FunctionalState NewState);
-void FLASH_OB_RDPConfig(uint8_t OB_RDP);
-void FLASH_OB_UserConfig(uint8_t OB_IWDG, uint8_t OB_STOP, uint8_t OB_STDBY);
-void FLASH_OB_BORConfig(uint8_t OB_BOR);
-FLASH_Status FLASH_OB_Launch(void);
-uint8_t FLASH_OB_GetUser(void);
-uint16_t FLASH_OB_GetWRP(void);
-FlagStatus FLASH_OB_GetRDP(void);
-uint8_t FLASH_OB_GetBOR(void);
 
 /* Interrupts and flags management functions **********************************/
 void FLASH_ITConfig(uint32_t FLASH_IT, FunctionalState NewState);

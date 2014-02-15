@@ -26,7 +26,7 @@
 // timeouts
 #define DEFAULT_TIMEOUT 1000
 #define SYNC_TIMEOUT    50
-#define FLASH_TIMEOUT   15000
+#define FLASH_TIMEOUT   20000
 
 // control characters
 #define SYNC            0xA5
@@ -90,6 +90,7 @@ void error(QString msg)
 void printStatus(int current, int total)
 {
     std::cout << "\b\b\b" << std::setfill('0') << std::setw(2) << current*100 / total << "%";
+    std::cout.flush();
 }
 
 QString getCOMPort()
@@ -99,7 +100,11 @@ QString getCOMPort()
         debug(QString("ID = %1:%2, Port = %3, PhysName = %4").arg(QString::number(info.vendorID), QString::number(info.productID), info.portName, info.physName));
         if (info.vendorID == USB_ST_VID && info.productID == USB_STM32F4_PID)
         {
+#ifdef Q_OS_WIN32
+            return info.portName;
+#else
             return info.physName;
+#endif
         }
     }
     return QString("");
@@ -252,7 +257,9 @@ state_t resetChip()
         QTime time;
         time.start();
         bool state = true;
+#ifndef Q_OS_WIN32
         SLEEP(5000);
+#endif
         while (time.elapsed() < 4000)
         {
             bool newState = isPortActive(port);
@@ -512,6 +519,7 @@ int main(int argc, char *argv[])
 
     }
     QString comPort = getCOMPort();
+    debug(comPort);
     if (!cmd.compare("detect", Qt::CaseInsensitive))
     {
         if (comPort.length() == 0)

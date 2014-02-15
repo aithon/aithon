@@ -4,10 +4,10 @@
 #
 #-------------------------------------------------
 
-#QT       += core
+QT       += core
 
 TARGET = AithonProgrammer
-#CONFIG   += console
+CONFIG   += console
 
 
 SOURCES += main.cpp
