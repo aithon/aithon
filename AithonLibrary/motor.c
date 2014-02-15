@@ -22,12 +22,6 @@ static const PWMConfig pwmcfg1 = {
 
 void _motor_init(void)
 {
-   palSetPadMode(GPIOE, GPIOE_MOTOR0_EN, PAL_MODE_ALTERNATE(1));
-   palSetPadMode(GPIOE, GPIOE_MOTOR1_EN, PAL_MODE_ALTERNATE(1));
-   palSetPadMode(GPIOE, GPIOE_MOTOR0_A, PAL_MODE_OUTPUT_PUSHPULL);
-   palSetPadMode(GPIOE, GPIOE_MOTOR1_A, PAL_MODE_OUTPUT_PUSHPULL);
-   palSetPadMode(GPIOE, GPIOE_MOTOR0_B, PAL_MODE_OUTPUT_PUSHPULL);
-   palSetPadMode(GPIOE, GPIOE_MOTOR1_B, PAL_MODE_OUTPUT_PUSHPULL);
    pwmStart(&PWMD1, &pwmcfg1);
 }
 
