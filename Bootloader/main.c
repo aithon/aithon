@@ -176,22 +176,19 @@ int main(void)
          // update the countdown
          if (i % 1000 == 0)
          {
-            lcd_cursor(0, 0);
-            lcd_printf("Aithon Board    \n%d ", (BOOT_TIMEOUT-i)/1000);
-             displayCountdown = TRUE;
+            lcd_clear();
+            lcd_printf("Aithon Board\n%d", (BOOT_TIMEOUT-i)/1000);
+            displayCountdown = TRUE;
          }
 
          // show the bootloader build date if button 0 pressed
          if (button_get(0) && displayCountdown) {
-           if (i > (.1 * BOOT_TIMEOUT)) {
-             lcd_clear();
-             lcd_cursor(0, 0);
-             lcd_printf("%s", DATE);
-             displayCountdown = FALSE;
-           }
+            if (i > (.1 * BOOT_TIMEOUT)) {
+               lcd_clear();
+               lcd_printf(DATE);
+               displayCountdown = FALSE;
+            }
          }
-
-
       }
 
       // check all the interfaces for a SYNC

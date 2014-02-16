@@ -65,13 +65,18 @@ BOARDDIR = $(AITHON_LIBRARY)/Board_$(BOARD_REV)
 # use the appropriate linker script based on whether or not we're using an IAP
 ifdef IS_BOOTLOADER
    LDSCRIPT = $(BOARDDIR)/AithonBootloader.ld
+ifneq ($(UNAME), windows32)
+	USE_COPT += -DDATE="\"$(shell cmd /C date /T)\""
+else
+	USE_COPT += -DDATE="\"$(shell date)\""
+endif
 else
    LDSCRIPT = $(BOARDDIR)/AithonIAP.ld
    USE_COPT += -DUSE_IAP
 endif
 
 
-USE_COPT += -DAITHON_$(BOARD_REV) -DDATE="\"`date`"\"
+USE_COPT += -DAITHON_$(BOARD_REV)
 
 # Imported source files and paths
 include $(CHIBIOS)/os/hal/platforms/STM32F4xx/platform.mk

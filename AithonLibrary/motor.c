@@ -1,7 +1,7 @@
 #include "Aithon.h"
 
 static const int motorPins[NUM_MOTORS][2] = {
-   {GPIOE_MOTOR0_B, GPIOE_MOTOR0_A},
+   {GPIOE_MOTOR0_A, GPIOE_MOTOR0_B},
    {GPIOE_MOTOR1_A, GPIOE_MOTOR1_B}
 };
 
