@@ -71,7 +71,7 @@ else
 endif
 
 
-USE_COPT += -DAITHON_$(BOARD_REV)
+USE_COPT += -DAITHON_$(BOARD_REV) -DDATE="\"`date`"\"
 
 # Imported source files and paths
 include $(CHIBIOS)/os/hal/platforms/STM32F4xx/platform.mk
