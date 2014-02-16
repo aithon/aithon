@@ -17,26 +17,28 @@
 #define SLEEP(x) usleep(uint(1000*x))
 #endif
 
-#define USB_ST_VID      0x0483
-#define USB_STM32F4_PID 0x5740
-#define PACKET_LEN      1024
-#define MAX_RETRIES     5
-#define SYNC_RETRIES    100
+#define USB_ST_VID          0x0483
+#define USB_STM32F4_PID     0x5740
+#define PACKET_LEN          1024
+#define MAX_RETRIES         5
+#define SYNC_RETRIES        100
 
 // timeouts
-#define DEFAULT_TIMEOUT 1000
-#define SYNC_TIMEOUT    50
-#define FLASH_TIMEOUT   20000
+#define DEFAULT_TIMEOUT     1000
+#define SYNC_TIMEOUT        50
+#define FLASH_TIMEOUT       5000
 
 // control characters
-#define SYNC            0xA5
-#define ACK             0x79
-#define NACK            0x1F
-#define ERASE_FLASH     0x43
-#define SET_ADDR        0x31
-#define FILL_BUFFER     0xC7
-#define COMMIT_BUFFER   0x6E
-#define START_PROGRAM   0x2A
+#define SYNC                0xA5
+#define BUSY                0xB2
+#define ACK                 0x79
+#define NACK                0x1F
+#define ERASE_FLASH_START   0x43
+#define ERASE_FLASH_STATUS  0x8C
+#define SET_ADDR            0x31
+#define FILL_BUFFER         0xC7
+#define COMMIT_BUFFER       0x6E
+#define START_PROGRAM       0x2A
 
 #define CHECK_FOR_ERROR(state) \
     do { \
@@ -52,6 +54,7 @@ typedef enum {
     TIMEOUT,
     BAD_RESPONSE,
     RECV_NACK,
+    RECV_BUSY,
     FSM_RETRY
 } error_t;
 
@@ -154,9 +157,6 @@ void waitForACK(int timeout=DEFAULT_TIMEOUT)
 {
     uint8_t data = getByte(timeout);
 
-    if (_error)
-        return;
-
     switch (data)
     {
     case ACK:
@@ -164,6 +164,9 @@ void waitForACK(int timeout=DEFAULT_TIMEOUT)
         break;
     case NACK:
         _error = RECV_NACK;
+        break;
+    case BUSY:
+        _error = RECV_BUSY;
         break;
     default:
         debug("Expected ACK or NACK - got "+QString("0x%1").arg((int)data, 0, 16));
@@ -180,6 +183,8 @@ void debugPrintError(QString state)
         debug("Got unexpected NACK from "+state+".");
     else if (_error == BAD_RESPONSE)
         debug("Got bad response from "+state+".");
+    else if (_error == RECV_BUSY)
+        debug("Got busy response from "+state+".");
 }
 
 
@@ -300,10 +305,25 @@ state_t initChip()
 state_t eraseFlash()
 {
     // send command
-    writeByte(ERASE_FLASH);
-
-    // wait for ACK signaling that we're done erasing the flash
+    writeByte(ERASE_FLASH_START);
     waitForACK(FLASH_TIMEOUT);
+
+    // check the status
+    while (true)
+    {
+        writeByte(ERASE_FLASH_STATUS);
+        waitForACK(FLASH_TIMEOUT);
+        if (_error == RECV_BUSY)
+        {
+            debug("FLASH BUSY");
+            SLEEP(10);
+        }
+        else
+        {
+            break;
+        }
+    }
+
     debugPrintError("ERASE_FLASH (2)");
     CHECK_FOR_ERROR(FSM_ERASE_FLASH);
 

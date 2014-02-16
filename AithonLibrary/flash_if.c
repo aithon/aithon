@@ -50,27 +50,26 @@ void FLASH_If_Init(void)
 // Async erase wrapper function
 static int _nextEraseSector = -1;
 static int _currentEraseSector = 0;
-FLASH_EraseResult FLASH_If_Erase_Start(uint16_t endSector)
+FLASH_EraseResult FLASH_If_Erase_Start(void)
 {
    _nextEraseSector = APPLICATION_START_SECTOR;
    _currentEraseSector = 0;
-   return FLASH_If_Erase_Status(endSector);
+   return FLASH_ERASE_IN_PROGRESS;
 }
 FLASH_EraseResult FLASH_If_Erase_Status(uint16_t endSector)
 {
+   // Check if we haven't started yet
    if (_nextEraseSector == -1)
-   {
       return FLASH_ERASE_ERROR;
-   }
    
+   // CHeck if we need to move to the next sector
    if (_nextEraseSector != _currentEraseSector)
    {
       _currentEraseSector = _nextEraseSector;
       if (FLASH_EraseSectorStart(_currentEraseSector, VoltageRange_3) != FLASH_COMPLETE)
-      {
-         // Error occurred
-         return FLASH_ERASE_COMPLETE;
-      }
+         return FLASH_ERASE_ERROR;
+      else
+         return FLASH_ERASE_IN_PROGRESS;
    }
    
    FLASH_Status status = FLASH_EraseSectorGetStatus();
@@ -84,7 +83,7 @@ FLASH_EraseResult FLASH_If_Erase_Status(uint16_t endSector)
       if (_nextEraseSector > endSector)
          return FLASH_ERASE_COMPLETE;
       else
-         return FLASH_If_Erase_Status(endSector);
+         return FLASH_ERASE_IN_PROGRESS;
    }
    else
    {

@@ -47,6 +47,7 @@ uint8_t calcChecksum(uint8_t *bytes, int len)
 void updateProgram(void)
 {
    int cmdByte, i, temp;
+   FLASH_EraseResult result;
    uint32_t addr, maxAddr = 0;
    uint16_t endSector = 0xFFFF;
    _ee_getReserved(_AI_EE_RES_ADDR_MAX_SECTOR, &endSector);
@@ -69,18 +70,17 @@ void updateProgram(void)
          flushInterface();
          sendByte(SYNC);
          break;
-      case ERASE_FLASH:
-         // global flash erase
-         if (FLASH_If_Erase_Start(endSector) == FLASH_ERASE_ERROR)
-         {
-            sendByte(NACK);
-         }
+      case ERASE_FLASH_START:
+         sendByte((FLASH_If_Erase_Start() == FLASH_ERASE_IN_PROGRESS)?ACK:NACK);
+         break;
+      case ERASE_FLASH_STATUS:
+         result = FLASH_If_Erase_Status(endSector);
+         if (result == FLASH_ERASE_COMPLETE)
+            sendByte(ACK);
+         else if (result == FLASH_ERASE_IN_PROGRESS)
+            sendByte(BUSY);
          else
-         {
-            FLASH_EraseResult result;
-            while ((result = FLASH_If_Erase_Status(endSector)) == FLASH_ERASE_IN_PROGRESS);
-            sendByte((result == FLASH_ERASE_COMPLETE)?ACK:NACK);
-         }
+            sendByte(NACK);
          break;
       case SET_ADDR:
          // Read in the address, MSB first.
