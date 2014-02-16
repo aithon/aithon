@@ -103,10 +103,10 @@ QString getCOMPort()
         debug(QString("ID = %1:%2, Port = %3, PhysName = %4").arg(QString::number(info.vendorID), QString::number(info.productID), info.portName, info.physName));
         if (info.vendorID == USB_ST_VID && info.productID == USB_STM32F4_PID)
         {
-#ifdef Q_OS_WIN32
-            return info.portName;
-#else
+#ifdef Q_OS_LINUX
             return info.physName;
+#else
+            return info.portName;
 #endif
         }
     }
