@@ -284,14 +284,14 @@
 <wire x1="-7.62" y1="0" x2="-7.62" y2="11.43" width="0.127" layer="21"/>
 </package>
 <package name="1206">
-<wire x1="0.305" y1="3.327" x2="2.235" y2="3.327" width="0.1016" layer="51"/>
-<wire x1="0.305" y1="1.753" x2="2.235" y2="1.753" width="0.1016" layer="51"/>
-<smd name="1" x="-0.13" y="2.54" dx="1.6" dy="1.8" layer="1"/>
-<smd name="2" x="2.67" y="2.54" dx="1.6" dy="1.8" layer="1"/>
-<text x="0" y="3.683" size="0.4064" layer="25">&gt;NAME</text>
-<text x="-0.127" y="1.016" size="0.4064" layer="27">&gt;VALUE</text>
-<rectangle x1="-0.4318" y1="1.6891" x2="0.3183" y2="3.3891" layer="51"/>
-<rectangle x1="2.2217" y1="1.6909" x2="2.9718" y2="3.3909" layer="51"/>
+<wire x1="-0.965" y1="0.787" x2="0.965" y2="0.787" width="0.1016" layer="51"/>
+<wire x1="-0.965" y1="-0.787" x2="0.965" y2="-0.787" width="0.1016" layer="51"/>
+<smd name="1" x="-1.4" y="0" dx="1.6" dy="1.8" layer="1"/>
+<smd name="2" x="1.4" y="0" dx="1.6" dy="1.8" layer="1"/>
+<text x="-1.27" y="1.143" size="0.4064" layer="25">&gt;NAME</text>
+<text x="-1.397" y="-1.524" size="0.4064" layer="27">&gt;VALUE</text>
+<rectangle x1="-1.7018" y1="-0.8509" x2="-0.9517" y2="0.8491" layer="51"/>
+<rectangle x1="0.9517" y1="-0.8491" x2="1.7018" y2="0.8509" layer="51"/>
 </package>
 <package name="POT">
 <smd name="3" x="2.54" y="0" dx="1.1938" dy="3.302" layer="1"/>
@@ -396,13 +396,13 @@
 <smd name="2" x="0" y="-1.778" dx="1.27" dy="0.635" layer="1" rot="R90"/>
 <smd name="3" x="1.27" y="-1.778" dx="1.27" dy="0.635" layer="1" rot="R90"/>
 <smd name="4" x="2.54" y="-1.778" dx="1.27" dy="0.635" layer="1" rot="R90"/>
-<wire x1="-2.286" y1="2.54" x2="-2.286" y2="-1.27" width="0.127" layer="21"/>
-<wire x1="-2.286" y1="-1.27" x2="3.556" y2="-1.27" width="0.127" layer="21"/>
-<wire x1="3.556" y1="-1.27" x2="3.556" y2="2.54" width="0.127" layer="21"/>
-<wire x1="3.556" y1="2.54" x2="-2.286" y2="2.54" width="0.127" layer="21"/>
+<wire x1="-1.778" y1="2.54" x2="-1.778" y2="-1.27" width="0.127" layer="21"/>
+<wire x1="-1.778" y1="-1.27" x2="3.048" y2="-1.27" width="0.127" layer="21"/>
+<wire x1="3.048" y1="-1.27" x2="3.048" y2="2.54" width="0.127" layer="21"/>
+<wire x1="3.048" y1="2.54" x2="-1.778" y2="2.54" width="0.127" layer="21"/>
 <text x="-2.54" y="3.81" size="1.27" layer="25">&gt;NAME</text>
 <text x="-2.54" y="-3.81" size="1.27" layer="27">&gt;VALUE</text>
-<circle x="-1.6256" y="-0.5588" radius="0.254" width="0.127" layer="21"/>
+<circle x="-1.3716" y="-0.8128" radius="0.254" width="0.127" layer="21"/>
 </package>
 <package name="TSSOP-14">
 <smd name="4" x="-2.9" y="0" dx="1.26" dy="0.36" layer="1"/>
@@ -830,8 +830,8 @@
 <wire x1="0" y1="0" x2="5.08" y2="0" width="0.254" layer="94" curve="-180"/>
 <text x="-10.16" y="2.54" size="1.27" layer="95">&gt;Name</text>
 <text x="5.08" y="2.54" size="1.27" layer="96">&gt;Value</text>
-<pin name="1" x="-10.16" y="0" length="middle"/>
-<pin name="2" x="10.16" y="0" length="middle" rot="R180"/>
+<pin name="1" x="-10.16" y="0" visible="off" length="middle"/>
+<pin name="2" x="10.16" y="0" visible="off" length="middle" rot="R180"/>
 </symbol>
 <symbol name="POT">
 <wire x1="-0.762" y1="2.54" x2="-0.762" y2="-2.54" width="0.254" layer="94"/>
@@ -1195,20 +1195,18 @@
 <text x="-10.16" y="15.24" size="1.27" layer="95">&gt;NAME</text>
 </symbol>
 <symbol name="LD1117_SO-8">
-<wire x1="-7.62" y1="10.16" x2="15.24" y2="10.16" width="0.254" layer="94"/>
-<wire x1="15.24" y1="10.16" x2="15.24" y2="-10.16" width="0.254" layer="94"/>
-<wire x1="15.24" y1="-10.16" x2="-7.62" y2="-10.16" width="0.254" layer="94"/>
-<wire x1="-7.62" y1="-10.16" x2="-7.62" y2="10.16" width="0.254" layer="94"/>
-<pin name="GND" x="-12.7" y="7.62" length="middle"/>
-<pin name="VOUT1" x="-12.7" y="2.54" length="middle"/>
-<pin name="VOUT2" x="-12.7" y="-2.54" length="middle"/>
-<pin name="VIN" x="-12.7" y="-7.62" length="middle"/>
-<pin name="NC2" x="20.32" y="7.62" length="middle" rot="R180"/>
-<pin name="VOUT4" x="20.32" y="2.54" length="middle" rot="R180"/>
-<pin name="VOUT3" x="20.32" y="-2.54" length="middle" rot="R180"/>
-<pin name="NC1" x="20.32" y="-7.62" length="middle" rot="R180"/>
-<text x="-7.62" y="10.668" size="1.27" layer="95">&gt;NAME</text>
-<text x="-7.62" y="-11.938" size="1.27" layer="95">&gt;VALUE</text>
+<wire x1="-5.08" y1="3.81" x2="5.08" y2="3.81" width="0.254" layer="94"/>
+<wire x1="5.08" y1="3.81" x2="5.08" y2="-2.54" width="0.254" layer="94"/>
+<wire x1="5.08" y1="-2.54" x2="-5.08" y2="-2.54" width="0.254" layer="94"/>
+<wire x1="-5.08" y1="-2.54" x2="-5.08" y2="3.81" width="0.254" layer="94"/>
+<pin name="GND" x="0" y="-5.08" visible="off" length="short" rot="R90"/>
+<pin name="VIN" x="-7.62" y="2.54" visible="off" length="short"/>
+<pin name="VOUT" x="7.62" y="2.54" visible="off" length="short" rot="R180"/>
+<text x="-5.08" y="4.064" size="1.27" layer="95">&gt;NAME</text>
+<text x="2.54" y="-4.318" size="1.27" layer="96">&gt;VALUE</text>
+<text x="-4.572" y="1.778" size="1.27" layer="97">VIN</text>
+<text x="-1.905" y="-2.032" size="1.27" layer="97">GND</text>
+<text x="0" y="1.778" size="1.27" layer="97">VOUT</text>
 </symbol>
 </symbols>
 <devicesets>
@@ -1808,13 +1806,8 @@ http://www.digikey.com/product-detail/en/SX1505I087TRT/SX1505I087CT-ND/2272323</
 <device name="" package="8-SOIC">
 <connects>
 <connect gate="G$1" pin="GND" pad="1"/>
-<connect gate="G$1" pin="NC1" pad="5"/>
-<connect gate="G$1" pin="NC2" pad="8"/>
 <connect gate="G$1" pin="VIN" pad="4"/>
-<connect gate="G$1" pin="VOUT1" pad="2"/>
-<connect gate="G$1" pin="VOUT2" pad="3"/>
-<connect gate="G$1" pin="VOUT3" pad="6"/>
-<connect gate="G$1" pin="VOUT4" pad="7"/>
+<connect gate="G$1" pin="VOUT" pad="2 3 6 7"/>
 </connects>
 <technologies>
 <technology name=""/>
