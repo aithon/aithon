@@ -19,6 +19,7 @@
 
 #define USB_ST_VID          0x0483
 #define USB_STM32F4_PID     0x5740
+#define USB_BOOTLOADER_PID  0x5741
 #define PACKET_LEN          1024
 #define MAX_RETRIES         5
 #define SYNC_RETRIES        100
@@ -78,8 +79,8 @@ bool _debug = false;
 
 void debug(QString msg)
 {
-	 if (_debug)
-	     std::cout << "\nDEBUG: " << msg.toStdString() << "\n";
+     if (_debug)
+         std::cout << "\nDEBUG: " << msg.toStdString() << "\n";
 }
 
 void error(QString msg)
@@ -96,12 +97,13 @@ void printStatus(int current, int total)
     std::cout.flush();
 }
 
-QString getCOMPort()
+QString getCOMPort(bool isBootloader)
 {
+    int productId = isBootloader?USB_BOOTLOADER_PID:USB_STM32F4_PID;
     foreach (QextPortInfo info, QextSerialEnumerator::getPorts())
     {
-        debug(QString("ID = %1:%2, Port = %3, PhysName = %4").arg(QString::number(info.vendorID), QString::number(info.productID), info.portName, info.physName));
-        if (info.vendorID == USB_ST_VID && info.productID == USB_STM32F4_PID)
+        debug(QString("ID = 0x%1:0x%2, Port = %3, PhysName = %4").arg(QString::number(info.vendorID, 16), QString::number(info.productID, 16), info.portName, info.physName));
+        if (info.vendorID == USB_ST_VID && info.productID == productId)
         {
 #ifdef Q_OS_LINUX
             return info.physName;
@@ -115,7 +117,12 @@ QString getCOMPort()
 
 bool isAithonCDC()
 {
-    return _port->portName() == getCOMPort();
+    return _port->portName() == getCOMPort(false) || _port->portName() == getCOMPort(true);
+}
+
+bool isAithonCDCBootloader()
+{
+    return _port->portName() == getCOMPort(true);
 }
 
 bool isPortActive(QString port)
@@ -243,6 +250,11 @@ bool doSync(int attempts = SYNC_RETRIES)
 
 state_t resetChip()
 {
+    if (isAithonCDCBootloader())
+    {
+        // We don't need to reset the board.
+        // Nothing to do here.
+    }
     if (isAithonCDC())
     {
         // send a 0x023 seqeunce using RTS/DTR to do a software reset of the board
@@ -254,32 +266,18 @@ state_t resetChip()
         debug("Reset board.");
 
         // reopen the port
-        QString port = _port->portName();
         _port->close();
         delete _port;
         debug("Deleted port.");
 
-        QTime time;
-        time.start();
-        bool state = true;
-#ifndef Q_OS_WIN32
-        SLEEP(5000);
-#endif
-        while (time.elapsed() < 4000)
+        QString comPort;
+        while (comPort.length() == 0)
         {
-            bool newState = isPortActive(port);
-            if (state != newState)
-            {
-                if (newState)
-                    break;
-                else
-                    state = newState;
-            }
-            SLEEP(50);
+            SLEEP(100);
+            comPort = getCOMPort(true);
         }
-        debug("Slept for "+QString::number(time.elapsed())+" milliseconds!");
 
-        _port = new QextSerialPort(port);
+        _port = new QextSerialPort(comPort);
         _port->setBaudRate(BAUD9600);
         _port->setTimeout(1000);
         if (!_port->open(QextSerialPort::ReadWrite))
@@ -539,7 +537,9 @@ int main(int argc, char *argv[])
         }
 
     }
-    QString comPort = getCOMPort();
+    QString comPort = getCOMPort(true); // see if it's in the bootloader first
+    if (comPort.length() == 0)
+        comPort = getCOMPort(false);
     debug(comPort);
     if (!cmd.compare("detect", Qt::CaseInsensitive))
     {
