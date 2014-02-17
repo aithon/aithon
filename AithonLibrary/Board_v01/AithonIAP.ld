@@ -33,7 +33,8 @@ __process_stack_size__  = 0x0400;
 
 MEMORY
 {
-    os_flash : org = 0x08010000, len = 448k
+    os_flash : org = 0x08010000, len = 64k
+    user_flash : org = 0x08020000, len = 384k
     ram : org = 0x20000000, len = 112k
     ethram : org = 0x2001C000, len = 16k
     ccmram : org = 0x10000000, len = 64k
@@ -71,15 +72,28 @@ SECTIONS
 
     .text : ALIGN(16) SUBALIGN(16)
     {
-        *(.text.startup.*)
+/*        *(.text.startup.*) */
         *(.text)
-        *(.text.*)
+/*        *(.text.*) */
         *(.rodata)
         *(.rodata.*)
         *(.glue_7t)
         *(.glue_7)
         *(.gcc*)
     } > os_flash
+
+    .usertext : ALIGN(16) SUBALIGN(16)
+    {
+        *(.text.startup.*) 
+        *(.usertext.startup.*)
+        *(.usertext)
+        *(.usertext.*)
+        *(.rodata)
+        *(.rodata.*)
+        *(.glue_7t)
+        *(.glue_7)
+        *(.gcc*)
+    } > user_flash
 
     .ARM.extab :
     {
