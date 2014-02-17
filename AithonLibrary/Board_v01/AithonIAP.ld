@@ -88,10 +88,10 @@ SECTIONS
     .usertext : ALIGN(16) SUBALIGN(16)
     {
         *(.usertext.text.startup.*) 
-        *(.usertext)
-        *(.usertext.*)
-        .usertext.rodata*
-        .usertext.rodata.*
+        *(.usertext.text)
+        *(.usertext.text.*)
+        *(.usertext.rodata)
+        *(.usertext.rodata.*)
         *(.glue_7t)
         *(.glue_7)
         *(.gcc*)
@@ -148,6 +148,10 @@ SECTIONS
         *(.data)
         . = ALIGN(4);
         *(.data.*)
+        . = ALIGN(4);
+        *(.usertext.data)
+        . = ALIGN(4);
+        *(.usertext.data.*)
         . = ALIGN(4);
         *(.ramtext)
         . = ALIGN(4);
