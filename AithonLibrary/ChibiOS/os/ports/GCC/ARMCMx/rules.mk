@@ -149,9 +149,9 @@ ifeq ($(USE_VERBOSE_COMPILE),yes)
 	$(CC) -c $(CFLAGS) $(TOPT) -I. $(IINCDIR) $< -o $@
         arm-none-eabi-objcopy --prefix-sections=.usertext $@
 else
-	@echo test Compiling $(<F) $@
+	@echo test Compiling $(<F) 
 	@$(CC) -c $(CFLAGS) $(TOPT) -I. $(IINCDIR) $< -o $@
-        arm-none-eabi-objcopy --prefix-sections=.usertext $@
+	@$(CP) --prefix-sections=.usertext $(shell pwd)/$@
 endif
 
 $(ACOBJS) : $(OBJDIR)/%.o : %.c Makefile

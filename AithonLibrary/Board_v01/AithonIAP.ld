@@ -72,11 +72,14 @@ SECTIONS
 
     .text : ALIGN(16) SUBALIGN(16)
     {
-/*        *(.text.startup.*) */
+/*        *(.text.startup.*)
         *(.text)
-/*        *(.text.*) */
-        *(.rodata)
-        *(.rodata.*)
+        *(.text.*)*/ 
+        .text.startup.*
+        .text*
+        .text.* 
+        .rodata*
+        .rodata.*
         *(.glue_7t)
         *(.glue_7)
         *(.gcc*)
@@ -84,12 +87,11 @@ SECTIONS
 
     .usertext : ALIGN(16) SUBALIGN(16)
     {
-        *(.text.startup.*) 
-        *(.usertext.startup.*)
+        *(.usertext.text.startup.*) 
         *(.usertext)
         *(.usertext.*)
-        *(.rodata)
-        *(.rodata.*)
+        *(.usertext.rodata)
+        *(.usertext.rodata.*)
         *(.glue_7t)
         *(.glue_7)
         *(.gcc*)
