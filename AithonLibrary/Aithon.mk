@@ -65,7 +65,7 @@ BOARDDIR = $(AITHON_LIBRARY)/Board_$(BOARD_REV)
 # use the appropriate linker script based on whether or not we're using an IAP
 ifdef IS_BOOTLOADER
    LDSCRIPT = $(BOARDDIR)/AithonBootloader.ld
-ifneq ($(UNAME), windows32)
+ifeq ($(UNAME), windows32)
 	USE_COPT += -DDATE="\"$(shell cmd /C date /T)\""
 else
 	USE_COPT += -DDATE="\"$(shell date)\""
