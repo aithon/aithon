@@ -166,6 +166,10 @@ SECTIONS
         . = ALIGN(4);
         *(.bss.*)
         . = ALIGN(4);
+        *(.usertext.bss)
+        . = ALIGN(4);
+        *(.usertext.bss.*)
+        . = ALIGN(4);
         *(COMMON)
         . = ALIGN(4);
         PROVIDE(_bss_end = .);
