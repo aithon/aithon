@@ -151,7 +151,9 @@ ifeq ($(USE_VERBOSE_COMPILE),yes)
 else
 	@echo test Compiling $(<F) 
 	@$(CC) -c $(CFLAGS) $(TOPT) -I. $(IINCDIR) $< -o $@
+ifndef IS_BOOTLOADER
 	@$(CP) --prefix-sections=.usertext $(shell pwd)/$@
+endif
 endif
 
 $(ACOBJS) : $(OBJDIR)/%.o : %.c Makefile
