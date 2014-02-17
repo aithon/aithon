@@ -9893,7 +9893,7 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <part name="SUPPLY26" library="supply2" deviceset="GND" device=""/>
 <part name="R4" library="SparkFun" deviceset="RESISTOR" device="0402-RES" value="220"/>
 <part name="Q1" library="r_cubed" deviceset="STL4P2UH7" device="" value="STL4P2UH7"/>
-<part name="R10" library="SparkFun" deviceset="RESISTOR" device="0402-RES" value="10k"/>
+<part name="R10" library="SparkFun" deviceset="RESISTOR" device="0402-RES" value="4.7k"/>
 <part name="R11" library="SparkFun" deviceset="RESISTOR" device="0402-RES" value="10k"/>
 <part name="SUPPLY27" library="supply2" deviceset="GND" device=""/>
 <part name="SUPPLY30" library="supply2" deviceset="GND" device=""/>
@@ -10523,7 +10523,7 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <instance part="+3V13" gate="G$1" x="355.6" y="287.02" smashed="yes">
 <attribute name="VALUE" x="353.06" y="284.48" size="1.778" layer="96" rot="R90"/>
 </instance>
-<instance part="U$7" gate="G$1" x="297.18" y="285.75" rot="R90"/>
+<instance part="U$7" gate="G$1" x="297.18" y="285.75"/>
 <instance part="U$8" gate="G$1" x="308.61" y="297.18"/>
 </instances>
 <busses>
