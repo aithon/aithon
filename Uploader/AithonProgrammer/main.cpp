@@ -75,12 +75,14 @@ QByteArray _programData;
 error_t _error;
 int _numPackets;
 bool _debug = false;
+qint64 startTime = 0;
 
 
 void debug(QString msg)
 {
-     if (_debug)
-         std::cout << "\nDEBUG: " << msg.toStdString() << "\n";
+    qint64 timeDiff = QDateTime::currentMSecsSinceEpoch() - startTime;
+    if (_debug)
+        std::cout << "\nDEBUG[" << timeDiff << "]: " << msg.toStdString() << "\n";
 }
 
 void error(QString msg)
@@ -102,7 +104,8 @@ QString getCOMPort(bool isBootloader)
     int productId = isBootloader?USB_BOOTLOADER_PID:USB_STM32F4_PID;
     foreach (QextPortInfo info, QextSerialEnumerator::getPorts())
     {
-        debug(QString("ID = 0x%1:0x%2, Port = %3, PhysName = %4").arg(QString::number(info.vendorID, 16), QString::number(info.productID, 16), info.portName, info.physName));
+        if (info.vendorID > 0 && info.vendorID < 0xFFFF)
+            debug(QString("ID = 0x%1:0x%2, Port = %3, PhysName = %4").arg(QString::number(info.vendorID, 16), QString::number(info.productID, 16), info.portName, info.physName));
         if (info.vendorID == USB_ST_VID && info.productID == productId)
         {
 #ifdef Q_OS_LINUX
@@ -273,7 +276,7 @@ state_t resetChip()
         QString comPort;
         while (comPort.length() == 0)
         {
-            SLEEP(100);
+            SLEEP(10);
             comPort = getCOMPort(true);
         }
 
@@ -439,6 +442,7 @@ void doProgramFSM()
     
     while (true)
     {
+        debug("Current State = "+QString::number(state));
         switch (state)
         {
         case FSM_RESET:
@@ -518,6 +522,7 @@ void displayUsage()
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
+    startTime = QDateTime::currentMSecsSinceEpoch();
 
     if (argc < 2)
     {
