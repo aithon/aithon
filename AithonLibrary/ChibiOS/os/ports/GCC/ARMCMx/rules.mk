@@ -34,7 +34,7 @@ SRCPATHS  = $(sort $(dir $(ASMXSRC)) $(dir $(ASMSRC)) $(dir $(ASRC)) $(dir $(TSR
 
 # Various directories
 OBJDIR    = $(BUILDDIR)/obj
-USEROBJDIR    = $(BUILDDIR)/user_obj
+USEROBJDIR    = $(BUILDDIR)/usr_obj
 LSTDIR    = $(BUILDDIR)/lst
 
 # Object files groups
@@ -149,7 +149,7 @@ ifeq ($(USE_VERBOSE_COMPILE),yes)
 	$(CC) -c $(CFLAGS) $(TOPT) -I. $(IINCDIR) $< -o $@
         arm-none-eabi-objcopy --prefix-sections=.usertext $@
 else
-	@echo test Compiling $(<F) 
+	@echo Compiling $(<F) 
 	@$(CC) -c $(CFLAGS) $(TOPT) -I. $(IINCDIR) $< -o $@
 ifndef IS_BOOTLOADER
 	@$(CP) --prefix-sections=.usertext $(shell pwd)/$@
