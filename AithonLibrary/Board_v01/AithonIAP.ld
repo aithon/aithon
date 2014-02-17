@@ -149,14 +149,21 @@ SECTIONS
         . = ALIGN(4);
         *(.data.*)
         . = ALIGN(4);
-        *(.usertext.data)
-        . = ALIGN(4);
-        *(.usertext.data.*)
-        . = ALIGN(4);
         *(.ramtext)
         . = ALIGN(4);
         PROVIDE(_edata = .);
     } > ram AT > os_flash
+
+    .userdata :
+    {
+        . = ALIGN(4);
+        *(.usertext.data)
+        . = ALIGN(4);
+        *(.usertext.data.*)
+        . = ALIGN(4);
+        *(.usertext.ramtext)
+        . = ALIGN(4);
+    } > ram AT > user_flash
 
     .bss :
     {
@@ -165,6 +172,11 @@ SECTIONS
         *(.bss)
         . = ALIGN(4);
         *(.bss.*)
+        . = ALIGN(4);
+    } > ram    
+
+    .userbss :
+    {
         . = ALIGN(4);
         *(.usertext.bss)
         . = ALIGN(4);
