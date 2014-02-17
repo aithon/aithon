@@ -72,12 +72,12 @@ SECTIONS
 
     .text : ALIGN(16) SUBALIGN(16)
     {
-/*        *(.text.startup.*)
+        *(.text.startup.*)
         *(.text)
-        *(.text.*)*/ 
-        .text.startup.*
+        *(.text.*) 
+    /*    .text.startup.*
         .text*
-        .text.* 
+        .text.* */
         *(.rodata)
         *(.rodata.*)
         *(.glue_7t)
