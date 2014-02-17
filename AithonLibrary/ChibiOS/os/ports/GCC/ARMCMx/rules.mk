@@ -21,11 +21,9 @@ endif
 # Source files groups and paths
 ifeq ($(USE_THUMB),yes)
   TCSRC += $(CSRC)
-  TCUSERSRC += $(USERSRC)
   TCPPSRC += $(CPPSRC)
 else
   ACSRC += $(CSRC)
-  ACUSERSRC += $(USERSRC)
   ACPPSRC += $(CPPSRC)
 endif
 ASRC	  = $(ACSRC)$(ACPPSRC)
@@ -34,18 +32,16 @@ SRCPATHS  = $(sort $(dir $(ASMXSRC)) $(dir $(ASMSRC)) $(dir $(ASRC)) $(dir $(TSR
 
 # Various directories
 OBJDIR    = $(BUILDDIR)/obj
-USEROBJDIR    = $(BUILDDIR)/user_obj
 LSTDIR    = $(BUILDDIR)/lst
 
 # Object files groups
-USEROBJS    = $(addprefix $(USEROBJDIR)/, $(notdir $(USERSRC:.c=.o)))
 ACOBJS    = $(addprefix $(OBJDIR)/, $(notdir $(ACSRC:.c=.o)))
 ACPPOBJS  = $(addprefix $(OBJDIR)/, $(notdir $(ACPPSRC:.cpp=.o)))
 TCOBJS    = $(addprefix $(OBJDIR)/, $(notdir $(TCSRC:.c=.o)))
 TCPPOBJS  = $(addprefix $(OBJDIR)/, $(notdir $(TCPPSRC:.cpp=.o)))
 ASMOBJS   = $(addprefix $(OBJDIR)/, $(notdir $(ASMSRC:.s=.o)))
 ASMXOBJS  = $(addprefix $(OBJDIR)/, $(notdir $(ASMXSRC:.S=.o)))
-OBJS	  = $(ASMXOBJS) $(ASMOBJS) $(ACOBJS) $(TCOBJS) $(ACPPOBJS) $(TCPPOBJS) $(USEROBJS)
+OBJS	  = $(ASMXOBJS) $(ASMOBJS) $(ACOBJS) $(TCOBJS) $(ACPPOBJS) $(TCPPOBJS)
 
 # Paths
 IINCDIR   = $(patsubst %,-I%,$(INCDIR) $(DINCDIR) $(UINCDIR))
@@ -122,7 +118,6 @@ ifneq ($(USE_VERBOSE_COMPILE),yes)
 endif
 	mkdir -p $(OBJDIR)
 	mkdir -p $(LSTDIR)
-	mkdir -p $(USEROBJDIR)
 
 $(ACPPOBJS) : $(OBJDIR)/%.o : %.cpp Makefile
 ifeq ($(USE_VERBOSE_COMPILE),yes)
@@ -140,18 +135,6 @@ ifeq ($(USE_VERBOSE_COMPILE),yes)
 else
 	@echo Compiling $(<F)
 	@$(CPPC) -c $(CPPFLAGS) $(TOPT) -I. $(IINCDIR) $< -o $@
-endif
-
-#build user objects
-$(USEROBJS) : $(USEROBJDIR)/%.o : %.c Makefile
-ifeq ($(USE_VERBOSE_COMPILE),yes)
-	@echo
-	$(CC) -c $(CFLAGS) $(TOPT) -I. $(IINCDIR) $< -o $@
-        arm-none-eabi-objcopy --prefix-sections=.usertext $@
-else
-	@echo test Compiling $(<F) 
-	@$(CC) -c $(CFLAGS) $(TOPT) -I. $(IINCDIR) $< -o $@
-	@$(CP) --prefix-sections=.usertext $(shell pwd)/$@
 endif
 
 $(ACOBJS) : $(OBJDIR)/%.o : %.c Makefile

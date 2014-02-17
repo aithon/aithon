@@ -97,6 +97,7 @@ CSRC = $(PORTSRC) \
        $(FATFSSRC) \
        $(CHIBIOS)/os/various/chprintf.c \
        $(wildcard $(AITHON_LIBRARY)/*.c) \
+       $(USERSRC)
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
