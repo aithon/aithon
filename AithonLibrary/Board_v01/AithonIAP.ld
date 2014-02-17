@@ -78,8 +78,8 @@ SECTIONS
         .text.startup.*
         .text*
         .text.* 
-        .rodata*
-        .rodata.*
+        *(.rodata)
+        *(.rodata.*)
         *(.glue_7t)
         *(.glue_7)
         *(.gcc*)
@@ -90,8 +90,8 @@ SECTIONS
         *(.usertext.text.startup.*) 
         *(.usertext)
         *(.usertext.*)
-        *(.usertext.rodata)
-        *(.usertext.rodata.*)
+        .usertext.rodata*
+        .usertext.rodata.*
         *(.glue_7t)
         *(.glue_7)
         *(.gcc*)
