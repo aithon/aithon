@@ -29,17 +29,22 @@
 #define SYNC_TIMEOUT        50
 #define FLASH_TIMEOUT       5000
 
-// control characters
-#define SYNC                0xA5
-#define BUSY                0xB2
-#define ACK                 0x79
-#define NACK                0x1F
-#define ERASE_FLASH_START   0x43
-#define ERASE_FLASH_STATUS  0x8C
-#define SET_ADDR            0x31
-#define FILL_BUFFER         0xC7
-#define COMMIT_BUFFER       0x6E
-#define START_PROGRAM       0x2A
+
+// Commands
+#define SYNC               0x01
+#define ERASE_FLASH_START  0x1B
+#define ERASE_FLASH_STATUS 0x09
+#define SET_ADDR           0x1A
+#define CHECK_ADDR         0x3B
+#define FILL_BUFFER        0x29
+#define CHECK_BUFFER       0x06
+#define COMMIT_BUFFER      0x28
+#define START_PROGRAM      0x11
+
+// Responses
+#define ACK                0x40
+#define NACK               0x80
+#define BUSY               0xC0
 
 #define CHECK_FOR_ERROR(state) \
     do { \
@@ -163,11 +168,20 @@ uint8_t getByte(int timeout=DEFAULT_TIMEOUT)
     return (uint8_t) _port->read(1).at(0);
 }
 
-void waitForACK(int timeout=DEFAULT_TIMEOUT)
+void waitForACK(uint8_t commandSent, int timeout=DEFAULT_TIMEOUT)
 {
     uint8_t data = getByte(timeout);
+    uint8_t response = data & 0xC0;
+    uint8_t command = data & 0x3F;
 
-    switch (data)
+    if (command != commandSent)
+    {
+        _error = BAD_RESPONSE;
+        debug(QString("Got response to incorrect command (Sent 0x%1). Received byte: 0x%2 ").arg(QString::number((int)commandSent, 16), QString::number((int)data, 16)));
+        return;
+    }
+
+    switch (response)
     {
     case ACK:
         _error = SUCCESS;
@@ -179,7 +193,7 @@ void waitForACK(int timeout=DEFAULT_TIMEOUT)
         _error = RECV_BUSY;
         break;
     default:
-        debug("Expected ACK or NACK - got "+QString("0x%1").arg((int)data, 0, 16));
+        debug("Got 0 response!");
         _error = BAD_RESPONSE;
         break;
     }
@@ -240,8 +254,9 @@ bool doSync(int attempts = SYNC_RETRIES)
 
         // send SYNC command and expect SYNC response
         writeByte(SYNC);
-        uint8_t response = getByte(SYNC_TIMEOUT);
-        if (!_error && response == SYNC)
+        waitForACK(SYNC, SYNC_TIMEOUT);
+        debugPrintError("SYNC");
+        if (!_error)
         {
             debug("Synced with Aithon.");
             return true;
@@ -309,13 +324,13 @@ state_t eraseFlash()
 {
     // send command
     writeByte(ERASE_FLASH_START);
-    waitForACK(FLASH_TIMEOUT);
+    waitForACK(ERASE_FLASH_START, FLASH_TIMEOUT);
 
     // check the status
     while (true)
     {
         writeByte(ERASE_FLASH_STATUS);
-        waitForACK(FLASH_TIMEOUT);
+        waitForACK(ERASE_FLASH_STATUS, FLASH_TIMEOUT);
         if (_error == RECV_BUSY)
         {
             debug("FLASH BUSY");
@@ -348,21 +363,18 @@ state_t setAddress(const int packetNum)
     _port->write((char *)&addr, 4);
 
     // wait for ACK
-    waitForACK();
+    waitForACK(SET_ADDR);
     debugPrintError("SET_ADDR");
     CHECK_FOR_ERROR(FSM_SET_ADDR);
 
-    // compare checksum for address
-    uint8_t checksum2 = getByte();
-    debugPrintError("SET_ADDR checksum");
-    CHECK_FOR_ERROR(FSM_SET_ADDR);
+    // send checksum
+    writeByte(CHECK_ADDR);
+    writeByte(checksum);
 
-    if (checksum2 != checksum)
-    {
-        debug("Got invalid checksum back from SET_ADDR.");
-        _error = FSM_RETRY;
-        return FSM_SET_ADDR;
-    }
+    // wait for ACK
+    waitForACK(CHECK_ADDR);
+    debugPrintError("CHECK_ADDR");
+    CHECK_FOR_ERROR(FSM_SET_ADDR);
 
     return FSM_FILL_BUFFER;
 }
@@ -378,7 +390,7 @@ state_t fillBuffer(const int packetNum)
     _port->write(data);
 
     // wait for ACK
-    waitForACK();
+    waitForACK(FILL_BUFFER);
     debugPrintError("FILL_BUFFER");
     CHECK_FOR_ERROR(FSM_FILL_BUFFER);
 
@@ -387,18 +399,14 @@ state_t fillBuffer(const int packetNum)
     for (int i = 0; i < PACKET_LEN; i++)
         checksum ^= (uint8_t) data.at(i);
 
-    // get checksum
-    uint8_t checksum2 = getByte();
-    debugPrintError("FILL_BUFFER (checksum)");
-    CHECK_FOR_ERROR(FSM_FILL_BUFFER);
+    // send checksum
+    writeByte(CHECK_BUFFER);
+    writeByte(checksum);
 
-    // compare checksum
-    if (checksum2 != checksum)
-    {
-        debug("Got invalid checksum back from FILL_BUFFER.");
-        _error = FSM_RETRY;
-        return FSM_FILL_BUFFER;
-    }
+    // wait for ACK
+    waitForACK(CHECK_BUFFER);
+    debugPrintError("CHECK_BUFFER");
+    CHECK_FOR_ERROR(FSM_FILL_BUFFER);
 
     return FSM_COMMIT_BUFFER;
 }
@@ -409,7 +417,7 @@ state_t commitBuffer(int &packetNum)
     writeByte(COMMIT_BUFFER);
 
     // wait for ACK
-    waitForACK(FLASH_TIMEOUT);
+    waitForACK(COMMIT_BUFFER, FLASH_TIMEOUT);
     debugPrintError("COMMIT_BUFFER");
     CHECK_FOR_ERROR(FSM_COMMIT_BUFFER);
 
@@ -424,7 +432,7 @@ state_t startProgram()
 {
     writeByte(START_PROGRAM);
     // wait for ACK
-    waitForACK();
+    waitForACK(START_PROGRAM);
     debugPrintError("START_PROGRAM");
     if (_error)
     {
