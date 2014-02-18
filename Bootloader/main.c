@@ -66,6 +66,7 @@ void updateProgram(void)
 
    while (TRUE)
    {
+      led_toggle(0);
       cmdByte = getByte();
       switch (cmdByte)
       {

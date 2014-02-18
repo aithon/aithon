@@ -9,12 +9,11 @@ int main(void)
    led_on(0);
    
    // main should never return, so enter infinite loop
+   SerialDriver *dev = (SerialDriver *)&SDU1;
    while (1)
    {
-      // main thread code here
-      led_toggle(0);
-      led_toggle(1);
-      
-      delayS(1);
+      while (!sdGetWouldBlock(dev))
+         sdPut(dev, sdGet(dev));
+      delayMs(1);
    }
 }

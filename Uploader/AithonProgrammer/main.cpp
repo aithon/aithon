@@ -618,12 +618,7 @@ int main(int argc, char *argv[])
     }
     else if (!cmd.compare("test", Qt::CaseInsensitive))
     {
-        if (argc == 3)
-        {
-            // user specified com port
-            comPort = QString(argv[2]);
-        }
-        else if (comPort.length() == 0)
+        if (comPort.length() == 0)
         {
             std::cout << "No Aithon board detected.\n";
             return -1;
@@ -632,6 +627,10 @@ int main(int argc, char *argv[])
         for (int i = 0; i <= 255; i++)
         {
             writeByte((uint8_t)i);
+            debug("WRITE: "+QString::number(i));
+            SLEEP(1);
+            while (_port->bytesAvailable())
+                debug("READ: "+QString::number((uint8_t)_port->read(1).at(0)));
         }
         _port->close();
     }
