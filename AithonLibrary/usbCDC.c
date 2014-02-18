@@ -292,13 +292,18 @@ static bool_t _request_hook(USBDriver *usbp) {
 	if (((usbp->setup[0] & USB_RTYPE_TYPE_MASK) == USB_RTYPE_TYPE_CLASS) &&
 		(usbp->setup[1] == CDC_SET_CONTROL_LINE_STATE)) {
       uint8_t ctrlState = (usbp->setup[2] & 0x3);
+
+      if (chTimeElapsedSince(_resetTime) > 500) {
+         _resetIndex = 0;
+      }
+
+      _resetTime = chTimeNow();
+
       if (_resetSequence[_resetIndex] == ctrlState) {
          _resetIndex++;
-         _resetTime = chTimeNow();
       }
       else if (_resetIndex > 0 && _resetSequence[_resetIndex-1] != ctrlState) {
          _resetIndex = 0;
-         _resetTime = chTimeNow();
       }
       if (_resetIndex == 3)
          chEvtSignal(_aithon_thd, (eventmask_t)1);

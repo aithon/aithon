@@ -362,7 +362,7 @@ bool doSync(int attempts = SYNC_RETRIES)
     {
         // small delay before trying
         SLEEP(SYNC_TIMEOUT);
-        flushPort();
+        //flushPort();
 
         // send SYNC command and expect SYNC response
         writeAndAck(SYNC, SYNC_TIMEOUT);
@@ -399,6 +399,8 @@ state_t resetChip()
             SLEEP(100);
             comPort = getCOMPort(true);
         }
+
+        SLEEP(5000);
 
         openPort(comPort);
         debug("Opened port.");

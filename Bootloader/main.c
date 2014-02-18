@@ -11,7 +11,10 @@ void sendResponse(uint8_t command, uint8_t response)
 
 int getByte(void)
 {
-   return sdGetTimeout(_interface, DEFAULT_TIMEOUT);
+   //return sdGetTimeout(_interface, DEFAULT_TIMEOUT);
+   uint8_t cmd = 0;
+   sdRead(_interface,&cmd,1);
+   return cmd;
 }
 
 void flushInterface(void)
@@ -50,6 +53,7 @@ uint8_t calcChecksum(uint8_t *bytes, int len)
 
 void updateProgram(void)
 {
+   int clear = 0;
    int cmdByte, i, temp;
    FLASH_EraseResult result;
    uint32_t addr, maxAddr = 0;
@@ -162,6 +166,11 @@ void updateProgram(void)
          return;
       case Q_TIMEOUT:
       default:
+         if (clear == 0) {
+           lcd_clear();
+           clear = 1;
+         }
+         lcd_printf ("0%x ", cmdByte); 
          break;
       }
    }
