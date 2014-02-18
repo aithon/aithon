@@ -19,7 +19,9 @@
 
 #define USB_ST_VID          0x0483
 #define USB_STM32F4_PID     0x5740
+#define USB_BOOTLOADER_PID  0x5741
 #define PACKET_LEN          1024
+#define RESEND_RETRIES      3
 #define MAX_RETRIES         5
 #define SYNC_RETRIES        100
 
@@ -28,17 +30,22 @@
 #define SYNC_TIMEOUT        50
 #define FLASH_TIMEOUT       5000
 
-// control characters
-#define SYNC                0xA5
-#define BUSY                0xB2
-#define ACK                 0x79
-#define NACK                0x1F
-#define ERASE_FLASH_START   0x43
-#define ERASE_FLASH_STATUS  0x8C
-#define SET_ADDR            0x31
-#define FILL_BUFFER         0xC7
-#define COMMIT_BUFFER       0x6E
-#define START_PROGRAM       0x2A
+
+// Commands
+#define SYNC               0x01
+#define ERASE_FLASH_START  0x1B
+#define ERASE_FLASH_STATUS 0x09
+#define SET_ADDR           0x1A
+#define CHECK_ADDR         0x3B
+#define FILL_BUFFER        0x29
+#define CHECK_BUFFER       0x06
+#define COMMIT_BUFFER      0x28
+#define START_PROGRAM      0x11
+
+// Responses
+#define ACK                0x40
+#define NACK               0x80
+#define BUSY               0xC0
 
 #define CHECK_FOR_ERROR(state) \
     do { \
@@ -55,6 +62,7 @@ typedef enum {
     BAD_RESPONSE,
     RECV_NACK,
     RECV_BUSY,
+    RECV_ZERO,
     FSM_RETRY
 } error_t;
 
@@ -70,23 +78,27 @@ typedef enum {
 } state_t;
 
 QextSerialPort *_port = NULL;
+QString _portName;
 QByteArray _programData;
 error_t _error;
 int _numPackets;
 bool _debug = false;
+qint64 startTime = 0;
+
+void closePort(void);
 
 
 void debug(QString msg)
 {
-	 if (_debug)
-	     std::cout << "\nDEBUG: " << msg.toStdString() << "\n";
+    qint64 timeDiff = QDateTime::currentMSecsSinceEpoch() - startTime;
+    if (_debug)
+        std::cout << "\nDEBUG[" << timeDiff << "]: " << msg.toStdString() << "\n";
 }
 
 void error(QString msg)
 {
     std::cout << "\nERROR: " << msg.toStdString() << "\n";
-    if (_port != NULL && _port->isOpen())
-        _port->close();
+    closePort();
     exit(1);
 }
 
@@ -96,38 +108,45 @@ void printStatus(int current, int total)
     std::cout.flush();
 }
 
-QString getCOMPort()
+
+void openPort(QString port)
 {
-    foreach (QextPortInfo info, QextSerialEnumerator::getPorts())
-    {
-        debug(QString("ID = %1:%2, Port = %3, PhysName = %4").arg(QString::number(info.vendorID), QString::number(info.productID), info.portName, info.physName));
-        if (info.vendorID == USB_ST_VID && info.productID == USB_STM32F4_PID)
-        {
-#ifdef Q_OS_LINUX
-            return info.physName;
-#else
-            return info.portName;
-#endif
-        }
-    }
-    return QString("");
+    _portName = port;
+    _port = new QextSerialPort(port);
+    _port->setBaudRate(BAUD9600);
+    _port->setTimeout(1000);
+    if (!_port->open(QextSerialPort::ReadWrite))
+        error("Could not open serial port.");
 }
 
-bool isAithonCDC()
+void flushPort(void)
 {
-    return _port->portName() == getCOMPort();
+    // empty output buffer
+    _port->flush();
+    // 1ms sleep to reduce chance of race conditions
+    SLEEP(1);
+    // empty input buffer
+    _port->readAll();
 }
 
-bool isPortActive(QString port)
+void sendReset(void)
 {
-    foreach (QextPortInfo info, QextSerialEnumerator::getPorts())
-    {
-        if (info.portName == port)
-        {
-            return true;
-        }
-    }
-    return false;
+    // send a 0x023 seqeunce using RTS/DTR to do a software reset of the board
+    _port->setRts(false);
+    _port->setDtr(false);
+    SLEEP(100);
+    _port->setRts(true);
+    _port->setDtr(false);
+    SLEEP(100);
+    _port->setDtr(true);
+}
+
+void closePort(void)
+{
+    if (!_port)
+        return;
+    _port->close();
+    delete _port;
 }
 
 
@@ -136,7 +155,7 @@ void writeByte(uint8_t byte)
     _port->write((const char *)&byte, 1);
 }
 
-uint8_t getByte(int timeout=DEFAULT_TIMEOUT)
+uint8_t getByte(int &timeout)
 {
     while (!_port->bytesAvailable())
     {
@@ -153,11 +172,74 @@ uint8_t getByte(int timeout=DEFAULT_TIMEOUT)
     return (uint8_t) _port->read(1).at(0);
 }
 
-void waitForACK(int timeout=DEFAULT_TIMEOUT)
-{
-    uint8_t data = getByte(timeout);
 
-    switch (data)
+QString getCOMPort(bool isBootloader)
+{
+    int productId = isBootloader?USB_BOOTLOADER_PID:USB_STM32F4_PID;
+    foreach (QextPortInfo info, QextSerialEnumerator::getPorts())
+    {
+        if (info.vendorID > 0 && info.vendorID < 0xFFFF)
+            debug(QString("ID = 0x%1:0x%2, Port = %3, PhysName = %4").arg(QString::number(info.vendorID, 16), QString::number(info.productID, 16), info.portName, info.physName));
+        if (info.vendorID == USB_ST_VID && info.productID == productId)
+        {
+#ifdef Q_OS_LINUX
+            return info.physName;
+#else
+            return info.portName;
+#endif
+        }
+    }
+    return QString("");
+}
+
+bool isAithonCDC()
+{
+    return _portName == getCOMPort(false) || _portName == getCOMPort(true);
+}
+
+bool isAithonCDCBootloader()
+{
+    return _portName == getCOMPort(true);
+}
+
+bool isPortActive(QString port)
+{
+    foreach (QextPortInfo info, QextSerialEnumerator::getPorts())
+    {
+        if (info.portName == port)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+void waitForACK(uint8_t commandSent, int timeout=DEFAULT_TIMEOUT)
+{
+    uint8_t data = 0;
+    int tries = 0;
+    while (timeout > 0 && !data)
+    {
+        data = getByte(timeout);
+        tries++;
+    }
+    if (!data)
+    {
+        _error = RECV_ZERO;
+        return;
+    }
+    uint8_t response = data & 0xC0;
+    uint8_t command = data & 0x3F;
+
+    if (command != commandSent)
+    {
+        _error = BAD_RESPONSE;
+        debug(QString("Got response to incorrect command (Sent 0x%1). Received byte: 0x%2 ").arg(QString::number((int)commandSent, 16), QString::number((int)data, 16)));
+        return;
+    }
+
+    switch (response)
     {
     case ACK:
         _error = SUCCESS;
@@ -169,9 +251,45 @@ void waitForACK(int timeout=DEFAULT_TIMEOUT)
         _error = RECV_BUSY;
         break;
     default:
-        debug("Expected ACK or NACK - got "+QString("0x%1").arg((int)data, 0, 16));
+        debug("Got invalid response bits!");
         _error = BAD_RESPONSE;
         break;
+    }
+}
+
+void writeAndAck(uint8_t byte, int timeout=DEFAULT_TIMEOUT)
+{
+    for (int i = 0; i < RESEND_RETRIES; i++)
+    {
+        writeByte(byte);
+        waitForACK(byte, timeout);
+        if (_error != RECV_ZERO)
+            break;
+    }
+}
+
+void write2AndAck(uint8_t byte, uint8_t byte2, int timeout=DEFAULT_TIMEOUT)
+{
+    for (int i = 0; i < RESEND_RETRIES; i++)
+    {
+        writeByte(byte);
+        writeByte(byte2);
+        waitForACK(byte, timeout);
+        if (_error != RECV_ZERO)
+            break;
+    }
+}
+
+void writeBytesAndAck(uint8_t byte, uint8_t *bytes, int numBytes, int timeout=DEFAULT_TIMEOUT)
+{
+    for (int i = 0; i < RESEND_RETRIES; i++)
+    {
+        writeByte(byte);
+        for (int j = 0; j < numBytes; j++)
+            writeByte(bytes[j]);
+        waitForACK(byte, timeout);
+        if (_error != RECV_ZERO)
+            break;
     }
 }
 
@@ -185,6 +303,8 @@ void debugPrintError(QString state)
         debug("Got bad response from "+state+".");
     else if (_error == RECV_BUSY)
         debug("Got busy response from "+state+".");
+    else if (_error == RECV_ZERO)
+        debug("Got 0 byte from "+state+".");
 }
 
 
@@ -204,34 +324,18 @@ void readFile(QString fileName)
     std::cout << "Done\n";
 }
 
-void openPort(QString port)
-{
-    std::cout << "Opening serial port...\t\t";
-    _port = new QextSerialPort(port);
-    _port->setBaudRate(BAUD9600);
-    _port->setTimeout(1000);
-    if (!_port->open(QextSerialPort::ReadWrite))
-        error("Could not open serial port.");
-    std::cout << "Done\n";
-}
-
 bool doSync(int attempts = SYNC_RETRIES)
 {
     for (int i = 0; i < attempts; i++)
     {
         // small delay before trying
         SLEEP(SYNC_TIMEOUT);
-        // empty output buffer
-        _port->flush();
-        // 1ms sleep to reduce chance of race conditions
-        SLEEP(1);
-        // empty input buffer
-        _port->readAll();
+        flushPort();
 
         // send SYNC command and expect SYNC response
-        writeByte(SYNC);
-        uint8_t response = getByte(SYNC_TIMEOUT);
-        if (!_error && response == SYNC)
+        writeAndAck(SYNC, SYNC_TIMEOUT);
+        debugPrintError("SYNC");
+        if (!_error)
         {
             debug("Synced with Aithon.");
             return true;
@@ -243,47 +347,28 @@ bool doSync(int attempts = SYNC_RETRIES)
 
 state_t resetChip()
 {
+    if (isAithonCDCBootloader())
+    {
+        // We don't need to reset the board.
+        // Nothing to do here.
+    }
     if (isAithonCDC())
     {
-        // send a 0x023 seqeunce using RTS/DTR to do a software reset of the board
-        _port->setRts(false);
-        _port->setDtr(false);
-        _port->setRts(true);
-        _port->setDtr(false);
-        _port->setDtr(true);
+        sendReset();
         debug("Reset board.");
 
         // reopen the port
-        QString port = _port->portName();
-        _port->close();
-        delete _port;
+        closePort();
         debug("Deleted port.");
 
-        QTime time;
-        time.start();
-        bool state = true;
-#ifndef Q_OS_WIN32
-        SLEEP(5000);
-#endif
-        while (time.elapsed() < 4000)
+        QString comPort;
+        while (comPort.length() == 0)
         {
-            bool newState = isPortActive(port);
-            if (state != newState)
-            {
-                if (newState)
-                    break;
-                else
-                    state = newState;
-            }
-            SLEEP(50);
+            SLEEP(100);
+            comPort = getCOMPort(true);
         }
-        debug("Slept for "+QString::number(time.elapsed())+" milliseconds!");
 
-        _port = new QextSerialPort(port);
-        _port->setBaudRate(BAUD9600);
-        _port->setTimeout(1000);
-        if (!_port->open(QextSerialPort::ReadWrite))
-            error("Could not open serial port.");
+        openPort(comPort);
         debug("Opened port.");
     }
     else
@@ -305,14 +390,12 @@ state_t initChip()
 state_t eraseFlash()
 {
     // send command
-    writeByte(ERASE_FLASH_START);
-    waitForACK(FLASH_TIMEOUT);
+    writeAndAck(ERASE_FLASH_START, FLASH_TIMEOUT);
 
     // check the status
     while (true)
     {
-        writeByte(ERASE_FLASH_STATUS);
-        waitForACK(FLASH_TIMEOUT);
+        writeAndAck(ERASE_FLASH_STATUS, FLASH_TIMEOUT);
         if (_error == RECV_BUSY)
         {
             debug("FLASH BUSY");
@@ -332,34 +415,23 @@ state_t eraseFlash()
 
 state_t setAddress(const int packetNum)
 {
-    // set address
+    // send address
+    // wait for ACK
     uint32_t addr = packetNum * PACKET_LEN;
-    writeByte(SET_ADDR);
+    writeBytesAndAck(SET_ADDR, (uint8_t *)&addr, 4);
+    debugPrintError("SET_ADDR");
+    CHECK_FOR_ERROR(FSM_SET_ADDR);
 
     // compute checksum
     uint8_t checksum = 0;
     for (int i = 0; i < 4; i++)
         checksum ^= (addr >> (8 * i)) & 0xFF;
 
-    // send address
-    _port->write((char *)&addr, 4);
-
+    // send checksum
     // wait for ACK
-    waitForACK();
-    debugPrintError("SET_ADDR");
+    write2AndAck(CHECK_ADDR, checksum);
+    debugPrintError("CHECK_ADDR");
     CHECK_FOR_ERROR(FSM_SET_ADDR);
-
-    // compare checksum for address
-    uint8_t checksum2 = getByte();
-    debugPrintError("SET_ADDR checksum");
-    CHECK_FOR_ERROR(FSM_SET_ADDR);
-
-    if (checksum2 != checksum)
-    {
-        debug("Got invalid checksum back from SET_ADDR.");
-        _error = FSM_RETRY;
-        return FSM_SET_ADDR;
-    }
 
     return FSM_FILL_BUFFER;
 }
@@ -371,11 +443,8 @@ state_t fillBuffer(const int packetNum)
         error("Invalid packet length!");
 
     // send data packet
-    writeByte(FILL_BUFFER);
-    _port->write(data);
-
     // wait for ACK
-    waitForACK();
+    writeBytesAndAck(FILL_BUFFER, (uint8_t *)data.data(), PACKET_LEN);
     debugPrintError("FILL_BUFFER");
     CHECK_FOR_ERROR(FSM_FILL_BUFFER);
 
@@ -384,18 +453,11 @@ state_t fillBuffer(const int packetNum)
     for (int i = 0; i < PACKET_LEN; i++)
         checksum ^= (uint8_t) data.at(i);
 
-    // get checksum
-    uint8_t checksum2 = getByte();
-    debugPrintError("FILL_BUFFER (checksum)");
+    // send checksum
+    // wait for ACK
+    write2AndAck(CHECK_BUFFER, checksum);
+    debugPrintError("CHECK_BUFFER");
     CHECK_FOR_ERROR(FSM_FILL_BUFFER);
-
-    // compare checksum
-    if (checksum2 != checksum)
-    {
-        debug("Got invalid checksum back from FILL_BUFFER.");
-        _error = FSM_RETRY;
-        return FSM_FILL_BUFFER;
-    }
 
     return FSM_COMMIT_BUFFER;
 }
@@ -403,10 +465,8 @@ state_t fillBuffer(const int packetNum)
 state_t commitBuffer(int &packetNum)
 {
     // commit buffer to FLASH
-    writeByte(COMMIT_BUFFER);
-
     // wait for ACK
-    waitForACK(FLASH_TIMEOUT);
+    writeAndAck(COMMIT_BUFFER, FLASH_TIMEOUT);
     debugPrintError("COMMIT_BUFFER");
     CHECK_FOR_ERROR(FSM_COMMIT_BUFFER);
 
@@ -419,9 +479,8 @@ state_t commitBuffer(int &packetNum)
 
 state_t startProgram()
 {
-    writeByte(START_PROGRAM);
     // wait for ACK
-    waitForACK();
+    writeAndAck(START_PROGRAM);
     debugPrintError("START_PROGRAM");
     if (_error)
     {
@@ -441,6 +500,7 @@ void doProgramFSM()
     
     while (true)
     {
+        debug("Current State = "+QString::number(state));
         switch (state)
         {
         case FSM_RESET:
@@ -520,6 +580,7 @@ void displayUsage()
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
+    startTime = QDateTime::currentMSecsSinceEpoch();
 
     if (argc < 2)
     {
@@ -539,7 +600,9 @@ int main(int argc, char *argv[])
         }
 
     }
-    QString comPort = getCOMPort();
+    QString comPort = getCOMPort(true); // see if it's in the bootloader first
+    if (comPort.length() == 0)
+        comPort = getCOMPort(false);
     debug(comPort);
     if (!cmd.compare("detect", Qt::CaseInsensitive))
     {
@@ -567,9 +630,28 @@ int main(int argc, char *argv[])
             return -1;
         }
         readFile(QString(argv[2]));
+        std::cout << "Opening serial port...\t\t";
         openPort(comPort);
+        std::cout << "Done\n";
         doProgramFSM();
-        _port->close();
+        closePort();
+    }
+    else if (!cmd.compare("test", Qt::CaseInsensitive))
+    {
+        if (comPort.length() == 0)
+        {
+            std::cout << "No Aithon board detected.\n";
+            return -1;
+        }
+        openPort(comPort);
+        for (int i = 0; i <= 255; i++)
+        {
+            writeByte((uint8_t)i);
+            debug("WRITE: "+QString::number(i));
+            while (_port->bytesAvailable())
+                debug("READ: "+QString::number((uint8_t)_port->read(1).at(0)));
+        }
+        closePort();
     }
     else
     {

@@ -4,9 +4,9 @@
 #define DATE "unknown"
 #endif
 
-void sendByte(uint8_t byte)
+void sendResponse(uint8_t command, uint8_t response)
 {
-   sdPut(_interface, byte);
+   sdPut(_interface, response|command);
 }
 
 int getByte(void)
@@ -66,25 +66,29 @@ void updateProgram(void)
 
    while (TRUE)
    {
+      led_toggle(0);
       cmdByte = getByte();
       switch (cmdByte)
       {
       case SYNC:
          // sync
          flushInterface();
-         sendByte(SYNC);
+         sendResponse(SYNC, ACK);
          break;
       case ERASE_FLASH_START:
-         sendByte((FLASH_If_Erase_Start() == FLASH_ERASE_IN_PROGRESS)?ACK:NACK);
+         if (FLASH_If_Erase_Start() == FLASH_ERASE_IN_PROGRESS)
+            sendResponse(ERASE_FLASH_START, ACK);
+         else
+            sendResponse(ERASE_FLASH_START, NACK);
          break;
       case ERASE_FLASH_STATUS:
          result = FLASH_If_Erase_Status(endSector);
          if (result == FLASH_ERASE_COMPLETE)
-            sendByte(ACK);
+            sendResponse(ERASE_FLASH_STATUS, ACK);
          else if (result == FLASH_ERASE_IN_PROGRESS)
-            sendByte(BUSY);
+            sendResponse(ERASE_FLASH_STATUS, BUSY);
          else
-            sendByte(NACK);
+            sendResponse(ERASE_FLASH_STATUS, NACK);
          break;
       case SET_ADDR:
          // Read in the address, MSB first.
@@ -98,12 +102,27 @@ void updateProgram(void)
 
          // Check for errors.
          if (temp == Q_TIMEOUT)
-            sendByte(NACK);
+            sendResponse(SET_ADDR, NACK);
          else
          {
-            sendByte(ACK);
-            sendByte(calcChecksum((uint8_t *)&addr, 4));
+            sendResponse(SET_ADDR, ACK);
             // We'll get relative addresses, so add the start address.
+            addr += APPLICATION_START_ADDRESS;
+         }
+         break;
+      case CHECK_ADDR:
+         // Get the checksum
+         temp = getByte();
+         if (temp == Q_TIMEOUT)
+            sendResponse(CHECK_ADDR, NACK);
+         else
+         {
+            // Subtract the start address before calculating the checksum
+            addr -= APPLICATION_START_ADDRESS;
+            if (temp == calcChecksum((uint8_t *)&addr, 4))
+               sendResponse(CHECK_ADDR, ACK);
+            else
+               sendResponse(CHECK_ADDR, NACK);
             addr += APPLICATION_START_ADDRESS;
          }
          break;
@@ -115,22 +134,27 @@ void updateProgram(void)
             _buffer[i] = (uint8_t) (temp & 0xFF);
          }
          if (temp == Q_TIMEOUT)
-            sendByte(NACK);
+            sendResponse(FILL_BUFFER, NACK);
          else
-         {
-            sendByte(ACK);
-            sendByte(calcChecksum(_buffer, PACKET_LEN));
-         }
+            sendResponse(FILL_BUFFER, ACK);
+         break;
+      case CHECK_BUFFER:
+         // Get the checksum
+         temp = getByte();
+         if (temp != Q_TIMEOUT && temp == calcChecksum(_buffer, PACKET_LEN))
+            sendResponse(CHECK_BUFFER, ACK);
+         else
+            sendResponse(CHECK_BUFFER, NACK);
          break;
       case COMMIT_BUFFER:
          maxAddr = addr + PACKET_LEN - 1;
          if (FLASH_If_Write((__IO uint32_t *)&addr, (uint32_t *)_buffer, PACKET_LEN/4))
-            sendByte(NACK);
+            sendResponse(COMMIT_BUFFER, NACK);
          else
-            sendByte(ACK);
+            sendResponse(COMMIT_BUFFER, ACK);
          break;
       case START_PROGRAM:
-         sendByte(ACK);
+         sendResponse(START_PROGRAM, ACK);
          flushInterface();
          _ee_putReserved(_AI_EE_RES_ADDR_MAX_SECTOR, FLASH_Addr_To_Sector(maxAddr));
          startProgram();

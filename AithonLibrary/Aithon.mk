@@ -184,32 +184,27 @@ include $(CHIBIOS)/os/ports/GCC/ARMCMx/rules.mk
 # Detect the OS
 UNAME := $(shell uname)
 
-program: all
 ifeq ($(UNAME), windows32)
-ifdef IS_BOOTLOADER
-	@$(AITHON_LIBRARY)/Programmer/Windows/ST-LINK_Utility/ST-LINK_CLI.exe -P $(BUILDDIR)/$(PROJECT).bin 0x08000000
-else
-	@$(AITHON_LIBRARY)/Programmer/Windows/AithonProgrammer.exe program $(BUILDDIR)/$(PROJECT).bin
-endif
+PROGRAMMER := $(AITHON_LIBRARY)/Programmer/Windows/AithonProgrammer.exe
 endif
 ifeq ($(UNAME), darwin)
-	@$(AITHON_LIBRARY)/Programmer/MacOSX/AithonProgrammer program $(BUILDDIR)/$(PROJECT).bin
+PROGRAMMER := $(AITHON_LIBRARY)/Programmer/MacOSX/AithonProgrammer
 endif
 ifeq ($(UNAME), Linux)
-	@$(AITHON_LIBRARY)/Programmer/Linux/AithonProgrammer program $(BUILDDIR)/$(PROJECT).bin
+PROGRAMMER := $(AITHON_LIBRARY)/Programmer/Linux/AithonProgrammer
 endif
 
-program_debug: all
-ifeq ($(UNAME), windows32)
+
+program_boot: all
 ifdef IS_BOOTLOADER
 	@$(AITHON_LIBRARY)/Programmer/Windows/ST-LINK_Utility/ST-LINK_CLI.exe -P $(BUILDDIR)/$(PROJECT).bin 0x08000000
-else
-	@$(AITHON_LIBRARY)/Programmer/Windows/AithonProgrammer.exe -d program $(BUILDDIR)/$(PROJECT).bin
 endif
-endif
-ifeq ($(UNAME), darwin)
-	@$(AITHON_LIBRARY)/Programmer/MacOSX/AithonProgrammer -d program $(BUILDDIR)/$(PROJECT).bin
-endif
-ifeq ($(UNAME), Linux)
-	@$(AITHON_LIBRARY)/Programmer/Linux/AithonProgrammer -d program $(BUILDDIR)/$(PROJECT).bin
-endif
+
+program: all
+	@$(PROGRAMMER) program $(BUILDDIR)/$(PROJECT).bin
+
+program_debug: all
+	@$(PROGRAMMER) -d program $(BUILDDIR)/$(PROJECT).bin
+
+program_test: all
+	@$(PROGRAMMER) -d test
