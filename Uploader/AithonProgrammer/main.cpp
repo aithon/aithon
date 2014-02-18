@@ -263,8 +263,10 @@ state_t resetChip()
         // send a 0x023 seqeunce using RTS/DTR to do a software reset of the board
         _port->setRts(false);
         _port->setDtr(false);
+        SLEEP(100);
         _port->setRts(true);
         _port->setDtr(false);
+        SLEEP(100);
         _port->setDtr(true);
         debug("Reset board.");
 
@@ -276,7 +278,7 @@ state_t resetChip()
         QString comPort;
         while (comPort.length() == 0)
         {
-            SLEEP(10);
+            SLEEP(100);
             comPort = getCOMPort(true);
         }
 
