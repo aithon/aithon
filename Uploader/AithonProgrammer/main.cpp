@@ -78,11 +78,14 @@ typedef enum {
 } state_t;
 
 QextSerialPort *_port = NULL;
+QString _portName;
 QByteArray _programData;
 error_t _error;
 int _numPackets;
 bool _debug = false;
 qint64 startTime = 0;
+
+void closePort(void);
 
 
 void debug(QString msg)
@@ -95,8 +98,7 @@ void debug(QString msg)
 void error(QString msg)
 {
     std::cout << "\nERROR: " << msg.toStdString() << "\n";
-    if (_port != NULL && _port->isOpen())
-        _port->close();
+    closePort();
     exit(1);
 }
 
@@ -106,45 +108,45 @@ void printStatus(int current, int total)
     std::cout.flush();
 }
 
-QString getCOMPort(bool isBootloader)
+
+void openPort(QString port)
 {
-    int productId = isBootloader?USB_BOOTLOADER_PID:USB_STM32F4_PID;
-    foreach (QextPortInfo info, QextSerialEnumerator::getPorts())
-    {
-        if (info.vendorID > 0 && info.vendorID < 0xFFFF)
-            debug(QString("ID = 0x%1:0x%2, Port = %3, PhysName = %4").arg(QString::number(info.vendorID, 16), QString::number(info.productID, 16), info.portName, info.physName));
-        if (info.vendorID == USB_ST_VID && info.productID == productId)
-        {
-#ifdef Q_OS_LINUX
-            return info.physName;
-#else
-            return info.portName;
-#endif
-        }
-    }
-    return QString("");
+    _portName = port;
+    _port = new QextSerialPort(port);
+    _port->setBaudRate(BAUD9600);
+    _port->setTimeout(1000);
+    if (!_port->open(QextSerialPort::ReadWrite))
+        error("Could not open serial port.");
 }
 
-bool isAithonCDC()
+void flushPort(void)
 {
-    return _port->portName() == getCOMPort(false) || _port->portName() == getCOMPort(true);
+    // empty output buffer
+    _port->flush();
+    // 1ms sleep to reduce chance of race conditions
+    SLEEP(1);
+    // empty input buffer
+    _port->readAll();
 }
 
-bool isAithonCDCBootloader()
+void sendReset(void)
 {
-    return _port->portName() == getCOMPort(true);
+    // send a 0x023 seqeunce using RTS/DTR to do a software reset of the board
+    _port->setRts(false);
+    _port->setDtr(false);
+    SLEEP(100);
+    _port->setRts(true);
+    _port->setDtr(false);
+    SLEEP(100);
+    _port->setDtr(true);
 }
 
-bool isPortActive(QString port)
+void closePort(void)
 {
-    foreach (QextPortInfo info, QextSerialEnumerator::getPorts())
-    {
-        if (info.portName == port)
-        {
-            return true;
-        }
-    }
-    return false;
+    if (!_port)
+        return;
+    _port->close();
+    delete _port;
 }
 
 
@@ -169,6 +171,49 @@ uint8_t getByte(int &timeout)
     _error = SUCCESS;
     return (uint8_t) _port->read(1).at(0);
 }
+
+
+QString getCOMPort(bool isBootloader)
+{
+    int productId = isBootloader?USB_BOOTLOADER_PID:USB_STM32F4_PID;
+    foreach (QextPortInfo info, QextSerialEnumerator::getPorts())
+    {
+        if (info.vendorID > 0 && info.vendorID < 0xFFFF)
+            debug(QString("ID = 0x%1:0x%2, Port = %3, PhysName = %4").arg(QString::number(info.vendorID, 16), QString::number(info.productID, 16), info.portName, info.physName));
+        if (info.vendorID == USB_ST_VID && info.productID == productId)
+        {
+#ifdef Q_OS_LINUX
+            return info.physName;
+#else
+            return info.portName;
+#endif
+        }
+    }
+    return QString("");
+}
+
+bool isAithonCDC()
+{
+    return _portName == getCOMPort(false) || _portName == getCOMPort(true);
+}
+
+bool isAithonCDCBootloader()
+{
+    return _portName == getCOMPort(true);
+}
+
+bool isPortActive(QString port)
+{
+    foreach (QextPortInfo info, QextSerialEnumerator::getPorts())
+    {
+        if (info.portName == port)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 
 void waitForACK(uint8_t commandSent, int timeout=DEFAULT_TIMEOUT)
 {
@@ -279,29 +324,13 @@ void readFile(QString fileName)
     std::cout << "Done\n";
 }
 
-void openPort(QString port)
-{
-    std::cout << "Opening serial port...\t\t";
-    _port = new QextSerialPort(port);
-    _port->setBaudRate(BAUD9600);
-    _port->setTimeout(1000);
-    if (!_port->open(QextSerialPort::ReadWrite))
-        error("Could not open serial port.");
-    std::cout << "Done\n";
-}
-
 bool doSync(int attempts = SYNC_RETRIES)
 {
     for (int i = 0; i < attempts; i++)
     {
         // small delay before trying
         SLEEP(SYNC_TIMEOUT);
-        // empty output buffer
-        _port->flush();
-        // 1ms sleep to reduce chance of race conditions
-        SLEEP(1);
-        // empty input buffer
-        _port->readAll();
+        flushPort();
 
         // send SYNC command and expect SYNC response
         writeAndAck(SYNC, SYNC_TIMEOUT);
@@ -325,19 +354,11 @@ state_t resetChip()
     }
     if (isAithonCDC())
     {
-        // send a 0x023 seqeunce using RTS/DTR to do a software reset of the board
-        _port->setRts(false);
-        _port->setDtr(false);
-        SLEEP(100);
-        _port->setRts(true);
-        _port->setDtr(false);
-        SLEEP(100);
-        _port->setDtr(true);
+        sendReset();
         debug("Reset board.");
 
         // reopen the port
-        _port->close();
-        delete _port;
+        closePort();
         debug("Deleted port.");
 
         QString comPort;
@@ -347,11 +368,7 @@ state_t resetChip()
             comPort = getCOMPort(true);
         }
 
-        _port = new QextSerialPort(comPort);
-        _port->setBaudRate(BAUD9600);
-        _port->setTimeout(1000);
-        if (!_port->open(QextSerialPort::ReadWrite))
-            error("Could not open serial port.");
+        openPort(comPort);
         debug("Opened port.");
     }
     else
@@ -613,9 +630,11 @@ int main(int argc, char *argv[])
             return -1;
         }
         readFile(QString(argv[2]));
+        std::cout << "Opening serial port...\t\t";
         openPort(comPort);
+        std::cout << "Done\n";
         doProgramFSM();
-        _port->close();
+        closePort();
     }
     else if (!cmd.compare("test", Qt::CaseInsensitive))
     {
@@ -632,7 +651,7 @@ int main(int argc, char *argv[])
             while (_port->bytesAvailable())
                 debug("READ: "+QString::number((uint8_t)_port->read(1).at(0)));
         }
-        _port->close();
+        closePort();
     }
     else
     {
