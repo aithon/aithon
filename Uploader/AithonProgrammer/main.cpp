@@ -21,6 +21,7 @@
 #define USB_STM32F4_PID     0x5740
 #define USB_BOOTLOADER_PID  0x5741
 #define PACKET_LEN          1024
+#define RESEND_RETRIES      3
 #define MAX_RETRIES         5
 #define SYNC_RETRIES        100
 
@@ -61,6 +62,7 @@ typedef enum {
     BAD_RESPONSE,
     RECV_NACK,
     RECV_BUSY,
+    RECV_ZERO,
     FSM_RETRY
 } error_t;
 
@@ -179,8 +181,7 @@ void waitForACK(uint8_t commandSent, int timeout=DEFAULT_TIMEOUT)
     }
     if (!data)
     {
-        debug("Got 0 byte.");
-        _error = BAD_RESPONSE;
+        _error = RECV_ZERO;
         return;
     }
     uint8_t response = data & 0xC0;
@@ -205,9 +206,44 @@ void waitForACK(uint8_t commandSent, int timeout=DEFAULT_TIMEOUT)
         _error = RECV_BUSY;
         break;
     default:
-        debug("Got 0 response!");
+        debug("Got invalid response bits!");
         _error = BAD_RESPONSE;
         break;
+    }
+}
+
+void writeAndAck(uint8_t byte, int timeout=DEFAULT_TIMEOUT)
+{
+    for (int i = 0; i < RESEND_RETRIES; i++)
+    {
+        writeByte(byte);
+        waitForACK(byte, timeout);
+        if (_error != RECV_ZERO)
+            break;
+    }
+}
+
+void write2AndAck(uint8_t byte, uint8_t byte2, int timeout=DEFAULT_TIMEOUT)
+{
+    for (int i = 0; i < RESEND_RETRIES; i++)
+    {
+        writeByte(byte);
+        writeByte(byte2);
+        waitForACK(byte, timeout);
+        if (_error != RECV_ZERO)
+            break;
+    }
+}
+
+void writeBytesAndAck(uint8_t byte, uint8_t *bytes, int numBytes, int timeout=DEFAULT_TIMEOUT)
+{
+    for (int i = 0; i < RESEND_RETRIES; i++)
+    {
+        writeByte(byte);
+        _port->write((const char *)bytes, numBytes);
+        waitForACK(byte, timeout);
+        if (_error != RECV_ZERO)
+            break;
     }
 }
 
@@ -221,6 +257,8 @@ void debugPrintError(QString state)
         debug("Got bad response from "+state+".");
     else if (_error == RECV_BUSY)
         debug("Got busy response from "+state+".");
+    else if (_error == RECV_ZERO)
+        debug("Got 0 byte from "+state+".");
 }
 
 
@@ -265,8 +303,7 @@ bool doSync(int attempts = SYNC_RETRIES)
         _port->readAll();
 
         // send SYNC command and expect SYNC response
-        writeByte(SYNC);
-        waitForACK(SYNC, SYNC_TIMEOUT);
+        writeAndAck(SYNC, SYNC_TIMEOUT);
         debugPrintError("SYNC");
         if (!_error)
         {
@@ -335,14 +372,12 @@ state_t initChip()
 state_t eraseFlash()
 {
     // send command
-    writeByte(ERASE_FLASH_START);
-    waitForACK(ERASE_FLASH_START, FLASH_TIMEOUT);
+    writeAndAck(ERASE_FLASH_START, FLASH_TIMEOUT);
 
     // check the status
     while (true)
     {
-        writeByte(ERASE_FLASH_STATUS);
-        waitForACK(ERASE_FLASH_STATUS, FLASH_TIMEOUT);
+        writeAndAck(ERASE_FLASH_STATUS, FLASH_TIMEOUT);
         if (_error == RECV_BUSY)
         {
             debug("FLASH BUSY");
@@ -362,29 +397,21 @@ state_t eraseFlash()
 
 state_t setAddress(const int packetNum)
 {
-    // set address
+    // send address
+    // wait for ACK
     uint32_t addr = packetNum * PACKET_LEN;
-    writeByte(SET_ADDR);
+    writeBytesAndAck(SET_ADDR, (uint8_t *)&addr, 4);
+    debugPrintError("SET_ADDR");
+    CHECK_FOR_ERROR(FSM_SET_ADDR);
 
     // compute checksum
     uint8_t checksum = 0;
     for (int i = 0; i < 4; i++)
         checksum ^= (addr >> (8 * i)) & 0xFF;
 
-    // send address
-    _port->write((char *)&addr, 4);
-
-    // wait for ACK
-    waitForACK(SET_ADDR);
-    debugPrintError("SET_ADDR");
-    CHECK_FOR_ERROR(FSM_SET_ADDR);
-
     // send checksum
-    writeByte(CHECK_ADDR);
-    writeByte(checksum);
-
     // wait for ACK
-    waitForACK(CHECK_ADDR);
+    write2AndAck(CHECK_ADDR, checksum);
     debugPrintError("CHECK_ADDR");
     CHECK_FOR_ERROR(FSM_SET_ADDR);
 
@@ -398,11 +425,8 @@ state_t fillBuffer(const int packetNum)
         error("Invalid packet length!");
 
     // send data packet
-    writeByte(FILL_BUFFER);
-    _port->write(data);
-
     // wait for ACK
-    waitForACK(FILL_BUFFER);
+    writeBytesAndAck(FILL_BUFFER, (uint8_t *)data.data(), PACKET_LEN);
     debugPrintError("FILL_BUFFER");
     CHECK_FOR_ERROR(FSM_FILL_BUFFER);
 
@@ -412,11 +436,8 @@ state_t fillBuffer(const int packetNum)
         checksum ^= (uint8_t) data.at(i);
 
     // send checksum
-    writeByte(CHECK_BUFFER);
-    writeByte(checksum);
-
     // wait for ACK
-    waitForACK(CHECK_BUFFER);
+    write2AndAck(CHECK_BUFFER, checksum);
     debugPrintError("CHECK_BUFFER");
     CHECK_FOR_ERROR(FSM_FILL_BUFFER);
 
@@ -426,10 +447,8 @@ state_t fillBuffer(const int packetNum)
 state_t commitBuffer(int &packetNum)
 {
     // commit buffer to FLASH
-    writeByte(COMMIT_BUFFER);
-
     // wait for ACK
-    waitForACK(COMMIT_BUFFER, FLASH_TIMEOUT);
+    writeAndAck(COMMIT_BUFFER, FLASH_TIMEOUT);
     debugPrintError("COMMIT_BUFFER");
     CHECK_FOR_ERROR(FSM_COMMIT_BUFFER);
 
@@ -442,9 +461,8 @@ state_t commitBuffer(int &packetNum)
 
 state_t startProgram()
 {
-    writeByte(START_PROGRAM);
     // wait for ACK
-    waitForACK(START_PROGRAM);
+    writeAndAck(START_PROGRAM);
     debugPrintError("START_PROGRAM");
     if (_error)
     {
