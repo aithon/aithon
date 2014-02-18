@@ -578,6 +578,25 @@ int main(int argc, char *argv[])
         doProgramFSM();
         _port->close();
     }
+    else if (!cmd.compare("test", Qt::CaseInsensitive))
+    {
+        if (argc == 3)
+        {
+            // user specified com port
+            comPort = QString(argv[2]);
+        }
+        else if (comPort.length() == 0)
+        {
+            std::cout << "No Aithon board detected.\n";
+            return -1;
+        }
+        openPort(comPort);
+        for (int i = 0; i <= 255; i++)
+        {
+            writeByte((uint8_t)i);
+        }
+        _port->close();
+    }
     else
     {
         displayUsage();

@@ -10,7 +10,7 @@ int main(void)
    
    // main should never return, so enter infinite loop
    while (1)
-	{
+   {
       // main thread code here
       led_toggle(0);
       led_toggle(1);
