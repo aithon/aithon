@@ -151,7 +151,6 @@ bool isPortActive(QString port)
 void writeByte(uint8_t byte)
 {
     _port->write((const char *)&byte, 1);
-    //SLEEP(1);
 }
 
 uint8_t getByte(int &timeout)
