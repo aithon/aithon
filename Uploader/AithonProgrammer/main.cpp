@@ -1,6 +1,8 @@
 #include <QtCore/QCoreApplication>
 #include "qextserialport.h"
 #include "qextserialenumerator.h"
+#include "../avrdude/serial.h"
+#include "../avrdude/avrdude.h"
 #include <QFile>
 #include <QTime>
 #include <iostream>
@@ -9,6 +11,8 @@
 #include <unistd.h>
 #include <qmath.h>
 #include <QObject>
+
+extern int ser_open(char * port, long baud, union filedescriptor *fdp);
 
 #ifdef Q_OS_WIN32
 #include <windows.h>
@@ -81,6 +85,7 @@ QextSerialPort *_port = NULL;
 QString _portName;
 QByteArray _programData;
 error_t _error;
+union filedescriptor portFD;
 int _numPackets;
 bool _debug = false;
 qint64 startTime = 0;
@@ -111,12 +116,20 @@ void printStatus(int current, int total)
 
 void openPort(QString port)
 {
+    QByteArray ba = port.toLocal8Bit();
+    ser_open(ba.data(), BAUD9600, &portFD);
+    //ser_open("test", BAUD9600, &portFD);
+
     _portName = port;
     _port = new QextSerialPort(port);
     _port->setBaudRate(BAUD9600);
     _port->setTimeout(1000);
     if (!_port->open(QextSerialPort::ReadWrite))
         error("Could not open serial port.");
+
+
+
+
 }
 
 void flushPort(void)

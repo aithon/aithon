@@ -46,6 +46,8 @@
 #include "serial.h"
 
 long serial_recv_timeout = 5000; /* ms */
+char progname[20] = "avrdude";
+int verbose = 0;
 
 struct baud_mapping {
   long baud;
@@ -54,7 +56,7 @@ struct baud_mapping {
 
 /* There are a lot more baud rates we could handle, but what's the point? */
 
-static struct baud_mapping baud_lookup_table [] = {
+struct baud_mapping baud_lookup_table [] = {
   { 1200,   B1200 },
   { 2400,   B2400 },
   { 4800,   B4800 },
@@ -73,10 +75,10 @@ static struct baud_mapping baud_lookup_table [] = {
   { 0,      0 }                 /* Terminator. */
 };
 
-static struct termios original_termios;
-static int saved_original_termios;
+struct termios original_termios;
+int saved_original_termios;
 
-static speed_t serial_baud_lookup(long baud)
+speed_t serial_baud_lookup(long baud)
 {
   struct baud_mapping *map = baud_lookup_table;
 
@@ -97,7 +99,7 @@ static speed_t serial_baud_lookup(long baud)
   return baud;
 }
 
-static int ser_setspeed(union filedescriptor *fd, long baud)
+int ser_setspeed(union filedescriptor *fd, long baud)
 {
   int rc;
   struct termios termios;
@@ -157,7 +159,7 @@ static int ser_setspeed(union filedescriptor *fd, long baud)
  * terminal/console server with serial parameters configured
  * appropriately (e. g. 115200-8-N-1 for a STK500.)
  */
-static int
+int
 net_open(const char *port, union filedescriptor *fdp)
 {
   char *hstr, *pstr, *end;
@@ -224,7 +226,7 @@ net_open(const char *port, union filedescriptor *fdp)
 }
 
 
-static int ser_set_dtr_rts(union filedescriptor *fdp, int is_on)
+int ser_set_dtr_rts(union filedescriptor *fdp, int is_on)
 {
   unsigned int	ctl;
   int           r;
@@ -253,7 +255,7 @@ static int ser_set_dtr_rts(union filedescriptor *fdp, int is_on)
   return 0;
 }
 
-static int ser_open(char * port, long baud, union filedescriptor *fdp)
+int ser_open(char * port, long baud, union filedescriptor *fdp)
 {
   int rc;
   int fd;
@@ -293,7 +295,7 @@ static int ser_open(char * port, long baud, union filedescriptor *fdp)
 }
 
 
-static void ser_close(union filedescriptor *fd)
+void ser_close(union filedescriptor *fd)
 {
   /*
    * restore original termios settings from ser_open
@@ -312,7 +314,7 @@ static void ser_close(union filedescriptor *fd)
 }
 
 
-static int ser_send(union filedescriptor *fd, unsigned char * buf, size_t buflen)
+int ser_send(union filedescriptor *fd, unsigned char * buf, size_t buflen)
 {
   int rc;
   unsigned char * p = buf;
@@ -357,7 +359,7 @@ static int ser_send(union filedescriptor *fd, unsigned char * buf, size_t buflen
 }
 
 
-static int ser_recv(union filedescriptor *fd, unsigned char * buf, size_t buflen)
+int ser_recv(union filedescriptor *fd, unsigned char * buf, size_t buflen)
 {
   struct timeval timeout, to2;
   fd_set rfds;
@@ -433,7 +435,7 @@ static int ser_recv(union filedescriptor *fd, unsigned char * buf, size_t buflen
 }
 
 
-static int ser_drain(union filedescriptor *fd, int display)
+int ser_drain(union filedescriptor *fd, int display)
 {
   struct timeval timeout;
   fd_set rfds;

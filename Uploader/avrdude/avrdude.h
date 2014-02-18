@@ -21,11 +21,11 @@
 #ifndef avrdude_h
 #define avrdude_h
 
-extern char * progname;		/* name of program, for messages */
+//extern char * progname;		/* name of program, for messages */
 extern char progbuf[];		/* spaces same length as progname */
 
 extern int ovsigck;		/* override signature check (-F) */
-extern int verbose;		/* verbosity level (-v, -vv, ...) */
+//extern int verbose;		/* verbosity level (-v, -vv, ...) */
 extern int quell_progress;	/* quiteness level (-q, -qq) */
 
 #if defined(WIN32NATIVE)
