@@ -151,6 +151,7 @@ bool isPortActive(QString port)
 void writeByte(uint8_t byte)
 {
     _port->write((const char *)&byte, 1);
+    //SLEEP(1);
 }
 
 uint8_t getByte(int &timeout)
@@ -240,7 +241,8 @@ void writeBytesAndAck(uint8_t byte, uint8_t *bytes, int numBytes, int timeout=DE
     for (int i = 0; i < RESEND_RETRIES; i++)
     {
         writeByte(byte);
-        _port->write((const char *)bytes, numBytes);
+        for (int j = 0; j < numBytes; j++)
+            writeByte(bytes[j]);
         waitForACK(byte, timeout);
         if (_error != RECV_ZERO)
             break;
@@ -628,7 +630,6 @@ int main(int argc, char *argv[])
         {
             writeByte((uint8_t)i);
             debug("WRITE: "+QString::number(i));
-            SLEEP(1);
             while (_port->bytesAvailable())
                 debug("READ: "+QString::number((uint8_t)_port->read(1).at(0)));
         }
