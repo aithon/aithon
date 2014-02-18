@@ -237,11 +237,16 @@ int ser_set_dtr_rts(union filedescriptor *fdp, int is_on)
     return -1;
   }
 
-  if (is_on) {
+  if (is_on == 3) {
     /* Set DTR and RTS */
     ctl |= (TIOCM_DTR | TIOCM_RTS);
-  }
-  else {
+  } else if (is_on == 2) {
+    ctl |= (TIOCM_RTS);
+    ctl &= ~(TIOCM_DTR);
+  } else if (is_on == 1) {
+    ctl |= (TIOCM_DTR);
+    ctl &= ~(TIOCM_RTS);
+  } else {
     /* Clear DTR and RTS */
     ctl &= ~(TIOCM_DTR | TIOCM_RTS);
   }

@@ -1,8 +1,10 @@
 #include <QtCore/QCoreApplication>
 #include "qextserialport.h"
 #include "qextserialenumerator.h"
+extern "C" {
 #include "../avrdude/serial.h"
 #include "../avrdude/avrdude.h"
+}
 #include <QFile>
 #include <QTime>
 #include <iostream>
@@ -11,8 +13,6 @@
 #include <unistd.h>
 #include <qmath.h>
 #include <QObject>
-
-extern int ser_open(char * port, long baud, union filedescriptor *fdp);
 
 #ifdef Q_OS_WIN32
 #include <windows.h>
@@ -116,73 +116,93 @@ void printStatus(int current, int total)
 
 void openPort(QString port)
 {
+    char name[100] = "test";
     QByteArray ba = port.toLocal8Bit();
-    ser_open(ba.data(), BAUD9600, &portFD);
-    //ser_open("test", BAUD9600, &portFD);
+    //ser_open(ba.data(), BAUD9600, &portFD);
+    ser_open(name, 9600, &portFD);
 
-    _portName = port;
-    _port = new QextSerialPort(port);
-    _port->setBaudRate(BAUD9600);
-    _port->setTimeout(1000);
-    if (!_port->open(QextSerialPort::ReadWrite))
-        error("Could not open serial port.");
-
-
-
-
+    //_portName = port;
+    //_port = new QextSerialPort(port);
+    //_port->setBaudRate(BAUD9600);
+    //_port->setTimeout(1000);
+    //if (!_port->open(QextSerialPort::ReadWrite))
+    //    error("Could not open serial port.");
 }
 
 void flushPort(void)
 {
+    ser_drain(&portFD, 0);
+
     // empty output buffer
-    _port->flush();
+    //_port->flush();
     // 1ms sleep to reduce chance of race conditions
-    SLEEP(1);
+    //SLEEP(1);
     // empty input buffer
-    _port->readAll();
+    //_port->readAll();
 }
 
 void sendReset(void)
 {
-    // send a 0x023 seqeunce using RTS/DTR to do a software reset of the board
-    _port->setRts(false);
-    _port->setDtr(false);
+    ser_set_dtr_rts(&portFD, 0);
     SLEEP(100);
-    _port->setRts(true);
-    _port->setDtr(false);
+    ser_set_dtr_rts(&portFD, 2);
     SLEEP(100);
-    _port->setDtr(true);
+    ser_set_dtr_rts(&portFD, 3);
+    SLEEP(100);
+
+    // send a 0x023 sequence using RTS/DTR to do a software reset of the board
+    //_port->setRts(false);
+    //_port->setDtr(false);
+    //SLEEP(100);
+    //_port->setRts(true);
+    //_port->setDtr(false);
+    //SLEEP(100);
+    //_port->setDtr(true);
 }
 
 void closePort(void)
 {
-    if (!_port)
-        return;
-    _port->close();
-    delete _port;
+    ser_close(&portFD);
+    //if (!_port)
+    //    return;
+    //_port->close();
+    //delete _port;
 }
 
 
 void writeByte(uint8_t byte)
 {
-    _port->write((const char *)&byte, 1);
+    ser_send(&portFD, &byte, 1);
+    //_port->write((const char *)&byte, 1);
 }
 
 uint8_t getByte(int &timeout)
 {
-    while (!_port->bytesAvailable())
-    {
-        if (timeout <= 0)
-        {
-            _error = TIMEOUT;
-            return 0;
-        }
+  int ret;
+  unsigned char buf;
+  ret = ser_recv(&portFD, &buf, 1);
 
-        SLEEP(1);
-        timeout--;
-    }
-    _error = SUCCESS;
-    return (uint8_t) _port->read(1).at(0);
+  if (ret == -1) {
+      _error = TIMEOUT;
+      return 0;
+  } else {
+      _error = SUCCESS;
+      return buf;
+  }
+  
+//    while (!_port->bytesAvailable())
+//    {
+//        if (timeout <= 0)
+//        {
+//            _error = TIMEOUT;
+//            return 0;
+//        }
+//
+//        SLEEP(1);
+//        timeout--;
+//    }
+//    _error = SUCCESS;
+//    return (uint8_t) _port->read(1).at(0);
 }
 
 
