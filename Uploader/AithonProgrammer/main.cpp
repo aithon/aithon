@@ -116,10 +116,9 @@ void printStatus(int current, int total)
 
 void openPort(QString port)
 {
-    char name[100] = "test";
     QByteArray ba = port.toLocal8Bit();
-    //ser_open(ba.data(), BAUD9600, &portFD);
-    ser_open(name, 9600, &portFD);
+    ser_open(ba.data(), 9600, &portFD);
+    //ser_open(name, 9600, &portFD);
 
     //_portName = port;
     //_port = new QextSerialPort(port);
@@ -144,11 +143,11 @@ void flushPort(void)
 void sendReset(void)
 {
     ser_set_dtr_rts(&portFD, 0);
-    SLEEP(100);
+    SLEEP(250);
     ser_set_dtr_rts(&portFD, 2);
-    SLEEP(100);
+    SLEEP(250);
     ser_set_dtr_rts(&portFD, 3);
-    SLEEP(100);
+    SLEEP(250);
 
     // send a 0x023 sequence using RTS/DTR to do a software reset of the board
     //_port->setRts(false);
