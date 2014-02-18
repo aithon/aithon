@@ -177,7 +177,12 @@ void waitForACK(uint8_t commandSent, int timeout=DEFAULT_TIMEOUT)
         data = getByte(timeout);
         tries++;
     }
-    debug(QString::number(timeout)+", "+QString::number(tries));
+    if (!data)
+    {
+        debug("Got 0 byte.");
+        _error = BAD_RESPONSE;
+        return;
+    }
     uint8_t response = data & 0xC0;
     uint8_t command = data & 0x3F;
 
@@ -253,11 +258,11 @@ bool doSync(int attempts = SYNC_RETRIES)
         // small delay before trying
         SLEEP(SYNC_TIMEOUT);
         // empty output buffer
-        //_port->flush();
+        _port->flush();
         // 1ms sleep to reduce chance of race conditions
-        //SLEEP(1);
+        SLEEP(1);
         // empty input buffer
-        //_port->readAll();
+        _port->readAll();
 
         // send SYNC command and expect SYNC response
         writeByte(SYNC);
