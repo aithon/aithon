@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<grid distance="0.05" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="no" active="no"/>
 <layer number="16" name="Bottom" color="1" fill="1" visible="no" active="no"/>
@@ -10516,9 +10516,9 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <attribute name="VALUE" x="347.98" y="71.12" size="1.778" layer="96" rot="R90"/>
 </instance>
 <instance part="U$5" gate="G$1" x="351.79" y="276.86"/>
-<instance part="Q3" gate="G$1" x="337.82" y="271.78" smashed="yes" rot="R270">
-<attribute name="NAME" x="339.09" y="274.32" size="1.778" layer="95" rot="MR0"/>
-<attribute name="VALUE" x="341.63" y="269.24" size="1.016" layer="96" rot="MR0"/>
+<instance part="Q3" gate="G$1" x="337.82" y="271.78" smashed="yes" rot="MR270">
+<attribute name="NAME" x="336.55" y="274.32" size="1.778" layer="95"/>
+<attribute name="VALUE" x="334.01" y="269.24" size="1.016" layer="96"/>
 </instance>
 <instance part="U$6" gate="G$1" x="331.47" y="273.05"/>
 <instance part="SUPPLY73" gate="GND" x="351.79" y="266.7"/>
@@ -11327,8 +11327,8 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <pinref part="U$6" gate="G$1" pin="5V"/>
 <wire x1="328.93" y1="270.51" x2="331.47" y2="270.51" width="0.1524" layer="91"/>
 <wire x1="331.47" y1="270.51" x2="331.47" y2="273.05" width="0.1524" layer="91"/>
-<pinref part="Q3" gate="G$1" pin="D"/>
-<wire x1="331.47" y1="270.51" x2="334.01" y2="270.51" width="0.1524" layer="91"/>
+<pinref part="Q3" gate="G$1" pin="S"/>
+<wire x1="334.01" y1="270.51" x2="331.47" y2="270.51" width="0.1524" layer="91"/>
 <junction x="331.47" y="270.51"/>
 </segment>
 <segment>
@@ -13800,11 +13800,11 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 </net>
 <net name="N$22" class="0">
 <segment>
-<pinref part="Q3" gate="G$1" pin="S"/>
 <pinref part="U$5" gate="G$1" pin="VIN"/>
-<wire x1="341.63" y1="270.51" x2="342.9" y2="270.51" width="0.1524" layer="91"/>
 <wire x1="342.9" y1="270.51" x2="342.9" y2="279.4" width="0.1524" layer="91"/>
 <wire x1="342.9" y1="279.4" x2="344.17" y2="279.4" width="0.1524" layer="91"/>
+<pinref part="Q3" gate="G$1" pin="D"/>
+<wire x1="341.63" y1="270.51" x2="342.9" y2="270.51" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$35" class="0">

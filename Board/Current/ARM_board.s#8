@@ -10511,13 +10511,13 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <instance part="+3V12" gate="G$1" x="350.52" y="73.66" smashed="yes">
 <attribute name="VALUE" x="347.98" y="71.12" size="1.778" layer="96" rot="R90"/>
 </instance>
-<instance part="U$5" gate="G$1" x="344.17" y="280.67"/>
+<instance part="U$5" gate="G$1" x="344.17" y="279.4"/>
 <instance part="Q3" gate="G$1" x="327.66" y="283.21" smashed="yes" rot="R270">
 <attribute name="NAME" x="328.93" y="285.75" size="1.778" layer="95" rot="MR0"/>
 <attribute name="VALUE" x="335.28" y="279.4" size="1.778" layer="96" rot="MR0"/>
 </instance>
 <instance part="U$6" gate="G$1" x="330.2" y="271.78"/>
-<instance part="SUPPLY73" gate="GND" x="344.17" y="271.78"/>
+<instance part="SUPPLY73" gate="GND" x="344.17" y="270.51"/>
 <instance part="+3V13" gate="G$1" x="355.6" y="287.02" smashed="yes">
 <attribute name="VALUE" x="353.06" y="284.48" size="1.778" layer="96" rot="R90"/>
 </instance>
@@ -11220,7 +11220,7 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 </segment>
 <segment>
 <pinref part="U$5" gate="G$1" pin="GND"/>
-<wire x1="344.17" y1="275.59" x2="344.17" y2="274.32" width="0.1524" layer="91"/>
+<wire x1="344.17" y1="274.32" x2="344.17" y2="273.05" width="0.1524" layer="91"/>
 <pinref part="SUPPLY73" gate="GND" pin="GND"/>
 </segment>
 </net>
@@ -12382,8 +12382,8 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 </segment>
 <segment>
 <pinref part="U$5" gate="G$1" pin="VOUT"/>
-<wire x1="351.79" y1="283.21" x2="355.6" y2="283.21" width="0.1524" layer="91"/>
-<wire x1="355.6" y1="283.21" x2="355.6" y2="284.48" width="0.1524" layer="91"/>
+<wire x1="351.79" y1="281.94" x2="355.6" y2="281.94" width="0.1524" layer="91"/>
+<wire x1="355.6" y1="281.94" x2="355.6" y2="284.48" width="0.1524" layer="91"/>
 <pinref part="+3V13" gate="G$1" pin="+3V3"/>
 </segment>
 </net>
@@ -13790,10 +13790,8 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <net name="N$22" class="0">
 <segment>
 <pinref part="Q3" gate="G$1" pin="S"/>
-<wire x1="331.47" y1="281.94" x2="332.74" y2="281.94" width="0.1524" layer="91"/>
-<wire x1="332.74" y1="281.94" x2="332.74" y2="283.21" width="0.1524" layer="91"/>
 <pinref part="U$5" gate="G$1" pin="VIN"/>
-<wire x1="332.74" y1="283.21" x2="336.55" y2="283.21" width="0.1524" layer="91"/>
+<wire x1="331.47" y1="281.94" x2="336.55" y2="281.94" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
