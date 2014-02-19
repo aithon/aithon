@@ -521,6 +521,7 @@ state_t startProgram()
 {
     // wait for ACK
     writeAndAck(START_PROGRAM);
+    closePort();
     debugPrintError("START_PROGRAM");
     if (_error)
     {

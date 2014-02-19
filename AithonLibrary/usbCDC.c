@@ -293,11 +293,11 @@ static bool_t _request_hook(USBDriver *usbp) {
 		(usbp->setup[1] == CDC_SET_CONTROL_LINE_STATE)) {
       uint8_t ctrlState = (usbp->setup[2] & 0x3);
 
-      //if (chTimeElapsedSince(_resetTime) > 100000) {
-      //   _resetIndex = 0;
-      //}
+      if (chTimeElapsedSince(_resetTime) > 200) {
+         _resetIndex = 1;
+      }
 
-      //_resetTime = chTimeNow();
+      _resetTime = chTimeNow();
 
       if (_resetSequence[_resetIndex] == ctrlState) {
          _resetIndex++;
