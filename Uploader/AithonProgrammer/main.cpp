@@ -145,13 +145,10 @@ void sendReset(void)
 {
     ser_set_dtr_rts(&portFD, 0);
     SLEEP(100);
-    flushPort();
     ser_set_dtr_rts(&portFD, 2);
     SLEEP(100);
-    flushPort();
     ser_set_dtr_rts(&portFD, 3);
     SLEEP(100);
-    flushPort();
 
     // send a 0x023 sequence using RTS/DTR to do a software reset of the board
     //_port->setRts(false);
@@ -398,7 +395,7 @@ state_t resetChip()
         // reopen the port
         closePort();
         debug("Deleted port.");
-        SLEEP(1000);
+        SLEEP(1500);
 
         QString comPort;
         while (comPort.length() == 0)
