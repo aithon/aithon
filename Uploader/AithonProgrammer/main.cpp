@@ -119,6 +119,7 @@ void openPort(QString port)
     QByteArray ba = port.toLocal8Bit();
     ser_open(ba.data(), 9600, &portFD);
     _portName = port;
+    ser_setspeed(&portFD, 9600);
     //ser_open(name, 9600, &portFD);
 
     //_portName = port;
@@ -143,8 +144,8 @@ void flushPort(void)
 
 void sendReset(void)
 {
-    ser_set_dtr_rts(&portFD, 0);
-    SLEEP(100);
+    //ser_set_dtr_rts(&portFD, 0);
+    SLEEP(200);
     ser_set_dtr_rts(&portFD, 2);
     SLEEP(100);
     ser_set_dtr_rts(&portFD, 3);
@@ -294,7 +295,7 @@ void writeAndAck(uint8_t byte, int timeout=DEFAULT_TIMEOUT)
 {
     for (int i = 0; i < RESEND_RETRIES; i++)
     {
-        std::cout << "\twriting byte: " << byte; 
+        //std::cout << "\twriting byte: " << byte; 
         writeByte(byte);
         waitForACK(byte, timeout);
         if (_error != RECV_ZERO)
@@ -395,7 +396,7 @@ state_t resetChip()
         // reopen the port
         closePort();
         debug("Deleted port.");
-        SLEEP(1500);
+        SLEEP(500);
 
         QString comPort;
         while (comPort.length() == 0)
@@ -671,6 +672,8 @@ int main(int argc, char *argv[])
         }
         readFile(QString(argv[2]));
         std::cout << "Opening serial port...\t\t";
+        openPort(comPort);
+        closePort();
         openPort(comPort);
         std::cout << "Done\n";
         doProgramFSM();

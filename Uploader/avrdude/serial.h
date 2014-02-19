@@ -82,5 +82,6 @@ void ser_close(union filedescriptor *fd);
 int ser_send(union filedescriptor *fd, unsigned char * buf, size_t buflen);
 int ser_recv(union filedescriptor *fd, unsigned char * buf, size_t buflen, int ser_timeout);
 int ser_set_dtr_rts(union filedescriptor *fdp, int is_on);
+int ser_setspeed(union filedescriptor *fd, long baud);
 
 #endif /* serial_h */
