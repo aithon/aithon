@@ -118,6 +118,7 @@ void openPort(QString port)
 {
     QByteArray ba = port.toLocal8Bit();
     ser_open(ba.data(), 9600, &portFD);
+    _portName = port;
     //ser_open(name, 9600, &portFD);
 
     //_portName = port;
@@ -143,11 +144,14 @@ void flushPort(void)
 void sendReset(void)
 {
     ser_set_dtr_rts(&portFD, 0);
-    SLEEP(250);
+    SLEEP(100);
+    flushPort();
     ser_set_dtr_rts(&portFD, 2);
-    SLEEP(250);
+    SLEEP(100);
+    flushPort();
     ser_set_dtr_rts(&portFD, 3);
-    SLEEP(250);
+    SLEEP(100);
+    flushPort();
 
     // send a 0x023 sequence using RTS/DTR to do a software reset of the board
     //_port->setRts(false);
@@ -175,11 +179,11 @@ void writeByte(uint8_t byte)
     //_port->write((const char *)&byte, 1);
 }
 
-uint8_t getByte(int &timeout)
+uint8_t getByte(int timeout)
 {
   int ret;
   unsigned char buf;
-  ret = ser_recv(&portFD, &buf, 1);
+  ret = ser_recv(&portFD, &buf, 1, timeout);
 
   if (ret == -1) {
       _error = TIMEOUT;
@@ -293,6 +297,7 @@ void writeAndAck(uint8_t byte, int timeout=DEFAULT_TIMEOUT)
 {
     for (int i = 0; i < RESEND_RETRIES; i++)
     {
+        std::cout << "\twriting byte: " << byte; 
         writeByte(byte);
         waitForACK(byte, timeout);
         if (_error != RECV_ZERO)
@@ -360,9 +365,10 @@ bool doSync(int attempts = SYNC_RETRIES)
 {
     for (int i = 0; i < attempts; i++)
     {
+        std::cout<< "trying to sync...\n";
         // small delay before trying
         SLEEP(SYNC_TIMEOUT);
-        //flushPort();
+        flushPort();
 
         // send SYNC command and expect SYNC response
         writeAndAck(SYNC, SYNC_TIMEOUT);
@@ -384,7 +390,7 @@ state_t resetChip()
         // We don't need to reset the board.
         // Nothing to do here.
     }
-    if (isAithonCDC())
+    else if (isAithonCDC())
     {
         sendReset();
         debug("Reset board.");
@@ -392,6 +398,7 @@ state_t resetChip()
         // reopen the port
         closePort();
         debug("Deleted port.");
+        SLEEP(1000);
 
         QString comPort;
         while (comPort.length() == 0)
@@ -400,7 +407,6 @@ state_t resetChip()
             comPort = getCOMPort(true);
         }
 
-        SLEEP(5000);
 
         openPort(comPort);
         debug("Opened port.");
@@ -544,6 +550,8 @@ void doProgramFSM()
                 std::cout << "\b\b\bDone\n";
             break;
         case FSM_SYNC:
+            writeByte(SYNC);
+            SLEEP(100);
             std::cout << "\rSyncing with Aithon...\t\t   ";
             nextState = initChip();
             if (nextState != state)

@@ -364,7 +364,7 @@ int ser_send(union filedescriptor *fd, unsigned char * buf, size_t buflen)
 }
 
 
-int ser_recv(union filedescriptor *fd, unsigned char * buf, size_t buflen)
+int ser_recv(union filedescriptor *fd, unsigned char * buf, size_t buflen, int ser_timeout)
 {
   struct timeval timeout, to2;
   fd_set rfds;
@@ -373,8 +373,8 @@ int ser_recv(union filedescriptor *fd, unsigned char * buf, size_t buflen)
   unsigned char * p = buf;
   size_t len = 0;
 
-  timeout.tv_sec  = serial_recv_timeout / 1000L;
-  timeout.tv_usec = (serial_recv_timeout % 1000L) * 1000;
+  timeout.tv_sec  = ser_timeout / 1000L;
+  timeout.tv_usec = (ser_timeout % 1000L) * 1000;
   to2 = timeout;
 
   while (len < buflen) {

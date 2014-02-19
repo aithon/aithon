@@ -80,7 +80,7 @@ int ser_open(char * port, long baud, union filedescriptor *fdp);
 int ser_drain(union filedescriptor *fd, int display);
 void ser_close(union filedescriptor *fd);
 int ser_send(union filedescriptor *fd, unsigned char * buf, size_t buflen);
-int ser_recv(union filedescriptor *fd, unsigned char * buf, size_t buflen);
+int ser_recv(union filedescriptor *fd, unsigned char * buf, size_t buflen, int ser_timeout);
 int ser_set_dtr_rts(union filedescriptor *fdp, int is_on);
 
 #endif /* serial_h */
