@@ -116,11 +116,28 @@ void printStatus(int current, int total)
 
 void openPort(QString port)
 {
+    int tries=10;
+    int i;
+
+    //repeatedly open the port until there are no errors
     QByteArray ba = port.toLocal8Bit();
-    ser_open(ba.data(), 9600, &portFD);
+    for(i=0;i<tries;i++) {
+       if (ser_open(ba.data(), 9600, &portFD) != -1) {
+          break;
+       } else {
+          //std::cout << "Error opening serial port\n";
+          SLEEP(250);
+       }
+    }
+
+    if (i==tries) {
+       exit(1);
+    }
+
     _portName = port;
+
+    //reconfigure the device
     ser_setspeed(&portFD, 9600);
-    //ser_open(name, 9600, &portFD);
 
     //_portName = port;
     //_port = new QextSerialPort(port);
@@ -144,8 +161,8 @@ void flushPort(void)
 
 void sendReset(void)
 {
-    //ser_set_dtr_rts(&portFD, 0);
-    SLEEP(200);
+    ser_set_dtr_rts(&portFD, 0);
+    SLEEP(100);
     ser_set_dtr_rts(&portFD, 2);
     SLEEP(100);
     ser_set_dtr_rts(&portFD, 3);
@@ -363,7 +380,7 @@ bool doSync(int attempts = SYNC_RETRIES)
 {
     for (int i = 0; i < attempts; i++)
     {
-        std::cout<< "trying to sync...\n";
+        //std::cout<< "trying to sync...\n";
         // small delay before trying
         SLEEP(SYNC_TIMEOUT);
         flushPort();
@@ -549,6 +566,7 @@ void doProgramFSM()
                 std::cout << "\b\b\bDone\n";
             break;
         case FSM_SYNC:
+            SLEEP(100);
             writeByte(SYNC);
             SLEEP(100);
             std::cout << "\rSyncing with Aithon...\t\t   ";

@@ -46,7 +46,7 @@
 #include "serial.h"
 
 long serial_recv_timeout = 5000; /* ms */
-char progname[20] = "avrdude";
+char progname[50] = "AithonProgrammer";
 int verbose = 0;
 
 struct baud_mapping {
@@ -278,8 +278,8 @@ int ser_open(char * port, long baud, union filedescriptor *fdp)
    */
   fd = open(port, O_RDWR | O_NOCTTY | O_NONBLOCK);
   if (fd < 0) {
-    fprintf(stderr, "%s: ser_open(): can't open device \"%s\": %s\n",
-            progname, port, strerror(errno));
+    //fprintf(stderr, "%s: ser_open(): can't open device \"%s\": %s\n",
+    //        progname, port, strerror(errno));
     return -1;
   }
 
