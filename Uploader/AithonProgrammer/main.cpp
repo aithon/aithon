@@ -91,10 +91,12 @@ QextSerialPort *_port = NULL;
 QString _portName;
 QByteArray _programData;
 error_t _error;
-union filedescriptor portFD;
 int _numPackets;
 bool _debug = false;
 qint64 startTime = 0;
+#ifndef Q_OS_WIN32
+union filedescriptor portFD;
+#endif
 
 void closePort(void);
 
