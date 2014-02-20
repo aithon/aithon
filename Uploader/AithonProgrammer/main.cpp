@@ -153,7 +153,7 @@ void openPort(QString port)
     //reconfigure the device
 #ifdef AVRDUDE
     _portName = port;
-    std::cout << "Reconfiguring device\n";
+    //std::cout << "Reconfiguring device\n";
     ser_setspeed(&portFD, 38400);
 #else
 /*    _portName = port;
@@ -184,7 +184,7 @@ void sendReset(void)
 #ifdef AVRDUDE
     //ser_set_dtr_rts(&portFD, 0);
     SLEEP(100);
-    ser_set_dtr_rts(&portFD, 2);
+    //ser_set_dtr_rts(&portFD, 2);
     SLEEP(100);
     ser_set_dtr_rts(&portFD, 3);
     SLEEP(100);
@@ -411,7 +411,7 @@ bool doSync(int attempts = SYNC_RETRIES)
         //std::cout<< "trying to sync...\n";
         // small delay before trying
         SLEEP(SYNC_TIMEOUT);
-        //flushPort();
+        flushPort();
 
         // send SYNC command and expect SYNC response
         writeAndAck(SYNC, SYNC_TIMEOUT);
@@ -435,11 +435,11 @@ state_t resetChip()
     }
     else if (isAithonCDC())
     {
-        sendReset();
+        //sendReset();
         debug("Reset board.");
 
         // reopen the port
-        closePort();
+        //closePort();
         debug("Deleted port.");
         //SLEEP(250);
 
@@ -452,6 +452,7 @@ state_t resetChip()
 
         openPort(comPort);
         debug("Opened port.");
+        SLEEP(500);
     }
     else
     {

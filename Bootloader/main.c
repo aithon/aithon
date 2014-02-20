@@ -11,10 +11,10 @@ void sendResponse(uint8_t command, uint8_t response)
 
 int getByte(void)
 {
-   //return sdGetTimeout(_interface, DEFAULT_TIMEOUT);
-   uint8_t cmd = 0;
-   sdRead(_interface,&cmd,1);
-   return cmd;
+   return sdGetTimeout(_interface, DEFAULT_TIMEOUT);
+   //uint8_t cmd = 0;
+   //sdRead(_interface,&cmd,1);
+   //return cmd;
 }
 
 void flushInterface(void)
