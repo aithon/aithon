@@ -1,10 +1,14 @@
 #include <QtCore/QCoreApplication>
 #include "qextserialport.h"
 #include "qextserialenumerator.h"
+
+#ifndef Q_OS_WIN32
 extern "C" {
 #include "../avrdude/serial.h"
 #include "../avrdude/avrdude.h"
 }
+#endif
+
 #include <QFile>
 #include <QTime>
 #include <iostream>
@@ -118,21 +122,21 @@ void printStatus(int current, int total)
 
 void openPort(QString port)
 {
-    int tries=10;
+    int tries=MAX_RETRIES;
     int i;
 
     //repeatedly open the port until there are no errors
     QByteArray ba = port.toLocal8Bit();
     for(i=0;i<tries;i++) {
-       #ifdef AVRDUDE
+#ifndef Q_OS_WIN32
        if (ser_open(ba.data(), 38400, &portFD) != -1) {
           break;
        } else {
-          //std::cout << "Error opening serial port\n";
+          std::cout << "Error opening serial port\n";
           SLEEP(250);
        }
-       #else
-/*       _portName = port;
+#else
+       _portName = port;
        _port = new QextSerialPort(port);
        _port->setBaudRate(BAUD9600);
        _port->setTimeout(1000);
@@ -141,33 +145,32 @@ void openPort(QString port)
        } else {
           SLEEP(250);
           error("Could not open serial port.");
-       }*/
-       #endif
+       }
+#endif
     }
 
     if (i==tries) {
        exit(1);
     }
 
-
-    //reconfigure the device
-#ifdef AVRDUDE
+#ifndef Q_OS_WIN32
+    //reconfigure the device for Mac
     _portName = port;
     //std::cout << "Reconfiguring device\n";
     ser_setspeed(&portFD, 38400);
 #else
-/*    _portName = port;
+    _portName = port;
     _port = new QextSerialPort(port);
     _port->setBaudRate(BAUD9600);
     _port->setTimeout(1000);
     if (!_port->open(QextSerialPort::ReadWrite))
-        error("Could not open serial port.");*/
+        error("Could not open serial port.");
 #endif
 }
 
 void flushPort(void)
 {
-#ifdef AVRDUDE
+#ifndef Q_OS_WIN32
     ser_drain(&portFD, 0);
 #else
     // empty output buffer
@@ -181,7 +184,7 @@ void flushPort(void)
 
 void sendReset(void)
 {
-#ifdef AVRDUDE
+#ifndef Q_OS_WIN32
     //ser_set_dtr_rts(&portFD, 0);
     SLEEP(100);
     //ser_set_dtr_rts(&portFD, 2);
@@ -190,31 +193,31 @@ void sendReset(void)
     SLEEP(100);
 #else
     // send a 0x023 sequence using RTS/DTR to do a software reset of the board
-    //_port->setRts(false);
-    //_port->setDtr(false);
-    //SLEEP(100);
-    //_port->setRts(true);
-    //_port->setDtr(false);
-    //SLEEP(100);
-    //_port->setDtr(true);
+    _port->setRts(false);
+    _port->setDtr(false);
+    SLEEP(100);
+    _port->setRts(true);
+    _port->setDtr(false);
+    SLEEP(100);
+    _port->setDtr(true);
 #endif
 }
 
 void closePort(void)
 {
-#ifdef AVRDUDE
-   ser_close(&portFD);
+#ifndef Q_OS_WIN32
+    ser_close(&portFD);
 #else
-/*    if (!_port)
+    if (!_port)
         return;
     _port->close();
-    delete _port;*/
+    delete _port;
 #endif
 }
 
 void writeByte(uint8_t byte)
 {
-#ifdef AVRDUDE
+#ifndef Q_OS_WIN32
     ser_send(&portFD, &byte, 1);
 #else
     _port->write((const char *)&byte, 1);
@@ -223,7 +226,7 @@ void writeByte(uint8_t byte)
 
 uint8_t getByte(int timeout)
 {
-#ifdef AVRDUDE
+#ifndef Q_OS_WIN32
   int ret;
   unsigned char buf;
   ret = ser_recv(&portFD, &buf, 1, timeout);
@@ -236,7 +239,7 @@ uint8_t getByte(int timeout)
      return buf;
   }
 #else
-/*    while (!_port->bytesAvailable())
+    while (!_port->bytesAvailable())
     {
         if (timeout <= 0)
         {
@@ -248,7 +251,7 @@ uint8_t getByte(int timeout)
         timeout--;
     }
     _error = SUCCESS;
-    return (uint8_t) _port->read(1).at(0); */
+    return (uint8_t) _port->read(1).at(0);
 #endif
 }
 
@@ -340,7 +343,6 @@ void writeAndAck(uint8_t byte, int timeout=DEFAULT_TIMEOUT)
 {
     for (int i = 0; i < RESEND_RETRIES; i++)
     {
-        //std::cout << "\twriting byte: " << byte; 
         writeByte(byte);
         waitForACK(byte, timeout);
         if (_error != RECV_ZERO)
@@ -408,7 +410,6 @@ bool doSync(int attempts = SYNC_RETRIES)
 {
     for (int i = 0; i < attempts; i++)
     {
-        //std::cout<< "trying to sync...\n";
         // small delay before trying
         SLEEP(SYNC_TIMEOUT);
         flushPort();
@@ -435,11 +436,15 @@ state_t resetChip()
     }
     else if (isAithonCDC())
     {
-        //sendReset();
+#ifndef Q_OS_MAC
+        sendReset();
+#endif
         debug("Reset board.");
 
         // reopen the port
-        //closePort();
+#ifndef Q_OS_MAC
+        closePort();
+#endif
         debug("Deleted port.");
         //SLEEP(250);
 
@@ -452,7 +457,7 @@ state_t resetChip()
 
         openPort(comPort);
         debug("Opened port.");
-        SLEEP(500);
+        SLEEP(200);
     }
     else
     {
@@ -594,9 +599,11 @@ void doProgramFSM()
                 std::cout << "\b\b\bDone\n";
             break;
         case FSM_SYNC:
+#ifdef Q_OS_MAC
             SLEEP(100);
             writeByte(SYNC);
             SLEEP(100);
+#endif
             std::cout << "\rSyncing with Aithon...\t\t   ";
             nextState = initChip();
             if (nextState != state)

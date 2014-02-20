@@ -10,7 +10,11 @@ TARGET = AithonProgrammer
 CONFIG   += console
 
 
-SOURCES += main.cpp ../avrdude/ser_posix.c
+SOURCES += main.cpp 
+
+unix {
+  SOURCES += ../avrdude/ser_posix.c
+}
 
 include(../qextserialport-1.2rc/src/qextserialport.pri)
 
