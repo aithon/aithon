@@ -13,7 +13,7 @@ int main(void)
    while (1)
    {
       lcd_clear();
-      lcd_printf("%d\n", _resetIndex);
+      lcd_printf("%d %d\n", _resetIndex, analog_get(10));
       lcd_printf("%d\n", chTimeNow());
       // main thread code here
       led_toggle(0);

@@ -51,6 +51,8 @@ extern "C" {
 #define NACK               0x80
 #define BUSY               0xC0
 
+#define AVRDUDE
+
 #define CHECK_FOR_ERROR(state) \
     do { \
         if (_error) { \
@@ -122,52 +124,71 @@ void openPort(QString port)
     //repeatedly open the port until there are no errors
     QByteArray ba = port.toLocal8Bit();
     for(i=0;i<tries;i++) {
-       if (ser_open(ba.data(), 9600, &portFD) != -1) {
+       #ifdef AVRDUDE
+       if (ser_open(ba.data(), 38400, &portFD) != -1) {
           break;
        } else {
           //std::cout << "Error opening serial port\n";
           SLEEP(250);
        }
+       #else
+/*       _portName = port;
+       _port = new QextSerialPort(port);
+       _port->setBaudRate(BAUD9600);
+       _port->setTimeout(1000);
+       if (_port->open(QextSerialPort::ReadWrite)) {
+          break;
+       } else {
+          SLEEP(250);
+          error("Could not open serial port.");
+       }*/
+       #endif
     }
 
     if (i==tries) {
        exit(1);
     }
 
-    _portName = port;
 
     //reconfigure the device
-    ser_setspeed(&portFD, 9600);
-
-    //_portName = port;
-    //_port = new QextSerialPort(port);
-    //_port->setBaudRate(BAUD9600);
-    //_port->setTimeout(1000);
-    //if (!_port->open(QextSerialPort::ReadWrite))
-    //    error("Could not open serial port.");
+#ifdef AVRDUDE
+    _portName = port;
+    std::cout << "Reconfiguring device\n";
+    ser_setspeed(&portFD, 38400);
+#else
+/*    _portName = port;
+    _port = new QextSerialPort(port);
+    _port->setBaudRate(BAUD9600);
+    _port->setTimeout(1000);
+    if (!_port->open(QextSerialPort::ReadWrite))
+        error("Could not open serial port.");*/
+#endif
 }
 
 void flushPort(void)
 {
+#ifdef AVRDUDE
     ser_drain(&portFD, 0);
-
+#else
     // empty output buffer
-    //_port->flush();
+    _port->flush();
     // 1ms sleep to reduce chance of race conditions
-    //SLEEP(1);
+    SLEEP(1);
     // empty input buffer
-    //_port->readAll();
+    _port->readAll();
+#endif
 }
 
 void sendReset(void)
 {
-    ser_set_dtr_rts(&portFD, 0);
+#ifdef AVRDUDE
+    //ser_set_dtr_rts(&portFD, 0);
     SLEEP(100);
     ser_set_dtr_rts(&portFD, 2);
     SLEEP(100);
     ser_set_dtr_rts(&portFD, 3);
     SLEEP(100);
-
+#else
     // send a 0x023 sequence using RTS/DTR to do a software reset of the board
     //_port->setRts(false);
     //_port->setDtr(false);
@@ -176,26 +197,33 @@ void sendReset(void)
     //_port->setDtr(false);
     //SLEEP(100);
     //_port->setDtr(true);
+#endif
 }
 
 void closePort(void)
 {
-    ser_close(&portFD);
-    //if (!_port)
-    //    return;
-    //_port->close();
-    //delete _port;
+#ifdef AVRDUDE
+   ser_close(&portFD);
+#else
+/*    if (!_port)
+        return;
+    _port->close();
+    delete _port;*/
+#endif
 }
-
 
 void writeByte(uint8_t byte)
 {
+#ifdef AVRDUDE
     ser_send(&portFD, &byte, 1);
-    //_port->write((const char *)&byte, 1);
+#else
+    _port->write((const char *)&byte, 1);
+#endif
 }
 
 uint8_t getByte(int timeout)
 {
+#ifdef AVRDUDE
   int ret;
   unsigned char buf;
   ret = ser_recv(&portFD, &buf, 1, timeout);
@@ -203,26 +231,26 @@ uint8_t getByte(int timeout)
   if (ret == -1) {
       _error = TIMEOUT;
       return 0;
-  } else {
-      _error = SUCCESS;
-      return buf;
+  } else { 
+     _error = SUCCESS;
+     return buf;
   }
-  
-//    while (!_port->bytesAvailable())
-//    {
-//        if (timeout <= 0)
-//        {
-//            _error = TIMEOUT;
-//            return 0;
-//        }
-//
-//        SLEEP(1);
-//        timeout--;
-//    }
-//    _error = SUCCESS;
-//    return (uint8_t) _port->read(1).at(0);
-}
+#else
+/*    while (!_port->bytesAvailable())
+    {
+        if (timeout <= 0)
+        {
+            _error = TIMEOUT;
+            return 0;
+        }
 
+        SLEEP(1);
+        timeout--;
+    }
+    _error = SUCCESS;
+    return (uint8_t) _port->read(1).at(0); */
+#endif
+}
 
 QString getCOMPort(bool isBootloader)
 {
@@ -383,7 +411,7 @@ bool doSync(int attempts = SYNC_RETRIES)
         //std::cout<< "trying to sync...\n";
         // small delay before trying
         SLEEP(SYNC_TIMEOUT);
-        flushPort();
+        //flushPort();
 
         // send SYNC command and expect SYNC response
         writeAndAck(SYNC, SYNC_TIMEOUT);
@@ -413,7 +441,7 @@ state_t resetChip()
         // reopen the port
         closePort();
         debug("Deleted port.");
-        SLEEP(500);
+        //SLEEP(250);
 
         QString comPort;
         while (comPort.length() == 0)
@@ -421,7 +449,6 @@ state_t resetChip()
             SLEEP(100);
             comPort = getCOMPort(true);
         }
-
 
         openPort(comPort);
         debug("Opened port.");
@@ -693,6 +720,7 @@ int main(int argc, char *argv[])
         openPort(comPort);
         closePort();
         openPort(comPort);
+
         std::cout << "Done\n";
         doProgramFSM();
         closePort();
