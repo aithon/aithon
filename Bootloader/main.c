@@ -3,6 +3,47 @@
 #ifndef DATE
 #define DATE "unknown"
 #endif
+#define debugPrintf(fmt, ...) chprintf((BaseSequentialStream *)&SD2, fmt, ##__VA_ARGS__)
+
+void debugPrintCmd(int cmdByte)
+{
+   switch (cmdByte)
+   {
+   case SYNC:
+      debugPrintf("CMD: SYNC\r\n");
+      break;
+   case ERASE_FLASH_START:
+      debugPrintf("CMD: ERASE_FLASH_START\r\n");
+      break;
+   case ERASE_FLASH_STATUS:
+      debugPrintf("CMD: ERASE_FLASH_STATUS\r\n");
+      break;
+   case SET_ADDR:
+      debugPrintf("CMD: SET_ADDR\r\n");
+      break;
+   case CHECK_ADDR:
+      debugPrintf("CMD: CHECK_ADDR\r\n");
+      break;
+   case FILL_BUFFER:
+      debugPrintf("CMD: FILL_BUFFER\r\n");
+      break;
+   case CHECK_BUFFER:
+      debugPrintf("CMD: CHECK_BUFFER\r\n");
+      break;
+   case COMMIT_BUFFER:
+      debugPrintf("CMD: COMMIT_BUFFER\r\n");
+      break;
+   case START_PROGRAM:
+      debugPrintf("CMD: START_PROGRAM\r\n");
+      break;
+   case Q_TIMEOUT:
+      debugPrintf("CMD: Q_TIMEOUT\r\n");
+      break;
+   default:
+      debugPrintf("CMD: UNKNOWN (0x%x|%d|%c)\r\n", cmdByte, cmdByte, cmdByte);
+      break;
+   }
+}
 
 void sendResponse(uint8_t command, uint8_t response)
 {
@@ -68,6 +109,7 @@ void updateProgram(void)
    {
       led_toggle(0);
       cmdByte = getByte();
+      debugPrintCmd(cmdByte);
       switch (cmdByte)
       {
       case SYNC:
@@ -157,6 +199,7 @@ void updateProgram(void)
          sendResponse(START_PROGRAM, ACK);
          flushInterface();
          _ee_putReserved(_AI_EE_RES_ADDR_MAX_SECTOR, FLASH_Addr_To_Sector(maxAddr));
+         delayS(1);
          startProgram();
          // ...should never get here
          return;
