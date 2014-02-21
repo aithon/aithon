@@ -1,6 +1,6 @@
-#!/Library/Frameworks/Python.framework/Versions/2.7/bin/python
+#!/usr/bin/python
 
-#this script reads in a .bin file and outputs a C header file that can
+#this script reads in a .bin file and outputs to STDOUT a C header file that can
 #be included in a user application
 
 import sys
@@ -18,7 +18,10 @@ f = open(sys.argv[1], "rb")
 try:
     byte = f.read(4)
     while byte != "":
-      print "%s%s %s" % ("0x", binascii.hexlify(bytearray(byte)), " ,")
+      temp_byte = bytearray(byte)
+      temp_byte.reverse()
+      #print "%s%s %s" % ("0x", binascii.hexlify(bytearray(byte)), " ,")
+      print "%s%s %s" % ("0x", binascii.hexlify(temp_byte), " ,")
       if lines == 1: #check that it is a bootloader binary
         temp_byte = bytearray(byte)
         temp_byte.reverse()
