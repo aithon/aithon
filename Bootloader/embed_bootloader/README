@@ -1,0 +1,13 @@
+To generate an application with an embedded bootloader image:
+
+1.  build the bootloader (the image will be in Bootloader/build/ch.bin)
+2.  run the embed.py script as:
+
+  embed.py ../build/ch.bin > embed_bootloader.h
+
+3.  build the user application by running 'make' in the embed_bootloader directory
+4.  flash the user application in Bootloader/embed_bootloader/build/ch.bin
+5.  the application will run and prompt to press Button0
+6.  the message 'Success' should appear 
+7.  flash a any new user application to erase the bootloader update image
+

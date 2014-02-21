@@ -48,7 +48,7 @@ void updateBootloader(void)
 int main(void)
 {
    lcd_clear();
-   lcd_printf("Press BTN0 to flash\n");
+   lcd_printf("Press BTN0 for\n");
    lcd_printf("new bootloader");
   
    //wait for button press
