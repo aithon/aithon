@@ -30,7 +30,7 @@ try:
         temp_byte = bytearray(byte)
         temp_byte.reverse()
         reset_addr = int(binascii.hexlify(temp_byte), 16)
-        if reset_addr > 0x08010000:
+        if reset_addr > 0x08010000 or reset_addr < 0x08000000:
           print "invalid reset address - this is a user application binary"
           sys.exit()
       byte = f.read(4)
