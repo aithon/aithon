@@ -2,6 +2,10 @@
 
 #this script reads in a .bin file and outputs to STDOUT a C header file that can
 #be included in a user application
+#
+#usage:  embed.py bootloader.bin > embed_bootloader.h
+#
+#after generating embed_bootloader.h, compile the bootloader update application
 
 import sys
 import re
