@@ -15,7 +15,7 @@ lines = 0
 count = 0
 temp_byte = bytearray()
 
-print "static const int bootloader[8192] = {"
+print "static const unsigned int bootloader[8192] = {"
 
 #output binary
 f = open(sys.argv[1], "rb")

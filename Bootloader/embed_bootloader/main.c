@@ -26,7 +26,9 @@ void updateBootloader(void)
          /* Error occurred while page erase */
          lcd_clear();
          lcd_printf ("Error during\npage erase #%d", i);
-         while(1) {}
+         while(1) {
+            chThdSleepMilliseconds(1);
+         }
       }
    }
 
@@ -42,11 +44,32 @@ void updateBootloader(void)
       lcd_printf ("Success");
    }
 
-   while(1) {}
+   while(1) {
+      chThdSleepMilliseconds(1);
+   }
 }
 
 int main(void)
 {
+   int i;
+   unsigned int data;
+
+   //check that the bootloader has not already been flashed
+   for (i=0;i<lines;i++) {
+      data = *(__IO uint32_t*) (ADDR_FLASH_SECTOR_0 + i*4); 
+      if (bootloader[i] != data) {
+         break;
+      }
+   }
+
+   if (i == lines) {
+      lcd_clear();
+      lcd_printf("Bootloader\nalready updated");
+      while(1) {
+         chThdSleepMilliseconds(1);
+      }
+   }
+
    lcd_clear();
    lcd_printf("Press BTN0 for\n");
    lcd_printf("new bootloader");
