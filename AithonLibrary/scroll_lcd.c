@@ -1,6 +1,7 @@
 #include "Aithon.h"
 
 static WORKING_AREA(scrollingThreadWorkingArea, 128);
+Mutex scroll_mtx;
 int scroll_row=0, scroll_col=0;
 int scroll_delay=300; //scrolling delay in ms
 int scroll_window=16; //width of scrolling area
@@ -23,6 +24,7 @@ static msg_t scrollingThread(void *arg)
    {
       if (scroll_status == 1) 
       {
+         chMtxLock(&scroll_mtx);
          //set cursor position
          lcd_cursor(scroll_col,scroll_row);
 
@@ -40,6 +42,7 @@ static msg_t scrollingThread(void *arg)
                i = i % message_length;
          }
 
+         chMtxUnlock();
          //adjust the scroll position
          cur_start++;
          if (cur_start == message_length) 
@@ -54,6 +57,7 @@ static msg_t scrollingThread(void *arg)
  
 void scroll_init(void) 
 {
+   chMtxInit(&scroll_mtx);
    //start the scrolling thread
    (void)chThdCreateStatic(scrollingThreadWorkingArea, sizeof(scrollingThreadWorkingArea),
          NORMALPRIO, scrollingThread, NULL);

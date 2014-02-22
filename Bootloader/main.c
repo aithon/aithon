@@ -4,6 +4,7 @@
 #define DATE "unknown"
 #endif
 #define debugPrintf(fmt, ...) chprintf((BaseSequentialStream *)&SD2, fmt, ##__VA_ARGS__)
+extern Mutex scroll_mtx;
 
 void debugPrintCmd(int cmdByte)
 {
@@ -231,6 +232,11 @@ int main(void)
    led_on(0);
    led_on(1);
 
+   lcd_clear();
+
+   scrollMessage("Press BTN0 to scroll, BTN1 to select", 1,0,12);
+   scroll_init();
+
    int i, j;
    for (i = 0; i < BOOT_TIMEOUT; i++)
    {
@@ -243,16 +249,20 @@ int main(void)
          // update the countdown
          if (i % 1000 == 0)
          {
-            lcd_clear();
-            lcd_printf("Aithon Board\n%d", (BOOT_TIMEOUT-i)/1000);
+            chMtxLock(&scroll_mtx);
+            lcd_cursor(0,0);
+            lcd_printf("Aithon Board  %2d ", (BOOT_TIMEOUT-i)/1000);
+            chMtxUnlock();
             displayCountdown = TRUE;
          }
 
          // show the bootloader build date if button 0 pressed
          if (button_get(0) && displayCountdown) {
             if (i > (.1 * BOOT_TIMEOUT)) {
-               lcd_clear();
+               chMtxLock(&scroll_mtx);
+               lcd_cursor(0,0);
                lcd_printf(DATE);
+               chMtxUnlock();
                displayCountdown = FALSE;
             }
          }
@@ -263,6 +273,7 @@ int main(void)
       {
          if (sdGetTimeout(_interfaces[j], TIME_IMMEDIATE) == SYNC)
          {
+            scrollPause();
             _interface = _interfaces[j];
             updateProgram();
             // We should never get here...
