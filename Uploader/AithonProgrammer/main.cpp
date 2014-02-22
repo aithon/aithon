@@ -211,7 +211,7 @@ void writeByte(uint8_t byte)
 #endif
 }
 
-uint8_t getByte(int timeout)
+uint8_t getByte(int &timeout)
 {
 #ifndef Q_OS_WIN32
   int ret;
@@ -556,7 +556,9 @@ state_t startProgram()
 {
     // wait for ACK
     writeAndAck(START_PROGRAM);
+#ifdef Q_OS_MAC
     closePort();
+#endif
     debugPrintError("START_PROGRAM");
     if (_error)
     {
