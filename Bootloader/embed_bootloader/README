@@ -1,4 +1,5 @@
-To generate an application with an embedded bootloader image:
+This application will allow you to update your bootloader over USB (without 
+using an ST-LINK).  To generate an application with an embedded bootloader image:
 
 1.  build the bootloader (the image will be in Bootloader/build/ch.bin)
 2.  run the embed.py script as:
@@ -9,5 +10,5 @@ To generate an application with an embedded bootloader image:
 4.  flash the user application in Bootloader/embed_bootloader/build/ch.bin
 5.  the application will run and prompt to press Button0
 6.  the message 'Success' should appear 
-7.  flash a any new user application to erase the bootloader update image
+7.  flash any new user application to erase the bootloader update image
 
