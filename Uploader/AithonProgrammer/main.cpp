@@ -713,8 +713,10 @@ int main(int argc, char *argv[])
         readFile(QString(argv[2]));
         std::cout << "Opening serial port...\t\t";
         openPort(comPort);
+#ifdef Q_OS_MAC
         closePort();
         openPort(comPort);
+#endif
 
         std::cout << "Done\n";
         doProgramFSM();
