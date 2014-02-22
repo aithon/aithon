@@ -40,7 +40,7 @@ void button_wait(int num);
 void lcd_on(void);
 void lcd_off(void);
 void lcd_clear(void);
-void lcd_cursor(uint8_t row, uint8_t col);
+void lcd_cursor(uint8_t col, uint8_t row);
 void lcd_printChar(char data);
 #define lcd_printf(fmt, ...) chprintf(&LCD, fmt, ##__VA_ARGS__)
 void scroll_init(void);
