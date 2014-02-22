@@ -21,4 +21,3 @@ include(../qextserialport-1.2rc/src/qextserialport.pri)
 HEADERS +=
 
 CONFIG += static
-QMAKE_LFLAGS += -stdlib=libstdc++

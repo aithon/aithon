@@ -55,8 +55,6 @@ extern "C" {
 #define NACK               0x80
 #define BUSY               0xC0
 
-#define AVRDUDE
-
 #define CHECK_FOR_ERROR(state) \
     do { \
         if (_error) { \
@@ -124,38 +122,25 @@ void printStatus(int current, int total)
 
 void openPort(QString port)
 {
+#ifndef Q_OS_WIN32
     int tries=MAX_RETRIES;
     int i;
 
     //repeatedly open the port until there are no errors
     QByteArray ba = port.toLocal8Bit();
     for(i=0;i<tries;i++) {
-#ifndef Q_OS_WIN32
        if (ser_open(ba.data(), 38400, &portFD) != -1) {
           break;
        } else {
           std::cout << "Error opening serial port\n";
           SLEEP(250);
        }
-#else
-       _portName = port;
-       _port = new QextSerialPort(port);
-       _port->setBaudRate(BAUD9600);
-       _port->setTimeout(1000);
-       if (_port->open(QextSerialPort::ReadWrite)) {
-          break;
-       } else {
-          SLEEP(250);
-          error("Could not open serial port.");
-       }
-#endif
     }
 
     if (i==tries) {
        exit(1);
     }
 
-#ifndef Q_OS_WIN32
     //reconfigure the device for Mac
     _portName = port;
     //std::cout << "Reconfiguring device\n";
