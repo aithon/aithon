@@ -5,7 +5,7 @@ int scroll_row=0, scroll_col=0;
 int scroll_delay=300; //scrolling delay in ms
 int scroll_window=16; //width of scrolling area
 int message_length=0; //length of message to scroll (not counting terminating null)
-int scroll_status=1;  //1=scrolling, 0=paused
+int scroll_status=1;  //1=scrolling, 2=paused, 0=exit scrolling thread
 char scroll_buf[100];
 
 //LCD scrolling thread
@@ -19,7 +19,7 @@ static msg_t scrollingThread(void *arg)
    
    cur_start = 0;
 
-   while (TRUE) 
+   while (scroll_status != 0) 
    {
       if (scroll_status == 1) 
       {
@@ -72,12 +72,17 @@ void scrollSetDelay(int delay) {
 }
 
 //enable scrolling
-void scrollGo(void) {
+void scrollEnable(void) {
    scroll_status = 1;
 }
 
 //pause scrolling
-void scrollStop(void) {
+void scrollPause(void) {
+   scroll_status = 2;
+}
+
+//end scrolling thread
+void scrollExit(void) {
    scroll_status = 0;
 }
 
@@ -110,10 +115,14 @@ void scrollMessage(char* m, int row, int col, int window)
    }
 
    scroll_buf[i] = m[i]; //copy null
-
    message_length = i; //message length not counting the null
-
    scrollSetCursor(row,col);
+
+   if ((col+window) > 16) 
+   {
+      window = 16-col;
+   }
+
    scroll_window=window;
 }
 

@@ -46,8 +46,9 @@ void lcd_printChar(char data);
 void scroll_init(void);
 void scrollSetCursor(int row, int col);
 void scrollSetDelay(int delay);
-void scrollGo(void);
-void scrollStop(void);
+void scrollEnable(void);
+void scrollPause(void);
+void scrollExit(void);
 void scrollMessage(char* m, int row, int col, int window);
 
 // IMU functions / definitions
