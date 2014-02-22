@@ -4,7 +4,7 @@
 #define DATE "unknown"
 #endif
 #define debugPrintf(fmt, ...) chprintf((BaseSequentialStream *)&SD2, fmt, ##__VA_ARGS__)
-extern Mutex scroll_mtx;
+extern Mutex _scrollMtx;
 
 void debugPrintCmd(int cmdByte)
 {
@@ -249,7 +249,7 @@ int main(void)
          // update the countdown
          if (i % 1000 == 0)
          {
-            chMtxLock(&scroll_mtx);
+            chMtxLock(&_scrollMtx);
             lcd_cursor(0,0);
             lcd_printf("Aithon Board  %2d ", (BOOT_TIMEOUT-i)/1000);
             chMtxUnlock();
@@ -259,7 +259,7 @@ int main(void)
          // show the bootloader build date if button 0 pressed
          if (button_get(0) && displayCountdown) {
             if (i > (.1 * BOOT_TIMEOUT)) {
-               chMtxLock(&scroll_mtx);
+               chMtxLock(&_scrollMtx);
                lcd_cursor(0,0);
                lcd_printf(DATE);
                chMtxUnlock();
