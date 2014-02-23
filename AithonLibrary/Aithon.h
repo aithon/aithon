@@ -43,13 +43,7 @@ void lcd_clear(void);
 void lcd_cursor(uint8_t col, uint8_t row);
 void lcd_printChar(char data);
 #define lcd_printf(fmt, ...) chprintf(&LCD, fmt, ##__VA_ARGS__)
-void scroll_init(void);
-void scrollSetCursor(int row, int col);
-void scrollSetDelay(int delay);
-void scrollEnable(void);
-void scrollPause(void);
-void scrollExit(void);
-void scrollMessage(char* m, int row, int col, int window);
+
 
 // IMU functions / definitions
 typedef enum {
