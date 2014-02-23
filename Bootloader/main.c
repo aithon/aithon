@@ -311,7 +311,9 @@ void runTests()
    scrollMessage("Press BTN0 for next option, BTN1 to select", 0, 0, 16);
    scrollSetDelay(200);
    scrollEnable();
+   chMtxLock(&_scrollMtx);
    lcd_clear();
+   chMtxUnlock();
 
    while (1) {
       // wait for button to be pushed down
@@ -326,6 +328,7 @@ void runTests()
          }
 
          //lcd_clear();
+         chMtxLock(&_scrollMtx);
          lcd_cursor(0,1);
          switch (i) 
          {
@@ -344,6 +347,7 @@ void runTests()
          default:
             break;
          }
+         chMtxUnlock();
 
          i++;
          if (i>4)
@@ -414,6 +418,7 @@ void runTests()
 
             while (1) 
             {
+               chMtxLock(&_scrollMtx);
                lcd_cursor(0,0);
                lcd_printf("Servo: %d", servoNum);
                lcd_cursor(9,0);
@@ -426,6 +431,7 @@ void runTests()
                } else {
                   lcd_printf("-");
                }
+               chMtxUnlock();
 
                if (button_get(0)) 
                {
@@ -447,6 +453,7 @@ void runTests()
                   if (button_get(1) == 0) //button 1 tap
                   {
                      servoDir = (servoDir ^ 1) & 1; //toggle servo direction
+                     chMtxLock(&_scrollMtx);
                      lcd_cursor(0,1);
                      if (servoDir) 
                      {
@@ -454,6 +461,7 @@ void runTests()
                      } else {
                         lcd_printf("-");
                      }
+                     chMtxUnlock();
                   } else { //button hold
                      while(button_get(1)) 
                      {
@@ -462,8 +470,10 @@ void runTests()
                         else
                            servoPos--;
 
+                        chMtxLock(&_scrollMtx);
                         lcd_cursor(9,0);
                         lcd_printf("Pos: %d\n", servoPos);
+                        chMtxUnlock();
                         servo_set(servoNum, servoPos); 
                         chThdSleepMilliseconds(175);
                      }
