@@ -303,6 +303,9 @@ void runTests()
 {
    int i=1;
    int j;
+   int servoNum=0;
+   int servoPos=75;
+   int servoDir=1;
 
    scrollPause();
    scrollMessage("Press BTN0 for next option, BTN1 to select", 0, 0, 16);
@@ -351,9 +354,9 @@ void runTests()
          chThdSleepMilliseconds(20);
 
          //wait for button release
-         while (button_get(1)) {
+         while (button_get(1)) 
             chThdSleepMilliseconds(1);
-         }
+
          i--;
          if (i == 0)
             i=4;
@@ -361,8 +364,9 @@ void runTests()
          switch (i) 
          {
          case 1:
-            _analog_init();
             //run analog test
+            _analog_init();
+
             while (1) 
             {
                lcd_clear();
@@ -403,6 +407,71 @@ void runTests()
             break;
          case 3:
             //run servo test
+            _servo_init();
+            lcd_clear();
+            scrollMessage("Press BTN0 to change servo, tap BTN1 for direction, hold BTN1 to change value", 1, 2, 14);
+            scrollEnable();
+
+            while (1) 
+            {
+               lcd_cursor(0,0);
+               lcd_printf("Servo: %d", servoNum);
+               lcd_cursor(9,0);
+               lcd_printf("Pos: %d", servoPos);
+               lcd_cursor(0,1);
+
+               if (servoDir) 
+               {
+                  lcd_printf("+");
+               } else {
+                  lcd_printf("-");
+               }
+
+               if (button_get(0)) 
+               {
+                  chThdSleepMilliseconds(20);
+
+                  //wait for button release
+                  while (button_get(0)) 
+                     chThdSleepMilliseconds(1);
+
+                  servoNum++;
+                  servoPos = 75;
+                  if (servoNum > 7)
+                     servoNum = 0;
+               }
+
+               if (button_get(1)) 
+               {
+                  chThdSleepMilliseconds(250);
+                  if (button_get(1) == 0) //button 1 tap
+                  {
+                     servoDir = (servoDir ^ 1) & 1; //toggle servo direction
+                     lcd_cursor(0,1);
+                     if (servoDir) 
+                     {
+                        lcd_printf("+");
+                     } else {
+                        lcd_printf("-");
+                     }
+                  } else { //button hold
+                     while(button_get(1)) 
+                     {
+                        if (servoDir)
+                           servoPos++;
+                        else
+                           servoPos--;
+
+                        lcd_cursor(9,0);
+                        lcd_printf("Pos: %d\n", servoPos);
+                        servo_set(servoNum, servoPos); 
+                        chThdSleepMilliseconds(175);
+                     }
+                  }
+               }
+
+               chThdSleepMilliseconds(50);
+            }
             break;
          case 4:
             //run motor test
