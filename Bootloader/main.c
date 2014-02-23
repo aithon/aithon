@@ -5,6 +5,7 @@
 #endif
 #define debugPrintf(fmt, ...) chprintf((BaseSequentialStream *)&SD2, fmt, ##__VA_ARGS__)
 extern Mutex _scrollMtx;
+void runTests(void);
 
 void debugPrintCmd(int cmdByte)
 {
@@ -234,7 +235,7 @@ int main(void)
 
    lcd_clear();
 
-   scrollMessage("Press BTN0 to scroll, BTN1 to select", 1,0,12);
+   scrollMessage("Press BTN0 for debugging mode", 1,0,12);
    scroll_init();
 
    int i, j;
@@ -257,8 +258,11 @@ int main(void)
          }
 
          // show the bootloader build date if button 0 pressed
-         if (button_get(0) && displayCountdown) {
-            if (i > (.1 * BOOT_TIMEOUT)) {
+         if (button_get(0) && displayCountdown) 
+         {
+            if (i > (.03 * BOOT_TIMEOUT)) 
+            {
+               runTests();
                chMtxLock(&_scrollMtx);
                lcd_cursor(0,0);
                lcd_printf(DATE);
@@ -284,4 +288,123 @@ int main(void)
    }
    startProgram();
    return 0;
+}
+
+void runTests()
+{
+   int i=1;
+   int j;
+
+   scrollPause();
+   scrollMessage("Press BTN0 for next option, BTN1 to select", 0, 0, 16);
+   scrollSetDelay(200);
+   scrollEnable();
+   lcd_clear();
+
+   while (1) {
+      // wait for button to be pushed down
+      if (button_get(0)) 
+      {
+         chThdSleepMilliseconds(20);
+
+         //wait for button release
+         while (button_get(0)) 
+         {
+            chThdSleepMilliseconds(1);
+         }
+
+         //lcd_clear();
+         lcd_cursor(0,1);
+         switch (i) 
+         {
+         case 1:
+            lcd_printf("Analog Test  1/4");
+            break;
+         case 2:
+            lcd_printf("Digital Test 2/4");
+            break;
+         case 3:
+            lcd_printf("Servo Test   3/4");
+            break;
+         case 4:
+            lcd_printf("Motor Test   4/4");
+            break;
+         default:
+            break;
+         }
+
+         i++;
+         if (i>4)
+            i=1;
+      } else if (button_get(1)) 
+      {
+         scrollPause();
+         chThdSleepMilliseconds(20);
+
+         //wait for button release
+         while (button_get(1)) {
+            chThdSleepMilliseconds(1);
+         }
+         i--;
+         if (i == 0)
+            i=4;
+
+         switch (i) 
+         {
+         case 1:
+            _analog_init();
+            //run analog test
+            while (1) 
+            {
+               lcd_clear();
+               lcd_cursor(0,0);
+               for (j=0; j<4; j++)
+               {
+                  lcd_printf ("%4d", analog_get(j));
+               }
+
+               lcd_cursor(0,1);
+               for (j=4; j<8; j++)
+               {
+                  lcd_printf ("%4d", analog_get(j));
+               }
+
+               delayMs(100);
+            }
+            break;
+         case 2:
+            //run digital test
+            lcd_clear();
+            lcd_cursor(0,1);
+            lcd_printf("0");
+            lcd_cursor(7,1);
+            lcd_printf("7");
+            lcd_cursor(14,1);
+            lcd_printf("14");
+
+            while (1) 
+            {
+               lcd_cursor(0,0);
+               for (j=0; j<15; j++)
+               {
+                  lcd_printf ("%d", digital_get(j));
+               }
+               delayMs(100);
+            }
+            break;
+         case 3:
+            //run servo test
+            break;
+         case 4:
+            //run motor test
+            break;
+         default:
+            break;
+         }
+      }
+
+      chThdSleepMilliseconds(1);
+   }
+
+   return;
 }
