@@ -21,16 +21,15 @@
 #define _SET_RS() palSetPad(GPIOD, GPIOD_LCD_RS)
 #define _CLR_RS() palClearPad(GPIOD, GPIOD_LCD_RS)
 
-
 static WORKING_AREA(scrollingThreadWorkingArea, 128);
 Mutex _scrollMtx;
 int _scrollRow = 0, _scrollCol = 0;
 int _scrollDelay = 300; //scrolling delay in ms
-int _scrollWidth = 16; //width of scrolling area
-int _scrollMsgLen = 0; //length of message to scroll (not counting terminating null)
+int _scrollWidth = 16;  //width of scrolling area
+int _scrollMsgLen = 0;  //length of message to scroll (not counting terminating null)
 int _scrollStatus = 1;  //1=scrolling, 2=paused, 0=exit scrolling thread
+int _scrollStart = 1;   //1=first time message is scrolled (give a slight pause) 
 char _scrollBuf[100];
-
 
 BaseSequentialStream LCD;
 static msg_t _put(void *instance, uint8_t b)
@@ -156,9 +155,7 @@ void lcd_printChar(char data)
       return;
    }
    _write_data(data);
-}
-
-
+} 
 
 //LCD scrolling thread
 static msg_t scrollingThread(void *arg) 
@@ -166,12 +163,21 @@ static msg_t scrollingThread(void *arg)
    (void)arg;
    int cur_start;
    int i;
+   int j=3;
    int times;
    
    cur_start = 0;
 
    while (_scrollStatus != 0) 
    {
+      //if a new message was just set, reset _scrollStart to give an initial pause
+      if (_scrollStart == 1) 
+      {
+         _scrollStart++;
+         cur_start = 0;
+         j = 3;
+      }
+
       if (_scrollStatus == 1) 
       {
          chMtxLock(&_scrollMtx);
@@ -194,9 +200,15 @@ static msg_t scrollingThread(void *arg)
 
          chMtxUnlock();
          //adjust the scroll position
-         cur_start++;
-         if (cur_start == _scrollMsgLen) 
-            cur_start = 0;
+         if (_scrollStart != 0 && j > 0) 
+         {
+            j--;
+         } else {
+            _scrollStart=0;
+            cur_start++;
+            if (cur_start == _scrollMsgLen) 
+               cur_start = 0;
+         }
       }
 
       chThdSleepMilliseconds(_scrollDelay);
@@ -273,10 +285,12 @@ void scrollMessage(char* m, int row, int col, int window)
    _scrollMsgLen = i; //message length not counting the null
    scrollSetCursor(row, col);
 
+   //error check to prevent exceeding 16 characters
    if ((col + window) > 16) 
    {
       window = 16-col;
    }
 
    _scrollWidth = window;
+   _scrollStart = 1;
 }
