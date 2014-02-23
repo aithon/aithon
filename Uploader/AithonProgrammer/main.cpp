@@ -1,14 +1,6 @@
 #include <QtCore/QCoreApplication>
 #include "qextserialport.h"
 #include "qextserialenumerator.h"
-
-#ifndef Q_OS_WIN32
-extern "C" {
-#include "../avrdude/serial.h"
-#include "../avrdude/avrdude.h"
-}
-#endif
-
 #include <QFile>
 #include <QTime>
 #include <iostream>
@@ -92,9 +84,6 @@ error_t _error;
 int _numPackets;
 bool _debug = false;
 qint64 startTime = 0;
-#ifndef Q_OS_WIN32
-union filedescriptor portFD;
-#endif
 
 void closePort(void);
 
@@ -122,64 +111,27 @@ void printStatus(int current, int total)
 
 void openPort(QString port)
 {
-#ifndef Q_OS_WIN32
-    int tries=MAX_RETRIES;
-    int i;
-
-    //repeatedly open the port until there are no errors
-    QByteArray ba = port.toLocal8Bit();
-    for(i=0;i<tries;i++) {
-       if (ser_open(ba.data(), 38400, &portFD) != -1) {
-          break;
-       } else {
-          std::cout << "Error opening serial port\n";
-          SLEEP(250);
-       }
-    }
-
-    if (i==tries) {
-       exit(1);
-    }
-
-    //reconfigure the device for Mac
-    _portName = port;
-    //std::cout << "Reconfiguring device\n";
-    ser_setspeed(&portFD, 38400);
-#else
     _portName = port;
     _port = new QextSerialPort(port);
     _port->setBaudRate(BAUD9600);
     _port->setTimeout(1000);
     if (!_port->open(QextSerialPort::ReadWrite))
         error("Could not open serial port.");
-#endif
 }
 
 void flushPort(void)
 {
-#ifndef Q_OS_WIN32
-    ser_drain(&portFD, 0);
-#else
     // empty output buffer
     _port->flush();
     // 1ms sleep to reduce chance of race conditions
     SLEEP(1);
     // empty input buffer
     _port->readAll();
-#endif
 }
 
 void sendReset(void)
 {
-#ifndef Q_OS_WIN32
-    //ser_set_dtr_rts(&portFD, 0);
-    SLEEP(100);
-    //ser_set_dtr_rts(&portFD, 2);
-    SLEEP(100);
-    ser_set_dtr_rts(&portFD, 3);
-    SLEEP(100);
-#else
-    // send a 0x023 sequence using RTS/DTR to do a software reset of the board
+    // send a 0x023 seqeunce using RTS/DTR to do a software reset of the board
     _port->setRts(false);
     _port->setDtr(false);
     SLEEP(100);
@@ -187,45 +139,24 @@ void sendReset(void)
     _port->setDtr(false);
     SLEEP(100);
     _port->setDtr(true);
-#endif
 }
 
 void closePort(void)
 {
-#ifndef Q_OS_WIN32
-    ser_close(&portFD);
-#else
     if (!_port)
         return;
     _port->close();
     delete _port;
-#endif
 }
+
 
 void writeByte(uint8_t byte)
 {
-#ifndef Q_OS_WIN32
-    ser_send(&portFD, &byte, 1);
-#else
     _port->write((const char *)&byte, 1);
-#endif
 }
 
 uint8_t getByte(int &timeout)
 {
-#ifndef Q_OS_WIN32
-  int ret;
-  unsigned char buf;
-  ret = ser_recv(&portFD, &buf, 1, timeout);
-
-  if (ret == -1) {
-      _error = TIMEOUT;
-      return 0;
-  } else { 
-     _error = SUCCESS;
-     return buf;
-  }
-#else
     while (!_port->bytesAvailable())
     {
         if (timeout <= 0)
@@ -239,8 +170,8 @@ uint8_t getByte(int &timeout)
     }
     _error = SUCCESS;
     return (uint8_t) _port->read(1).at(0);
-#endif
 }
+
 
 QString getCOMPort(bool isBootloader)
 {
@@ -421,19 +352,14 @@ state_t resetChip()
         // We don't need to reset the board.
         // Nothing to do here.
     }
-    else if (isAithonCDC())
+    if (isAithonCDC())
     {
-#ifndef Q_OS_MAC
         sendReset();
-#endif
         debug("Reset board.");
 
         // reopen the port
-#ifndef Q_OS_MAC
         closePort();
-#endif
         debug("Deleted port.");
-        //SLEEP(250);
 
         QString comPort;
         while (comPort.length() == 0)
@@ -444,7 +370,6 @@ state_t resetChip()
 
         openPort(comPort);
         debug("Opened port.");
-        SLEEP(200);
     }
     else
     {
@@ -556,9 +481,6 @@ state_t startProgram()
 {
     // wait for ACK
     writeAndAck(START_PROGRAM);
-#ifdef Q_OS_MAC
-    closePort();
-#endif
     debugPrintError("START_PROGRAM");
     if (_error)
     {
@@ -588,11 +510,6 @@ void doProgramFSM()
                 std::cout << "\b\b\bDone\n";
             break;
         case FSM_SYNC:
-#ifdef Q_OS_MAC
-            SLEEP(100);
-            writeByte(SYNC);
-            SLEEP(100);
-#endif
             std::cout << "\rSyncing with Aithon...\t\t   ";
             nextState = initChip();
             if (nextState != state)
@@ -715,11 +632,6 @@ int main(int argc, char *argv[])
         readFile(QString(argv[2]));
         std::cout << "Opening serial port...\t\t";
         openPort(comPort);
-#ifdef Q_OS_MAC
-        closePort();
-        openPort(comPort);
-#endif
-
         std::cout << "Done\n";
         doProgramFSM();
         closePort();
