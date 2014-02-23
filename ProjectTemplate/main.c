@@ -1,5 +1,4 @@
 #include "Aithon.h"
-extern int _resetIndex;
 
 int main(void)
 {
@@ -12,9 +11,6 @@ int main(void)
    // main should never return, so enter infinite loop
    while (1)
    {
-      lcd_clear();
-      lcd_printf("%d %d\n", _resetIndex, analog_get(10));
-      lcd_printf("%d\n", chTimeNow());
       // main thread code here
       led_toggle(0);
       led_toggle(1);
