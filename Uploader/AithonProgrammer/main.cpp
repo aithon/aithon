@@ -172,11 +172,11 @@ void flushPort(void)
 void sendReset(void)
 {
 #ifndef Q_OS_WIN32
-    //ser_set_dtr_rts(&portFD, 0);
+    ser_set_dtr_rts(&portFD, 0);
     SLEEP(100);
-    //ser_set_dtr_rts(&portFD, 2);
+    ser_set_dtr_rts(&portFD, 2);
     SLEEP(100);
-    ser_set_dtr_rts(&portFD, 3);
+    //ser_set_dtr_rts(&portFD, 3);
     SLEEP(100);
 #else
     // send a 0x023 sequence using RTS/DTR to do a software reset of the board
@@ -220,6 +220,7 @@ uint8_t getByte(int &timeout)
 
   if (ret == -1) {
       _error = TIMEOUT;
+      timeout = 0;
       return 0;
   } else { 
      _error = SUCCESS;
@@ -588,8 +589,8 @@ void doProgramFSM()
                 std::cout << "\b\b\bDone\n";
             break;
         case FSM_SYNC:
-#ifdef Q_OS_MAC
-            SLEEP(100);
+#ifndef Q_OS_WIN32
+            SLEEP(200);
             writeByte(SYNC);
             SLEEP(100);
 #endif
@@ -599,6 +600,7 @@ void doProgramFSM()
                 std::cout << "\b\b\bDone\n";
             break;
         case FSM_ERASE_FLASH:
+            flushPort();
             std::cout << "\rErasing FLASH...\t\t   ";
             nextState = eraseFlash();
             if (nextState != state)
