@@ -1,9 +1,10 @@
 #include "Aithon.h"
+extern int _resetIndex;
 
 int main(void)
 {
    // print something to the LCD screen
-   lcd_printf("Hello Aithon!");
+   lcd_printf("Hello Aithon!\n");
    
    // start with led 0 on
    led_on(0);
@@ -11,6 +12,9 @@ int main(void)
    // main should never return, so enter infinite loop
    while (1)
    {
+      lcd_clear();
+      lcd_printf("%d %d\n", _resetIndex, analog_get(10));
+      lcd_printf("%d\n", chTimeNow());
       // main thread code here
       led_toggle(0);
       led_toggle(1);
