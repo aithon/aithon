@@ -306,6 +306,9 @@ void runTests()
    int servoNum=0;
    int servoPos=75;
    int servoDir=1;
+   int motorNum=0;
+   int motorSpeed=0;
+   int motorDir=1;
 
    scrollPause();
    scrollMessage("Press BTN0 for next option, BTN1 to select", 0, 0, 16);
@@ -485,6 +488,83 @@ void runTests()
             break;
          case 4:
             //run motor test
+            _motor_init();
+            lcd_clear();
+            scrollMessage("Press BTN0 to change motor, tap BTN1 for direction, hold BTN1 to change value", 1, 2, 14);
+            scrollEnable();
+
+            while (1) 
+            {
+               chMtxLock(&_scrollMtx);
+               lcd_cursor(0,0);
+               lcd_printf("Motor: %d", motorNum);
+               lcd_cursor(9,0);
+               lcd_printf("Spd:%3d", motorSpeed);
+               lcd_cursor(0,1);
+
+               if (motorDir) 
+               {
+                  lcd_printf("+");
+               } else {
+                  lcd_printf("-");
+               }
+               chMtxUnlock();
+
+               if (button_get(0)) 
+               {
+                  chThdSleepMilliseconds(20);
+
+                  //wait for button release
+                  while (button_get(0)) 
+                     chThdSleepMilliseconds(1);
+
+                  motorNum++;
+                  motorSpeed=0;
+                  if (motorNum > 1)
+                     motorNum = 0;
+               }
+
+               if (button_get(1)) 
+               {
+                  chThdSleepMilliseconds(250);
+                  if (button_get(1) == 0) //button 1 tap
+                  {
+                     motorDir = (motorDir ^ 1) & 1; //toggle servo direction
+                     chMtxLock(&_scrollMtx);
+                     lcd_cursor(0,1);
+                     if (motorDir) 
+                     {
+                        lcd_printf("+");
+                     } else {
+                        lcd_printf("-");
+                     }
+                     chMtxUnlock();
+                  } else { //button hold
+                     while(button_get(1)) 
+                     {
+                        if (motorDir) 
+                        {
+                           motorSpeed++;
+                           if (motorSpeed > 100)
+                              motorSpeed = 100;
+                        } else {
+                           motorSpeed--;
+                           if (motorSpeed < -100)
+                              motorSpeed = -100;
+                        }
+
+                        chMtxLock(&_scrollMtx);
+                        lcd_cursor(9,0);
+                        lcd_printf("Spd:%3d\n", motorSpeed);
+                        chMtxUnlock();
+                        motor_set(motorNum, motorSpeed); 
+                        chThdSleepMilliseconds(75);
+                     }
+                  }
+               }
+
+               chThdSleepMilliseconds(50);
+            }
             break;
          default:
             break;
