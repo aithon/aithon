@@ -583,6 +583,9 @@ void runTests()
          case 5:
             //terminal mode
             _interface = _interfaces[2]; //use the USB interface
+            _motor_init();
+            _servo_init();
+            _analog_init();
 
             lcd_clear();
             scrollMessage("Terminal Mode - 38400 Baud 8-N-1", 0, 0, 16);
@@ -605,12 +608,58 @@ void runTests()
                { 
                   sendString("Welcome to the Aithon Board\n\r");
                   sendString("(commands will not be echoed to terminal)\n\r");
-                  sendString("mxdyyy (x=motor number, d=0/1 direction, yyy=3-digit speed)\n\r");
+                  sendString("mxdyyy (x=motor number, d=-/+ direction, yyy=3-digit speed)\n\r");
                   sendString("sxyyy (x=servo number, yyy=3-digit position)\n\r");
                   sendString("ax (x=analog input)\n\r");
                   sendString("dx (x=digital input)\n\r");
                   sendString("bx (x=button number)\n\r");
-               } else {
+               } else if (command[0] == 'm') {
+                  //motor command
+                  int k;
+                  int motor_speed=0;
+
+                  for(k=0; k<2; k++)
+                  {
+                     motor_speed += command[k+3] - 48;
+                     motor_speed *= 10;
+                  }
+                  motor_speed += command[k+3] - 48;
+
+                  if (command[2] == '-')
+                     motor_speed = -motor_speed;
+
+                  motor_set(command[1]-48, motor_speed);
+               } else if (command[0] == 's') {
+                  //servo command
+                  int k;
+                  int servo_pos=0;
+
+                  for(k=0; k<2; k++)
+                  {
+                     servo_pos += command[k+2] - 48;
+                     servo_pos *= 10;
+                  }
+                  servo_pos += command[k+2] - 48;
+
+                  servo_set(command[1]-48, servo_pos);
+               } else if (command[0] == 'a') {
+                  //read analog command
+                  int pin=0;
+                  int value;
+                  int k;
+                  int divider=1000;
+
+                  pin = command[1] - 48;
+                  value = analog_get(pin);
+                  
+                  for (k=0; k<4; k++) {
+                     sdPut(_interface, (value/divider) + 48);
+                     value = value % divider;
+                     divider = divider / 10;
+                  }
+                  sdPut(_interface, 10);
+                  sdPut(_interface, 13);
+                } else {
                   //for testing just echo back the command
                   i=0;
                   while(command[i] != 0) {
