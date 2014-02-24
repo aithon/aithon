@@ -299,6 +299,16 @@ int main(void)
    return 0;
 }
 
+void sendString(char* s) 
+{
+   int i=0;
+
+   while (s[i] != 0) {
+      sdPut(_interface, s[i]);
+      i++;
+   }
+}
+
 void runTests()
 {
    int i=1;
@@ -309,6 +319,7 @@ void runTests()
    int motorNum=0;
    int motorSpeed=0;
    int motorDir=1;
+   uint8_t command[20];
 
    scrollPause();
    scrollMessage("Press BTN0 for next option, BTN1 to select", 0, 0, 16);
@@ -336,16 +347,19 @@ void runTests()
          switch (i) 
          {
          case 1:
-            lcd_printf("Analog Test  1/4");
+            lcd_printf("Analog Test  1/5");
             break;
          case 2:
-            lcd_printf("Digital Test 2/4");
+            lcd_printf("Digital Test 2/5");
             break;
          case 3:
-            lcd_printf("Servo Test   3/4");
+            lcd_printf("Servo Test   3/5");
             break;
          case 4:
-            lcd_printf("Motor Test   4/4");
+            lcd_printf("Motor Test   4/5");
+            break;
+         case 5:
+            lcd_printf("Terminal     5/5");
             break;
          default:
             break;
@@ -353,7 +367,7 @@ void runTests()
          chMtxUnlock();
 
          i++;
-         if (i>4)
+         if (i>5)
             i=1;
       } else if (button_get(1)) 
       {
@@ -366,7 +380,7 @@ void runTests()
 
          i--;
          if (i == 0)
-            i=4;
+            i=5;
 
          switch (i) 
          {
@@ -565,6 +579,50 @@ void runTests()
 
                chThdSleepMilliseconds(50);
             }
+            break;
+         case 5:
+            //terminal mode
+            _interface = _interfaces[2]; //use the USB interface
+
+            lcd_clear();
+            scrollMessage("Terminal Mode - 38400 Baud 8-N-1", 0, 0, 16);
+            scrollEnable();
+            sendString("\n\r\n\rWelcome to the Aithon Board\n\r");
+            sendString("(commands will not be echoed to terminal)\n\r");
+            sendString("send 'h' for help message\n\r");
+
+            while (1) 
+            {
+               //read character until a carriage return (13)
+               i=-1;
+               do {
+                  i++;
+                  sdRead(_interface,&(command[i]),1);
+               } while (command[i] != 13);
+               command[i]=0;
+
+               if (command[0]=='h' || i==0)  //if help command
+               { 
+                  sendString("Welcome to the Aithon Board\n\r");
+                  sendString("(commands will not be echoed to terminal)\n\r");
+                  sendString("mxdyyy (x=motor number, d=0/1 direction, yyy=3-digit speed)\n\r");
+                  sendString("sxyyy (x=servo number, yyy=3-digit position)\n\r");
+                  sendString("ax (x=analog input)\n\r");
+                  sendString("dx (x=digital input)\n\r");
+                  sendString("bx (x=button number)\n\r");
+               } else {
+                  //for testing just echo back the command
+                  i=0;
+                  while(command[i] != 0) {
+                     sdPut(_interface, command[i]);
+                     i++;
+                  } 
+                  sdPut(_interface, 10);
+                  sdPut(_interface, 13);
+               }
+               chThdSleepMilliseconds(1);
+            }
+
             break;
          default:
             break;
