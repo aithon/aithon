@@ -1,5 +1,5 @@
 # Path to Aithon library
-AITHON_LIBRARY = /Users/jseng/aithon/AithonLibrary
+AITHON_LIBRARY = ../AithonLibrary
 
 # User source files
 USERFOLDER = ./
