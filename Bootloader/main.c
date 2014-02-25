@@ -347,19 +347,22 @@ void runTests()
          switch (i) 
          {
          case 1:
-            lcd_printf("Analog Test  1/5");
+            lcd_printf("Analog Test  1/6");
             break;
          case 2:
-            lcd_printf("Digital Test 2/5");
+            lcd_printf("Digital Test 2/6");
             break;
          case 3:
-            lcd_printf("Servo Test   3/5");
+            lcd_printf("Servo Test   3/6");
             break;
          case 4:
-            lcd_printf("Motor Test   4/5");
+            lcd_printf("Motor Test   4/6");
             break;
          case 5:
-            lcd_printf("Terminal     5/5");
+            lcd_printf("Terminal     5/6");
+            break;
+         case 6:
+            lcd_printf("Firmware Date6/6");
             break;
          default:
             break;
@@ -367,7 +370,7 @@ void runTests()
          chMtxUnlock();
 
          i++;
-         if (i>5)
+         if (i>6)
             i=1;
       } else if (button_get(1)) 
       {
@@ -380,7 +383,7 @@ void runTests()
 
          i--;
          if (i == 0)
-            i=5;
+            i=6;
 
          switch (i) 
          {
@@ -672,6 +675,15 @@ void runTests()
                chThdSleepMilliseconds(1);
             }
 
+            break;
+         case 6:
+            //bootloader date
+            lcd_clear();
+            lcd_printf(DATE);
+            while(1) 
+            {
+               chThdSleepMilliseconds(1);
+            }
             break;
          default:
             break;
