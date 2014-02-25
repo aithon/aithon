@@ -1,5 +1,7 @@
 # ARM Cortex-Mx common makefile scripts and rules.
 
+OS := $(shell uname)
+
 # Output directory and files
 ifeq ($(BUILDDIR),)
   BUILDDIR = build
@@ -116,7 +118,7 @@ ifneq ($(USE_VERBOSE_COMPILE),yes)
 	@echo $(CC) -c $(CFLAGS) -I. $(IINCDIR) main.c -o main.o
 	@echo
 endif
-ifeq ($(UNAME), windows32)
+ifeq ($(OS), windows32)
 	"C:\Program Files (x86)\GnuWin32\bin\mkdir.exe" -p $(OBJDIR)
 	"C:\Program Files (x86)\GnuWin32\bin\mkdir.exe" -p $(LSTDIR)
 else
@@ -220,7 +222,7 @@ clean:
 #
 # Include the dependency files, should be the last of the makefile
 #
-ifeq ($(UNAME), windows32)
+ifeq ($(OS), windows32)
 -include $(shell mkdir .dep >NUL 2>&1) $(wildcard .dep/*)
 else
 -include $(shell mkdir .dep 2>/dev/null) $(wildcard .dep/*)
