@@ -116,8 +116,13 @@ ifneq ($(USE_VERBOSE_COMPILE),yes)
 	@echo $(CC) -c $(CFLAGS) -I. $(IINCDIR) main.c -o main.o
 	@echo
 endif
+ifeq ($(UNAME), windows32)
+	"C:\Program Files (x86)\GnuWin32\bin\mkdir.exe" -p $(OBJDIR)
+	"C:\Program Files (x86)\GnuWin32\bin\mkdir.exe" -p $(LSTDIR)
+else
 	mkdir -p $(OBJDIR)
 	mkdir -p $(LSTDIR)
+endif
 
 $(ACPPOBJS) : $(OBJDIR)/%.o : %.cpp Makefile
 ifeq ($(USE_VERBOSE_COMPILE),yes)
@@ -215,6 +220,10 @@ clean:
 #
 # Include the dependency files, should be the last of the makefile
 #
+ifeq ($(UNAME), windows32)
+-include $(shell mkdir .dep >NUL 2>&1) $(wildcard .dep/*)
+else
 -include $(shell mkdir .dep 2>/dev/null) $(wildcard .dep/*)
+endif
 
 # *** EOF ***
