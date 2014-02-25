@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.05" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="no"/>
 <layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="no"/>
@@ -9971,7 +9971,7 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <part name="R31" library="SparkFun" deviceset="RESISTOR" device="0402-RES" value="10k"/>
 <part name="SUPPLY42" library="supply2" deviceset="GND" device=""/>
 <part name="J5" library="SparkFun" deviceset="M06" device="SIP" value="SPI"/>
-<part name="C6" library="SparkFun" deviceset="CAP" device="0603-CAP" value="33u"/>
+<part name="C6" library="SparkFun" deviceset="CAP" device="0805" value="33u"/>
 <part name="C30" library="SparkFun" deviceset="CAP" device="0402-CAP" value="10n"/>
 <part name="R36" library="SparkFun" deviceset="RESISTOR" device="0402-RES" value="100k"/>
 <part name="Q2" library="SparkFun" deviceset="TRANSISTOR_NPN" device="SOT23-3" value="2STR1230"/>
@@ -10011,7 +10011,7 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <part name="C46" library="SparkFun" deviceset="CAP" device="0402-CAP" value="1u"/>
 <part name="C47" library="SparkFun" deviceset="CAP" device="0402-CAP" value="10n"/>
 <part name="C43" library="SparkFun" deviceset="CAP" device="0402-CAP" value="0.1u"/>
-<part name="C44" library="SparkFun" deviceset="CAP_POL" device="E" value="680uF"/>
+<part name="C44" library="SparkFun" deviceset="CAP_POL" device="D" value="680uF"/>
 <part name="U1" library="r_cubed" deviceset="LSM330" device=""/>
 <part name="SUPPLY36" library="supply2" deviceset="GND" device=""/>
 <part name="SUPPLY55" library="supply2" deviceset="GND" device=""/>
@@ -10063,7 +10063,7 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <part name="L1" library="r_cubed" deviceset="INDUCTOR" device="2" value="1.5uH"/>
 <part name="SUPPLY58" library="supply2" deviceset="GND" device=""/>
 <part name="R8" library="SparkFun" deviceset="RESISTOR" device="0402-RES" value="510"/>
-<part name="C52" library="SparkFun" deviceset="CAP_POL" device="E" value="680uF"/>
+<part name="C52" library="SparkFun" deviceset="CAP_POL" device="D" value="680uF"/>
 <part name="U$3" library="SparkFun" deviceset="5V" device=""/>
 <part name="C53" library="SparkFun" deviceset="CAP" device="0402-CAP" value="47p"/>
 <part name="C54" library="SparkFun" deviceset="CAP" device="0402-CAP" value="100p"/>
@@ -10106,7 +10106,7 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <part name="L3" library="r_cubed" deviceset="INDUCTOR" device="3" value="3.3uH"/>
 <part name="D3" library="r_cubed" deviceset="SOD-23" device=""/>
 <part name="C26" library="SparkFun" deviceset="CAP" device="1206" value="33u"/>
-<part name="C28" library="SparkFun" deviceset="CAP" device="0603-CAP" value="33u"/>
+<part name="C28" library="SparkFun" deviceset="CAP" device="0805" value="33u"/>
 <part name="C32" library="SparkFun" deviceset="CAP" device="0402-CAP" value="0.1u"/>
 <part name="R33" library="SparkFun" deviceset="RESISTOR" device="0402-RES" value="1k"/>
 <part name="R34" library="SparkFun" deviceset="RESISTOR" device="0402-RES" value="1k"/>

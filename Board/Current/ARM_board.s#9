@@ -10129,6 +10129,7 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <part name="U$7" library="SparkFun" deviceset="5V" device=""/>
 <part name="R51" library="SparkFun" deviceset="RESISTOR" device="0402-RES" value="10"/>
 <part name="R52" library="SparkFun" deviceset="RESISTOR" device="0402-RES" value="10"/>
+<part name="R53" library="SparkFun" deviceset="RESISTOR" device="0402-RES" value="330k"/>
 </parts>
 <sheets>
 <sheet>
@@ -10535,6 +10536,7 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <instance part="U$7" gate="G$1" x="284.48" y="298.45"/>
 <instance part="R51" gate="G$1" x="144.78" y="290.83"/>
 <instance part="R52" gate="G$1" x="154.94" y="257.81"/>
+<instance part="R53" gate="G$1" x="67.31" y="233.68"/>
 </instances>
 <busses>
 </busses>
@@ -11398,11 +11400,6 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <pinref part="U$4" gate="G$1" pin="D1"/>
 </segment>
 <segment>
-<pinref part="R30" gate="G$1" pin="1"/>
-<label x="67.31" y="233.68" size="1.778" layer="95"/>
-<wire x1="74.93" y1="233.68" x2="67.31" y2="233.68" width="0.1524" layer="91"/>
-</segment>
-<segment>
 <pinref part="R16" gate="G$1" pin="1"/>
 <wire x1="85.09" y1="302.26" x2="78.74" y2="302.26" width="0.1524" layer="91"/>
 <pinref part="C3" gate="G$1" pin="1"/>
@@ -11419,6 +11416,11 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <pinref part="C26" gate="G$1" pin="1"/>
 <wire x1="78.74" y1="302.26" x2="78.74" y2="300.99" width="0.1524" layer="91"/>
 <junction x="78.74" y="302.26"/>
+</segment>
+<segment>
+<pinref part="R53" gate="G$1" pin="1"/>
+<wire x1="62.23" y1="233.68" x2="53.34" y2="233.68" width="0.1524" layer="91"/>
+<label x="53.34" y="233.68" size="1.778" layer="95"/>
 </segment>
 </net>
 <net name="N$29" class="0">
@@ -13844,6 +13846,13 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <pinref part="C55" gate="G$1" pin="1"/>
 <wire x1="149.86" y1="255.27" x2="149.86" y2="248.92" width="0.1524" layer="91"/>
 <junction x="149.86" y="255.27"/>
+</segment>
+</net>
+<net name="N$72" class="0">
+<segment>
+<pinref part="R53" gate="G$1" pin="2"/>
+<pinref part="R30" gate="G$1" pin="1"/>
+<wire x1="72.39" y1="233.68" x2="74.93" y2="233.68" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
