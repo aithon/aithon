@@ -119,8 +119,9 @@ ifneq ($(USE_VERBOSE_COMPILE),yes)
 	@echo
 endif
 ifeq ($(OS), windows32)
-	"C:\Program Files (x86)\GnuWin32\bin\mkdir.exe" -p $(OBJDIR)
-	"C:\Program Files (x86)\GnuWin32\bin\mkdir.exe" -p $(LSTDIR)
+	md $(BUILDDIR)
+	md $(BUILDDIR)\obj
+	md $(BUILDDIR)\lst
 else
 	mkdir -p $(OBJDIR)
 	mkdir -p $(LSTDIR)
