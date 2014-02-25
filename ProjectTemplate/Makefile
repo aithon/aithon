@@ -1,9 +1,9 @@
 # Path to Aithon library
-AITHON_LIBRARY = ../AithonLibrary
+AITHON_LIBRARY = /Users/jseng/aithon/AithonLibrary
 
 # User source files
 USERFOLDER = ./
-USERSRC = $(USERFOLDER)/$(wildcard *.c)
+USERSRC =$(addprefix $(USERFOLDER),$(wildcard *.c))
 
 # User include paths
 USERINC = ./
