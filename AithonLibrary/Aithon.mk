@@ -70,6 +70,14 @@ ifeq ($(UNAME), windows32)
 else
 	USE_COPT += -DDATE="\"$(shell date)\""
 endif
+else ifdef IS_DEMO_MODE
+ifeq ($(UNAME), windows32)
+	USE_COPT += -DDATE="\"$(shell cmd /C date /T)\""
+else
+	USE_COPT += -DDATE="\"$(shell date)\""
+   LDSCRIPT = $(BOARDDIR)/AithonDemoMode.ld
+   USE_COPT += -DUSE_DEMO_MODE
+endif
 else
    LDSCRIPT = $(BOARDDIR)/AithonIAP.ld
    USE_COPT += -DUSE_IAP

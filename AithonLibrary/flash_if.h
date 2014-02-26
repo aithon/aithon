@@ -73,10 +73,14 @@ typedef enum {
 #define EEPROM_PAGE1_END_ADDRESS		(ADDR_FLASH_SECTOR_4-1)
 #define EEPROM_PAGE1_SECTOR   		FLASH_Sector_3
 
-#define APPLICATION_START_ADDRESS   ADDR_FLASH_SECTOR_4
+#define APPLICATION_START_ADDRESS   ADDR_FLASH_SECTOR_5
 #define APPLICATION_END_ADDRESS   	(ADDR_FLASH_SECTOR_12-1)
-#define APPLICATION_START_SECTOR   	FLASH_Sector_4
+#define APPLICATION_START_SECTOR   	FLASH_Sector_5
 #define APPLICATION_END_SECTOR   	FLASH_Sector_11 // this is last sector of 1MB of FLASH
+
+#define DEMO_START_ADDRESS   ADDR_FLASH_SECTOR_4
+#define DEMO_END_ADDRESS   	(ADDR_FLASH_SECTOR_5-1)
+#define DEMO_START_SECTOR   	FLASH_Sector_4
 
 /* Exported macro ------------------------------------------------------------*/
 
