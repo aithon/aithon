@@ -34,12 +34,6 @@ void flushInterface(void)
       sdGet(_interface);
 }
 
-int main(void)
-{
-   runTests();
-   return 0;
-}
-
 void sendString(char* s) 
 {
    int i=0;
@@ -52,7 +46,7 @@ void sendString(char* s)
 
 void runTests()
 {
-   int i=1;
+   int i=2;
    int j;
    int servoNum=0;
    int servoPos=75;
@@ -62,13 +56,14 @@ void runTests()
    int motorDir=1;
    uint8_t command[20];
 
-   scrollPause();
-   scrollMessage("Press BTN0 for next option, BTN1 to select", 0, 0, 16);
-   scrollSetDelay(200);
-   scrollEnable();
-   chMtxLock(&_scrollMtx);
    lcd_clear();
-   chMtxUnlock();
+   lcd_cursor(0,1);
+   lcd_printf("Analog Test  1/6");
+   scrollMessage("Press BTN0 for next option, BTN1 to select", 0, 0, 16);
+   scroll_init();
+   //while(button_get(0)==0) {
+   //   chThdSleepMilliseconds(1);
+   //}
 
    while (1) {
       // wait for button to be pushed down
@@ -436,3 +431,10 @@ void runTests()
 
    return;
 }
+
+int main(void)
+{
+   runTests();
+   return 0;
+}
+
