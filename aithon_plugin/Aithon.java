@@ -195,12 +195,30 @@ implements ActionListener, EBComponent, AithonActions,
     Object src = evt.getSource();
     
     if (src == uploadButton) { //check if upload clicked
-      //Using for testing - prints out current directories from property values
-      console_area.append("Compiler: " + jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "gcc-filepath") + "\n");
-      console_area.append("Library: " + jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "library-filepath") + "\n");
-      console_area.append("Programmer: " + jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "programmer-filepath") + "\n");
-      //scroll the area
-      console_area.setCaretPosition (console_area.getDocument().getLength());
+       try {
+          String programmer_path = jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "programmer-filepath");
+          //Using for testing - prints out current directories from property values
+          //console_area.append("Compiler: " + jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "gcc-filepath") + "\n");
+          //console_area.append("Library: " + jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "library-filepath") + "\n");
+          //console_area.append("Programmer: " + jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "programmer-filepath") + "\n");
+
+          //Location of makefile and main.c - make general with working directory somehow
+          makefile_path = curr_buffer.getDirectory().replace(" ", "\\s");
+          File dir = new File(makefile_path);    
+          //Path environment variables - required for mac/linux, use null for windows
+          String env[] = {"PATH=/usr/bin:/bin:/usr/sbin:."};
+
+          String upload_cmd[] = {programmer_path + "/AithonProgrammer", "program", "build/ch.bin"};
+          //console_area.append(user_src + "\n");
+          compile = r.exec(upload_cmd, env, dir);
+          inputStreamToOutputStream(compile.getInputStream());
+          inputStreamToOutputStream(compile.getErrorStream());
+       } catch (IOException e) {
+          System.err.println("Caught IOException: " + e.getMessage());
+       }
+
+       //scroll the area
+       console_area.setCaretPosition (console_area.getDocument().getLength());
     } else if (src == detectButton) { //check if detect clicked
       //console_area.append("Detect board\n");
       detectAithonBoard();
@@ -216,7 +234,6 @@ implements ActionListener, EBComponent, AithonActions,
         //String env[] = null;
         //String user_src = "USERFOLDER=\"" + curr_buffer.getDirectory().replace(" ", "\\s") + "\"";
         
-        //String make_cmd[] = {"make", user_src};
         String make_cmd[] = {"make"};
         //console_area.append(user_src + "\n");
       	compile = r.exec(make_cmd, env, dir);
@@ -242,11 +259,12 @@ implements ActionListener, EBComponent, AithonActions,
      } else if (os.indexOf("mac") >= 0) {
         try { 
         String env[] = {"PATH=/usr/bin:/bin:/usr/sbin:."};
-        path = userDir + "/jEdit.app/Contents/Resources/Java/AithonLibrary/Programmer/MacOSX/AithonProgrammer.app/Contents/MacOS";
+        path = jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "programmer-filepath");    
         File dir = new File(path);    
+        //console_area.append(path + "\n");
         String detect_cmd[] = {path + "/AithonProgrammer", "detect"};
 
-        //console_area.append(path + "\n");
+        //console_area.append(detect_cmd[0] + "\n");
         detect = r.exec(detect_cmd, env, dir);
         inputStreamToOutputStream(detect.getInputStream());
         inputStreamToOutputStream(detect.getErrorStream());
