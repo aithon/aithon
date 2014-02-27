@@ -253,9 +253,6 @@ int main(void)
 
    lcd_clear();
 
-   scrollMessage("Press BTN0 for debugging mode", 1,0,12);
-   scroll_init();
-
    int i, j;
    for (i = 0; i < BOOT_TIMEOUT; i++)
    {
@@ -268,10 +265,8 @@ int main(void)
          // update the countdown
          if (i % 1000 == 0)
          {
-            chMtxLock(&_scrollMtx);
             lcd_cursor(0,0);
             lcd_printf("Aithon Board  %2d ", (BOOT_TIMEOUT-i)/1000);
-            chMtxUnlock();
             displayCountdown = TRUE;
          }
 
@@ -290,7 +285,6 @@ int main(void)
       {
          if (sdGetTimeout(_interfaces[j], TIME_IMMEDIATE) == SYNC)
          {
-            scrollPause();
             _interface = _interfaces[j];
             updateProgram();
             // We should never get here...
