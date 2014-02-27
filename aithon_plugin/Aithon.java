@@ -208,7 +208,8 @@ implements ActionListener, EBComponent, AithonActions,
       //scroll the area
       console_area.setCaretPosition (console_area.getDocument().getLength());
     } else if (src == detectButton) { //check if detect clicked
-      console_area.append("Detect board\n");
+      //console_area.append("Detect board\n");
+      detectAithonBoard();
       //scroll the area
       console_area.setCaretPosition (console_area.getDocument().getLength());
     } else if (src == compileButton) { //check if compile clicked
@@ -229,6 +230,40 @@ implements ActionListener, EBComponent, AithonActions,
         System.err.println("Caught IOException: " + e.getMessage());
       }
     }
+  }
+
+  //Finds default directory for compiler
+  private String detectAithonBoard() {
+     Process detect;
+     String path = "";
+     String os = System.getProperty("os.name").toLowerCase();
+     String userDir = System.getProperty("user.dir");
+
+     if (os.indexOf("win") >= 0) {
+        path = userDir + "/Windows";
+     } else if (os.indexOf("mac") >= 0) {
+        try { 
+        String env[] = {"PATH=/usr/bin:/bin:/usr/sbin:."};
+        path = userDir + "/jEdit.app/Contents/Resources/Java/AithonLibrary/Programmer/MacOSX/AithonProgrammer.app/Contents/MacOS";
+        File dir = new File(path);    
+        String detect_cmd[] = {path + "/AithonProgrammer", "detect"};
+
+        //console_area.append(path + "\n");
+        detect = r.exec(detect_cmd, env, dir);
+        inputStreamToOutputStream(detect.getInputStream());
+        inputStreamToOutputStream(detect.getErrorStream());
+        } catch (IOException e) {
+           System.err.println("Caught IOException: " + e.getMessage());
+        }
+
+        //scroll the area
+        console_area.setCaretPosition (console_area.getDocument().getLength());
+     } else if (os.indexOf("nux") >= 0) {
+        path = userDir + "/Linux";
+     }
+
+     //jEdit.setProperty(AithonPlugin.OPTION_PREFIX + "gcc-filepath", path);
+     return path;
   }
 
     //Finds default directory for compiler
