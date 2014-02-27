@@ -1,11 +1,20 @@
-This directory is for building the jEdit installers.  Run the script buildinstallers.sh on Mac/Linux and the script will:
+This directory is for building the jEdit installers.  
 
-1.  download the source for jEdit 5.1.1
-2.  copy over new versions of ld and windres (needed for Mac)
-3.  copy the AithonLibrary from the git repository
-4.  build the installers
+1.  Build the plugin in aithon_plugin
 
-You will find the installers in the 'dist' directory.
+      -Rename the appropriate build.properties file
+      -run 'ant dist'
+      -make a 'jars' directory in the aithon_plugin directory and
+       copy the Aithon.jar file into the 'jars' directory
+
+2.  Run the script buildinstallers.sh on Mac/Linux and the script will:
+
+      -download the source for jEdit 5.1.1
+      -copy over new versions of ld and windres (needed for Mac)
+      -copy the AithonLibrary from the git repository
+      -build the installers
+
+You will find the installers in the 'jedit_temp/dist' directory.
 
 ---------------
 
