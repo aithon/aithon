@@ -192,12 +192,6 @@ implements ActionListener, EBComponent, AithonActions,
     Process compile;
     String line, makefile_path, lib_path;
     
-    lib_path = jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "library-filepath");
-    //Location of makefile and main.c - make general with working directory somehow
-    makefile_path = lib_path + "/../ProjectTemplate/";
-    //File dir = new File("C:\\Users\\Justine Dunham\\Documents\\GitHub\\aithon\\ProjectTemplate");
-    //File dir = new File("/Users/jseng/Desktop/jEdit.app/Contents/Resources/Java/ProjectTemplate");
-    File dir = new File(makefile_path);    
     Object src = evt.getSource();
     
     if (src == uploadButton) { //check if upload clicked
@@ -208,18 +202,23 @@ implements ActionListener, EBComponent, AithonActions,
       //scroll the area
       console_area.setCaretPosition (console_area.getDocument().getLength());
     } else if (src == detectButton) { //check if detect clicked
-      console_area.append("Detect board\n");
+      //console_area.append("Detect board\n");
+      detectAithonBoard();
       //scroll the area
       console_area.setCaretPosition (console_area.getDocument().getLength());
     } else if (src == compileButton) { //check if compile clicked
       try {
+         //Location of makefile and main.c - make general with working directory somehow
+         makefile_path = curr_buffer.getDirectory().replace(" ", "\\s");
+         File dir = new File(makefile_path);    
       	//Path environment variables - required for mac/linux, use null for windows
-        //String env[] = {"PATH=/usr/bin:/bin:/usr/sbin:/Users/jseng/gccarm/bin"};
-        String env[] = null;
-        String user_src = "USERFOLDER=\"" + curr_buffer.getDirectory().replace(" ", "\\s") + "\"";
+        String env[] = {"PATH=/usr/bin:/bin:/usr/sbin:/Users/jseng/gccarm/bin:."};
+        //String env[] = null;
+        //String user_src = "USERFOLDER=\"" + curr_buffer.getDirectory().replace(" ", "\\s") + "\"";
         
-        String make_cmd[] = {"make", user_src};
-        console_area.append(user_src + "\n");
+        //String make_cmd[] = {"make", user_src};
+        String make_cmd[] = {"make"};
+        //console_area.append(user_src + "\n");
       	compile = r.exec(make_cmd, env, dir);
       	inputStreamToOutputStream(compile.getInputStream());
       	inputStreamToOutputStream(compile.getErrorStream());
@@ -229,6 +228,40 @@ implements ActionListener, EBComponent, AithonActions,
         System.err.println("Caught IOException: " + e.getMessage());
       }
     }
+  }
+
+  //Finds default directory for compiler
+  private String detectAithonBoard() {
+     Process detect;
+     String path = "";
+     String os = System.getProperty("os.name").toLowerCase();
+     String userDir = System.getProperty("user.dir");
+
+     if (os.indexOf("win") >= 0) {
+        path = userDir + "/Windows";
+     } else if (os.indexOf("mac") >= 0) {
+        try { 
+        String env[] = {"PATH=/usr/bin:/bin:/usr/sbin:."};
+        path = userDir + "/jEdit.app/Contents/Resources/Java/AithonLibrary/Programmer/MacOSX/AithonProgrammer.app/Contents/MacOS";
+        File dir = new File(path);    
+        String detect_cmd[] = {path + "/AithonProgrammer", "detect"};
+
+        //console_area.append(path + "\n");
+        detect = r.exec(detect_cmd, env, dir);
+        inputStreamToOutputStream(detect.getInputStream());
+        inputStreamToOutputStream(detect.getErrorStream());
+        } catch (IOException e) {
+           System.err.println("Caught IOException: " + e.getMessage());
+        }
+
+        //scroll the area
+        console_area.setCaretPosition (console_area.getDocument().getLength());
+     } else if (os.indexOf("nux") >= 0) {
+        path = userDir + "/Linux";
+     }
+
+     //jEdit.setProperty(AithonPlugin.OPTION_PREFIX + "gcc-filepath", path);
+     return path;
   }
 
     //Finds default directory for compiler

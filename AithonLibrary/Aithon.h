@@ -91,8 +91,8 @@ void digital_toggle(int pin);
 
 // analog pin functions / definitions
 typedef enum {
-   MAIN_PWR = 10,
-   SERVO_PWR = 11,
+   SERVO_PWR = 10,
+   MAIN_PWR = 11,
 } AnalogPin;
 uint16_t analog_get(AnalogPin pin);
 
