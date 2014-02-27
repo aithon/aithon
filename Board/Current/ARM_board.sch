@@ -8,20 +8,20 @@
 </settings>
 <grid distance="0.05" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
-<layer number="1" name="Top" color="4" fill="1" visible="yes" active="no"/>
-<layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="no"/>
-<layer number="17" name="Pads" color="2" fill="1" visible="yes" active="no"/>
-<layer number="18" name="Vias" color="2" fill="1" visible="yes" active="no"/>
-<layer number="19" name="Unrouted" color="6" fill="1" visible="yes" active="no"/>
-<layer number="20" name="Dimension" color="15" fill="1" visible="yes" active="no"/>
-<layer number="21" name="tPlace" color="15" fill="1" visible="yes" active="no"/>
-<layer number="22" name="bPlace" color="7" fill="1" visible="yes" active="no"/>
-<layer number="23" name="tOrigins" color="15" fill="1" visible="yes" active="no"/>
-<layer number="24" name="bOrigins" color="15" fill="1" visible="yes" active="no"/>
-<layer number="25" name="tNames" color="15" fill="1" visible="yes" active="no"/>
-<layer number="26" name="bNames" color="7" fill="1" visible="yes" active="no"/>
-<layer number="27" name="tValues" color="7" fill="1" visible="yes" active="no"/>
-<layer number="28" name="bValues" color="7" fill="1" visible="yes" active="no"/>
+<layer number="1" name="Top" color="4" fill="1" visible="no" active="no"/>
+<layer number="16" name="Bottom" color="1" fill="1" visible="no" active="no"/>
+<layer number="17" name="Pads" color="2" fill="1" visible="no" active="no"/>
+<layer number="18" name="Vias" color="2" fill="1" visible="no" active="no"/>
+<layer number="19" name="Unrouted" color="6" fill="1" visible="no" active="no"/>
+<layer number="20" name="Dimension" color="15" fill="1" visible="no" active="no"/>
+<layer number="21" name="tPlace" color="15" fill="1" visible="no" active="no"/>
+<layer number="22" name="bPlace" color="7" fill="1" visible="no" active="no"/>
+<layer number="23" name="tOrigins" color="15" fill="1" visible="no" active="no"/>
+<layer number="24" name="bOrigins" color="15" fill="1" visible="no" active="no"/>
+<layer number="25" name="tNames" color="15" fill="1" visible="no" active="no"/>
+<layer number="26" name="bNames" color="7" fill="1" visible="no" active="no"/>
+<layer number="27" name="tValues" color="7" fill="1" visible="no" active="no"/>
+<layer number="28" name="bValues" color="7" fill="1" visible="no" active="no"/>
 <layer number="29" name="tStop" color="7" fill="3" visible="no" active="no"/>
 <layer number="30" name="bStop" color="7" fill="6" visible="no" active="no"/>
 <layer number="31" name="tCream" color="15" fill="1" visible="no" active="no"/>
@@ -30,8 +30,8 @@
 <layer number="34" name="bFinish" color="6" fill="6" visible="no" active="no"/>
 <layer number="35" name="tGlue" color="7" fill="4" visible="no" active="no"/>
 <layer number="36" name="bGlue" color="7" fill="5" visible="no" active="no"/>
-<layer number="37" name="tTest" color="7" fill="1" visible="yes" active="no"/>
-<layer number="38" name="bTest" color="7" fill="1" visible="yes" active="no"/>
+<layer number="37" name="tTest" color="7" fill="1" visible="no" active="no"/>
+<layer number="38" name="bTest" color="7" fill="1" visible="no" active="no"/>
 <layer number="39" name="tKeepout" color="4" fill="11" visible="no" active="no"/>
 <layer number="40" name="bKeepout" color="1" fill="11" visible="no" active="no"/>
 <layer number="41" name="tRestrict" color="4" fill="10" visible="no" active="no"/>
@@ -39,16 +39,16 @@
 <layer number="43" name="vRestrict" color="2" fill="10" visible="no" active="no"/>
 <layer number="44" name="Drills" color="7" fill="1" visible="no" active="no"/>
 <layer number="45" name="Holes" color="7" fill="1" visible="no" active="no"/>
-<layer number="46" name="Milling" color="3" fill="1" visible="yes" active="no"/>
-<layer number="47" name="Measures" color="7" fill="1" visible="yes" active="no"/>
-<layer number="48" name="Document" color="12" fill="1" visible="yes" active="no"/>
-<layer number="49" name="Reference" color="7" fill="1" visible="yes" active="no"/>
-<layer number="50" name="dxf" color="7" fill="1" visible="yes" active="no"/>
-<layer number="51" name="tDocu" color="7" fill="1" visible="yes" active="no"/>
-<layer number="52" name="bDocu" color="7" fill="1" visible="yes" active="no"/>
-<layer number="53" name="tGND_GNDA" color="7" fill="9" visible="yes" active="no"/>
-<layer number="54" name="bGND_GNDA" color="1" fill="9" visible="yes" active="no"/>
-<layer number="56" name="wert" color="7" fill="1" visible="yes" active="no"/>
+<layer number="46" name="Milling" color="3" fill="1" visible="no" active="no"/>
+<layer number="47" name="Measures" color="7" fill="1" visible="no" active="no"/>
+<layer number="48" name="Document" color="12" fill="1" visible="no" active="no"/>
+<layer number="49" name="Reference" color="7" fill="1" visible="no" active="no"/>
+<layer number="50" name="dxf" color="7" fill="1" visible="no" active="no"/>
+<layer number="51" name="tDocu" color="7" fill="1" visible="no" active="no"/>
+<layer number="52" name="bDocu" color="7" fill="1" visible="no" active="no"/>
+<layer number="53" name="tGND_GNDA" color="7" fill="9" visible="no" active="no"/>
+<layer number="54" name="bGND_GNDA" color="1" fill="9" visible="no" active="no"/>
+<layer number="56" name="wert" color="7" fill="1" visible="no" active="no"/>
 <layer number="91" name="Nets" color="2" fill="1" visible="yes" active="yes"/>
 <layer number="92" name="Busses" color="1" fill="1" visible="yes" active="yes"/>
 <layer number="93" name="Pins" color="2" fill="1" visible="no" active="yes"/>
@@ -10219,7 +10219,7 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 </instance>
 <instance part="R11" gate="G$1" x="274.32" y="279.4" rot="R90"/>
 <instance part="SUPPLY27" gate="GND" x="274.32" y="270.51"/>
-<instance part="SUPPLY30" gate="GND" x="359.41" y="58.42"/>
+<instance part="SUPPLY30" gate="GND" x="355.6" y="73.66" rot="R270"/>
 <instance part="R18" gate="G$1" x="15.24" y="260.35" smashed="yes" rot="R270">
 <attribute name="NAME" x="11.6586" y="264.16" size="1.778" layer="95" rot="R270"/>
 <attribute name="VALUE" x="17.018" y="264.16" size="1.778" layer="96" rot="R270"/>
@@ -10506,15 +10506,15 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <instance part="C32" gate="G$1" x="350.52" y="109.22"/>
 <instance part="R33" gate="G$1" x="314.96" y="130.81" rot="R270"/>
 <instance part="R34" gate="G$1" x="307.34" y="139.7" rot="R270"/>
-<instance part="C31" gate="G$1" x="341.63" y="64.77"/>
-<instance part="+3V9" gate="G$1" x="341.63" y="73.66" smashed="yes">
-<attribute name="VALUE" x="339.09" y="71.12" size="1.778" layer="96" rot="R90"/>
+<instance part="C31" gate="G$1" x="335.28" y="64.77"/>
+<instance part="+3V9" gate="G$1" x="335.28" y="73.66" smashed="yes">
+<attribute name="VALUE" x="332.74" y="71.12" size="1.778" layer="96" rot="R90"/>
 </instance>
-<instance part="SUPPLY72" gate="GND" x="341.63" y="58.42"/>
+<instance part="SUPPLY72" gate="GND" x="335.28" y="58.42"/>
 <instance part="Q3" gate="G$1" x="170.18" y="276.86"/>
 <instance part="Q4" gate="G$1" x="170.18" y="240.03"/>
-<instance part="+3V12" gate="G$1" x="350.52" y="73.66" smashed="yes">
-<attribute name="VALUE" x="347.98" y="71.12" size="1.778" layer="96" rot="R90"/>
+<instance part="+3V12" gate="G$1" x="347.98" y="72.39" smashed="yes">
+<attribute name="VALUE" x="345.44" y="69.85" size="1.778" layer="96" rot="R90"/>
 </instance>
 <instance part="U3" gate="G$1" x="351.79" y="276.86"/>
 <instance part="Q6" gate="G$1" x="337.82" y="271.78" smashed="yes" rot="MR270">
@@ -10894,20 +10894,6 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <wire x1="213.36" y1="133.35" x2="213.36" y2="134.62" width="0.1524" layer="91"/>
 </segment>
 <segment>
-<pinref part="USD" gate="G$1" pin="SHIELD@3"/>
-<wire x1="363.22" y1="64.77" x2="359.41" y2="64.77" width="0.1524" layer="91"/>
-<pinref part="USD" gate="G$1" pin="SHIELD@1"/>
-<wire x1="359.41" y1="64.77" x2="359.41" y2="69.85" width="0.1524" layer="91"/>
-<wire x1="359.41" y1="69.85" x2="363.22" y2="69.85" width="0.1524" layer="91"/>
-<wire x1="359.41" y1="69.85" x2="359.41" y2="80.01" width="0.1524" layer="91"/>
-<pinref part="USD" gate="G$1" pin="GND"/>
-<wire x1="359.41" y1="80.01" x2="363.22" y2="80.01" width="0.1524" layer="91"/>
-<junction x="359.41" y="69.85"/>
-<pinref part="SUPPLY30" gate="GND" pin="GND"/>
-<wire x1="359.41" y1="64.77" x2="359.41" y2="60.96" width="0.1524" layer="91"/>
-<junction x="359.41" y="64.77"/>
-</segment>
-<segment>
 <pinref part="U10" gate="POWER" pin="VSS_5"/>
 <wire x1="148.59" y1="172.72" x2="148.59" y2="175.26" width="0.1524" layer="91"/>
 <wire x1="148.59" y1="175.26" x2="153.67" y2="175.26" width="0.1524" layer="91"/>
@@ -11228,7 +11214,7 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <segment>
 <pinref part="C31" gate="G$1" pin="2"/>
 <pinref part="SUPPLY72" gate="GND" pin="GND"/>
-<wire x1="341.63" y1="62.23" x2="341.63" y2="60.96" width="0.1524" layer="91"/>
+<wire x1="335.28" y1="62.23" x2="335.28" y2="60.96" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="SW1" gate="G$1" pin="P$1"/>
@@ -11250,6 +11236,17 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <pinref part="SUPPLY6" gate="GND" pin="GND"/>
 <wire x1="223.52" y1="160.02" x2="222.25" y2="160.02" width="0.1524" layer="91"/>
 <wire x1="222.25" y1="160.02" x2="222.25" y2="158.75" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="USD" gate="G$1" pin="GND"/>
+<wire x1="359.41" y1="80.01" x2="363.22" y2="80.01" width="0.1524" layer="91"/>
+<pinref part="USD" gate="G$1" pin="SHIELD@1"/>
+<wire x1="359.41" y1="69.85" x2="363.22" y2="69.85" width="0.1524" layer="91"/>
+<wire x1="359.41" y1="80.01" x2="359.41" y2="73.66" width="0.1524" layer="91"/>
+<pinref part="SUPPLY30" gate="GND" pin="GND"/>
+<wire x1="359.41" y1="73.66" x2="359.41" y2="69.85" width="0.1524" layer="91"/>
+<wire x1="358.14" y1="73.66" x2="359.41" y2="73.66" width="0.1524" layer="91"/>
+<junction x="359.41" y="73.66"/>
 </segment>
 </net>
 <net name="5V" class="0">
@@ -12369,13 +12366,17 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <segment>
 <pinref part="C31" gate="G$1" pin="1"/>
 <pinref part="+3V9" gate="G$1" pin="+3V3"/>
-<wire x1="341.63" y1="71.12" x2="341.63" y2="69.85" width="0.1524" layer="91"/>
+<wire x1="335.28" y1="71.12" x2="335.28" y2="69.85" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="USD" gate="G$1" pin="SHIELD@2"/>
-<wire x1="363.22" y1="67.31" x2="350.52" y2="67.31" width="0.1524" layer="91"/>
+<wire x1="363.22" y1="67.31" x2="347.98" y2="67.31" width="0.1524" layer="91"/>
 <pinref part="+3V12" gate="G$1" pin="+3V3"/>
-<wire x1="350.52" y1="71.12" x2="350.52" y2="67.31" width="0.1524" layer="91"/>
+<wire x1="347.98" y1="69.85" x2="347.98" y2="67.31" width="0.1524" layer="91"/>
+<pinref part="USD" gate="G$1" pin="SHIELD@4"/>
+<wire x1="363.22" y1="62.23" x2="347.98" y2="62.23" width="0.1524" layer="91"/>
+<wire x1="347.98" y1="62.23" x2="347.98" y2="67.31" width="0.1524" layer="91"/>
+<junction x="347.98" y="67.31"/>
 </segment>
 <segment>
 <pinref part="U3" gate="G$1" pin="VOUT"/>
@@ -13284,9 +13285,9 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <label x="194.31" y="144.78" size="1.778" layer="95"/>
 </segment>
 <segment>
-<pinref part="USD" gate="G$1" pin="SHIELD@4"/>
-<wire x1="363.22" y1="62.23" x2="350.52" y2="62.23" width="0.1524" layer="91"/>
-<label x="350.52" y="62.23" size="1.778" layer="95"/>
+<wire x1="363.22" y1="64.77" x2="350.52" y2="64.77" width="0.1524" layer="91"/>
+<label x="350.52" y="64.77" size="1.778" layer="95"/>
+<pinref part="USD" gate="G$1" pin="SHIELD@3"/>
 </segment>
 </net>
 <net name="SPI3_SCK" class="0">
