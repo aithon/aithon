@@ -192,12 +192,6 @@ implements ActionListener, EBComponent, AithonActions,
     Process compile;
     String line, makefile_path, lib_path;
     
-    lib_path = jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "library-filepath");
-    //Location of makefile and main.c - make general with working directory somehow
-    makefile_path = lib_path + "/../ProjectTemplate/";
-    //File dir = new File("C:\\Users\\Justine Dunham\\Documents\\GitHub\\aithon\\ProjectTemplate");
-    //File dir = new File("/Users/jseng/Desktop/jEdit.app/Contents/Resources/Java/ProjectTemplate");
-    File dir = new File(makefile_path);    
     Object src = evt.getSource();
     
     if (src == uploadButton) { //check if upload clicked
@@ -214,13 +208,17 @@ implements ActionListener, EBComponent, AithonActions,
       console_area.setCaretPosition (console_area.getDocument().getLength());
     } else if (src == compileButton) { //check if compile clicked
       try {
+         //Location of makefile and main.c - make general with working directory somehow
+         makefile_path = curr_buffer.getDirectory().replace(" ", "\\s");
+         File dir = new File(makefile_path);    
       	//Path environment variables - required for mac/linux, use null for windows
-        //String env[] = {"PATH=/usr/bin:/bin:/usr/sbin:/Users/jseng/gccarm/bin"};
-        String env[] = null;
-        String user_src = "USERFOLDER=\"" + curr_buffer.getDirectory().replace(" ", "\\s") + "\"";
+        String env[] = {"PATH=/usr/bin:/bin:/usr/sbin:/Users/jseng/gccarm/bin:."};
+        //String env[] = null;
+        //String user_src = "USERFOLDER=\"" + curr_buffer.getDirectory().replace(" ", "\\s") + "\"";
         
-        String make_cmd[] = {"make", user_src};
-        console_area.append(user_src + "\n");
+        //String make_cmd[] = {"make", user_src};
+        String make_cmd[] = {"make"};
+        //console_area.append(user_src + "\n");
       	compile = r.exec(make_cmd, env, dir);
       	inputStreamToOutputStream(compile.getInputStream());
       	inputStreamToOutputStream(compile.getErrorStream());
