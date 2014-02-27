@@ -2,7 +2,7 @@
 #run on Mac or Linux
 
 #checkout v.5.1.1 of jEdit
-svn co -r 23300 https://jedit.svn.sourceforge.net/svnroot/jedit/jEdit/branches/5.1.x jedit_temp
+svn co -r 23300 https://svn.code.sf.net/p/jedit/svn/jEdit/branches/5.1.x jedit_temp
 
 cd jedit_temp
 cp -r ../../AithonLibrary .

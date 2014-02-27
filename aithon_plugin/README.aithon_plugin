@@ -1,6 +1,6 @@
 1.  Checkout jEdit build-support into the directory above this directory:
 
-  svn co https://jedit.svn.sourceforge.net/svnroot/jedit/build-support/trunk build-support
+  svn co https://svn.code.sf.net/p/jedit/svn/build-support/trunk build-support
 
 2.  Edit the build.properties file to match your jEdit installation
 3.  Run 'ant' to build
