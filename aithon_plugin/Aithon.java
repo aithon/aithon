@@ -55,395 +55,409 @@ import org.gjt.sp.util.StandardUtilities;
  */
 public class Aithon extends JPanel
 implements ActionListener, EBComponent, AithonActions, 
-           DefaultFocusComponent {
+           DefaultFocusComponent 
+{
+   private String filename;
+   private String defaultFilename;
+   private View view;
+   private boolean floating;
 
-  // {{{ Instance Variables
-  private String filename;
-  private String defaultFilename;
-  private View view;
-  private boolean floating;
+   private JButton detectButton;
+   private JButton uploadButton;
+   private JButton compileButton;
+   private JToggleButton showSerialTerminal;
+   private JTextArea console_area;
+   private JScrollPane console_scrollbars;
+   private Runtime r;
+   private Process p;
+   private Thread t;
+   private BufferedWriter out;
 
-  private JButton detectButton;
-  private JButton uploadButton;
-  private JButton compileButton;
-  private JToggleButton showSerialTerminal;
-  private JTextArea console_area;
-  private JScrollPane console_scrollbars;
-  private Runtime r;
-  private Process p;
-  private Thread t;
-  private BufferedWriter out;
-    // }}}
+   // {{{ Constructor
+   /**
+    * 
+    * @param view the current jedit window
+    * @param position a variable passed in from the script in actions.xml,
+    * 	which can be DockableWindowManager.FLOATING, TOP, BOTTOM, LEFT, RIGHT, etc.
+    * 	see @ref DockableWindowManager for possible values.
+    */
+   public Aithon(View view, String position) throws IOException
+   {
+      //The top level layout is a BoxLayout with the boxes side by side.
+      //The buttons on the left and the console on the right.
+      this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+      this.view = view;
+      this.floating = position.equals(DockableWindowManager.FLOATING);
 
-    // {{{ Constructor
-  /**
-   * 
-   * @param view the current jedit window
-   * @param position a variable passed in from the script in actions.xml,
-   * 	which can be DockableWindowManager.FLOATING, TOP, BOTTOM, LEFT, RIGHT, etc.
-   * 	see @ref DockableWindowManager for possible values.
-   */
-  public Aithon(View view, String position) throws IOException{
-    //The top level layout is a BoxLayout with the boxes side by side.
-    //The buttons on the left and the console on the right.
-    this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-    this.view = view;
-    this.floating = position.equals(DockableWindowManager.FLOATING);
+      if (floating)
+         this.setPreferredSize(new Dimension(500, 250));
 
-    if (floating)
-      this.setPreferredSize(new Dimension(500, 250));
+      //The buttons panel is a FlowLayout with a fixed maximum size which
+      //forces the buttons to be arranged in a single column.
+      BufferedImage aithon_logo = ImageIO.read(getClass().getResource("/images/AithonEmblemRedClear.png"));
+      JLabel picLabel = new JLabel(new ImageIcon(aithon_logo));
+      add(picLabel);
 
-    //The buttons panel is a FlowLayout with a fixed maximum size which
-    //forces the buttons to be arranged in a single column.
-    BufferedImage aithon_logo = ImageIO.read(getClass().getResource("/images/AithonEmblemRedClear.png"));
-    JLabel picLabel = new JLabel(new ImageIcon(aithon_logo));
-    add(picLabel);
-    
-    Dimension button_size = new Dimension(120, 25);
-    JPanel buttons = new JPanel();
-    buttons.setLayout(new FlowLayout());
-    buttons.setPreferredSize(new Dimension(150,180));
-    buttons.setMaximumSize(new Dimension(150, 180));
-    
-    detectButton = new JButton("Detect\nBoard");
-    detectButton.setText("Detect Board");
-    detectButton.setPreferredSize(button_size);
-    detectButton.addActionListener(this);
-    
-    compileButton = new JButton("Compile");
-    compileButton.setText("<html><center>"+"Compile"+"</center></html>");
-    compileButton.setPreferredSize(button_size);
-    compileButton.addActionListener(this);
-    
-    uploadButton = new JButton("Upload");
-    uploadButton.setText("<html><center>"+"Upload"+"</center></html>");
-    uploadButton.setPreferredSize(button_size);
-    uploadButton.addActionListener(this);
-    
-    showSerialTerminal = new JToggleButton("Serial Terminal");
-    showSerialTerminal.setPreferredSize(button_size);
-    
-    buttons.add(detectButton);
-    buttons.add(compileButton);
-    buttons.add(uploadButton);
-    buttons.add(showSerialTerminal);
+      Dimension button_size = new Dimension(120, 25);
+      JPanel buttons = new JPanel();
+      buttons.setLayout(new FlowLayout());
+      buttons.setPreferredSize(new Dimension(150,180));
+      buttons.setMaximumSize(new Dimension(150, 180));
 
-    add(buttons);
+      detectButton = new JButton("Detect\nBoard");
+      detectButton.setText("Detect Board");
+      detectButton.setPreferredSize(button_size);
+      detectButton.addActionListener(this);
 
-    //create the console area
-    console_area = new JTextArea("Aithon console area:\n");
-    console_area.setLineWrap(true);
-    console_area.setWrapStyleWord(true);
-    console_area.setEditable(false);
+      compileButton = new JButton("Compile");
+      compileButton.setText("<html><center>"+"Compile"+"</center></html>");
+      compileButton.setPreferredSize(button_size);
+      compileButton.addActionListener(this);
 
-    console_scrollbars = new JScrollPane (console_area,
-    	    JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
-    	    JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-    Color color=new Color(0,0,0); //set background to black
-    console_area.setBackground(color);
+      uploadButton = new JButton("Upload");
+      uploadButton.setText("<html><center>"+"Upload"+"</center></html>");
+      uploadButton.setPreferredSize(button_size);
+      uploadButton.addActionListener(this);
 
-    Color color2=new Color(180,180,180); //set foreground to gray
-    console_area.setForeground(color2);
+      showSerialTerminal = new JToggleButton("Serial Terminal");
+      showSerialTerminal.setPreferredSize(button_size);
 
-    add(console_scrollbars);
+      buttons.add(detectButton);
+      buttons.add(compileButton);
+      buttons.add(uploadButton);
+      buttons.add(showSerialTerminal);
 
-    r = Runtime.getRuntime();
-    
-    //If property for any of the paths hasn't been set (is null or empty string)
-    //Calls functions to find a default directory and sets the property
-    String prop = jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "gcc-filepath");
-    if (prop == null || prop.equals("")) {
-      autoDetectGcc();
-    }
-    prop = jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "library-filepath");
-    if (prop == null || prop.equals("")) {
-      aithonLibraryPath();
-    }
-    prop = jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "programmer-filepath");
-    if (prop == null || prop.equals("")) {
-      aithonProgrammerPath();
-    }
-    
-  }
+      add(buttons);
 
-  //starts a thread that reads an OutputStream and displays it to the console
-  void inputStreamToOutputStream(final InputStream inputStream) {
-    t = new Thread(new Runnable() {
-          public void run() {
+      //create the console area
+      console_area = new JTextArea("");
+      console_area.setLineWrap(true);
+      console_area.setWrapStyleWord(true);
+      console_area.setEditable(false);
+
+      console_scrollbars = new JScrollPane (console_area,
+            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
+            JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+      Color color=new Color(0,0,0); //set background to black
+      console_area.setBackground(color);
+
+      Color color2=new Color(180,180,180); //set foreground to gray
+      console_area.setForeground(color2);
+
+      add(console_scrollbars);
+
+      r = Runtime.getRuntime();
+
+      //If property for any of the paths hasn't been set (is null or empty string)
+      //Calls functions to find a default directory and sets the property
+      String prop = jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "gcc-filepath");
+      if (prop == null || prop.equals("")) 
+      {
+         autoDetectGcc();
+      }
+      prop = jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "library-filepath");
+      if (prop == null || prop.equals("")) 
+      {
+         aithonLibraryPath();
+      }
+      prop = jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "programmer-filepath");
+      if (prop == null || prop.equals("")) 
+      {
+         aithonProgrammerPath();
+      }
+
+   }
+
+   //starts a thread that reads an OutputStream and displays it to the console
+   void inputStreamToOutputStream(final InputStream inputStream) 
+   {
+      t = new Thread(new Runnable() {
+            public void run() 
+            {
             try {
-              int d;
-              //if there is nothing to read then block, otherwise print
-              while ((d = inputStream.read()) != -1) {
-                console_area.append(Character.toString((char)d));
-                console_area.setCaretPosition (console_area.getDocument().getLength());
-              }
-            } catch (IOException e) {
-              System.err.println("Caught IOException: " + e.getMessage());
+            int d;
+            //if there is nothing to read then block, otherwise print
+            while ((d = inputStream.read()) != -1) 
+            {
+            console_area.append(Character.toString((char)d));
+            console_area.setCaretPosition (console_area.getDocument().getLength());
             }
-          }
-        });
-    t.setDaemon(true);  //make this a daemon thread so the JVM will exit
-    t.start();
-  }
+            } catch (IOException e) 
+            {
+            System.err.println("Caught IOException: " + e.getMessage());
+            }
+            }
+            });
+      t.setDaemon(true);  //make this a daemon thread so the JVM will exit
+      t.start();
+   }
 
-  //invoked when the buttons are clicked
-  public void actionPerformed(ActionEvent evt) {
-    Buffer curr_buffer = jEdit.getLastBuffer();
-    Process compile;
-    String line, makefile_path, lib_path;
-    
-    Object src = evt.getSource();
-    
-    if (src == uploadButton) { //check if upload clicked
-       try {
-          String programmer_path = jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "programmer-filepath");
-          //Using for testing - prints out current directories from property values
-          //console_area.append("Compiler: " + jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "gcc-filepath") + "\n");
-          //console_area.append("Library: " + jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "library-filepath") + "\n");
-          //console_area.append("Programmer: " + jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "programmer-filepath") + "\n");
-
-          //Location of makefile and main.c - make general with working directory somehow
-          makefile_path = curr_buffer.getDirectory().replace(" ", "\\s");
-          File dir = new File(makefile_path);    
-          //Path environment variables - required for mac/linux, use null for windows
-          String env[] = {"PATH=/usr/bin:/bin:/usr/sbin:."};
-
-          String upload_cmd[] = {programmer_path + "/AithonProgrammer", "program", "build/ch.bin"};
-          //console_area.append(user_src + "\n");
-          compile = r.exec(upload_cmd, env, dir);
-          inputStreamToOutputStream(compile.getInputStream());
-          inputStreamToOutputStream(compile.getErrorStream());
-       } catch (IOException e) {
-          System.err.println("Caught IOException: " + e.getMessage());
-       }
-
-       //scroll the area
-       console_area.setCaretPosition (console_area.getDocument().getLength());
-    } else if (src == detectButton) { //check if detect clicked
-      //console_area.append("Detect board\n");
-      detectAithonBoard();
-      //scroll the area
-      console_area.setCaretPosition (console_area.getDocument().getLength());
-    } else if (src == compileButton) { //check if compile clicked
-      compileCode();
-      console_area.setCaretPosition (console_area.getDocument().getLength());
-    }
-  }
-
-   public void compileCode() {
+   //invoked when the buttons are clicked
+   public void actionPerformed(ActionEvent evt) 
+   {
       Buffer curr_buffer = jEdit.getLastBuffer();
       Process compile;
       String line, makefile_path, lib_path;
+
+      Object src = evt.getSource();
+
+      if (src == uploadButton) 
+      { //check if upload clicked
+         console_area.append("----------------------\n");
+
+         try {
+            String programmer_path = jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "programmer-filepath");
+            //Using for testing - prints out current directories from property values
+            //console_area.append("Compiler: " + jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "gcc-filepath") + "\n");
+            //console_area.append("Library: " + jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "library-filepath") + "\n");
+            //console_area.append("Programmer: " + jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "programmer-filepath") + "\n");
+
+            //Location of makefile and main.c - make general with working directory somehow
+            makefile_path = curr_buffer.getDirectory().replace(" ", "\\s");
+            File dir = new File(makefile_path);    
+            //Path environment variables - required for mac/linux, use null for windows
+            String env[] = {"PATH=/usr/bin:/bin:/usr/sbin:."};
+
+            String upload_cmd[] = {programmer_path + "/AithonProgrammer", "program", "build/ch.bin"};
+            //console_area.append(user_src + "\n");
+            compile = r.exec(upload_cmd, env, dir);
+            inputStreamToOutputStream(compile.getInputStream());
+            inputStreamToOutputStream(compile.getErrorStream());
+         } catch (IOException e) {
+            System.err.println("Caught IOException: " + e.getMessage());
+         }
+
+         //scroll the area
+         console_area.setCaretPosition (console_area.getDocument().getLength());
+      } else if (src == detectButton) { //check if detect clicked
+         //console_area.append("Detect board\n");
+         detectAithonBoard();
+         //scroll the area
+         console_area.setCaretPosition (console_area.getDocument().getLength());
+      } else if (src == compileButton) { //check if compile clicked
+         compileCode();
+         console_area.setCaretPosition (console_area.getDocument().getLength());
+      }
+   }
+
+   public void compileCode() 
+   {
+      Buffer curr_buffer = jEdit.getLastBuffer();
+      Process compile;
+      String line, makefile_path, lib_path;
+      console_area.append("----------------------\n");
       try {
          //Location of makefile and main.c - make general with working directory somehow
          makefile_path = curr_buffer.getDirectory().replace(" ", "\\s");
          File dir = new File(makefile_path);    
-      	//Path environment variables - required for mac/linux, use null for windows
-        String env[] = {"PATH=/usr/bin:/bin:/usr/sbin:/Users/jseng/gccarm/bin:."};
-        //String env[] = null;
-        //String user_src = "USERFOLDER=\"" + curr_buffer.getDirectory().replace(" ", "\\s") + "\"";
-        
-        String make_cmd[] = {"make"};
-        //console_area.append(user_src + "\n");
-      	compile = r.exec(make_cmd, env, dir);
-      	inputStreamToOutputStream(compile.getInputStream());
-      	inputStreamToOutputStream(compile.getErrorStream());
-        //scroll the area
-        console_area.setCaretPosition (console_area.getDocument().getLength());
+         //Path environment variables - required for mac/linux, use null for windows
+         String env[] = {"PATH=/usr/bin:/bin:/usr/sbin:/Users/jseng/gccarm/bin:."};
+         //String env[] = null;
+         //String user_src = "USERFOLDER=\"" + curr_buffer.getDirectory().replace(" ", "\\s") + "\"";
+
+         String make_cmd[] = {"make"};
+         //console_area.append(user_src + "\n");
+         compile = r.exec(make_cmd, env, dir);
+         inputStreamToOutputStream(compile.getInputStream());
+         inputStreamToOutputStream(compile.getErrorStream());
+         //scroll the area
+         console_area.setCaretPosition (console_area.getDocument().getLength());
       } catch (IOException e) {
-        System.err.println("Caught IOException: " + e.getMessage());
+         System.err.println("Caught IOException: " + e.getMessage());
       }
 
       return;
    }
 
-   public void rebuildCode() {
+   public void rebuildCode() 
+   {
       Buffer curr_buffer = jEdit.getLastBuffer();
       Process compile;
       String line, makefile_path, lib_path;
+      console_area.append("----------------------\n");
       try {
          //Location of makefile and main.c - make general with working directory somehow
          makefile_path = curr_buffer.getDirectory().replace(" ", "\\s");
          File dir = new File(makefile_path);    
-      	//Path environment variables - required for mac/linux, use null for windows
-        String env[] = {"PATH=/usr/bin:/bin:/usr/sbin:/Users/jseng/gccarm/bin:."};
-        //String env[] = null;
-        //String user_src = "USERFOLDER=\"" + curr_buffer.getDirectory().replace(" ", "\\s") + "\"";
-        
-        String make_cmd[] = {"make clean"};
-        //console_area.append(user_src + "\n");
-      	compile = r.exec(make_cmd, env, dir);
-      	inputStreamToOutputStream(compile.getInputStream());
-      	inputStreamToOutputStream(compile.getErrorStream());
-        //scroll the area
-        console_area.setCaretPosition (console_area.getDocument().getLength());
+         //Path environment variables - required for mac/linux, use null for windows
+         String env[] = {"PATH=/usr/bin:/bin:/usr/sbin:/Users/jseng/gccarm/bin:."};
+         //String env[] = null;
+         //String user_src = "USERFOLDER=\"" + curr_buffer.getDirectory().replace(" ", "\\s") + "\"";
+
+         String make_cmd[] = {"make", "clean"};
+         //console_area.append(user_src + "\n");
+         compile = r.exec(make_cmd, env, dir);
+         inputStreamToOutputStream(compile.getInputStream());
+         inputStreamToOutputStream(compile.getErrorStream());
+         //scroll the area
+         console_area.setCaretPosition (console_area.getDocument().getLength());
+
+         try{
+            //do what you want to do before sleeping
+            Thread.currentThread().sleep(100);//sleep for 100 ms
+            //do what you want to do after sleeptig
+         }
+         catch(InterruptedException ie){
+            //If this thread was intrrupted by nother thread 
+         }
+
+         String make_cmd1[] = {"make"};
+         //console_area.append(user_src + "\n");
+         compile = r.exec(make_cmd1, env, dir);
+         inputStreamToOutputStream(compile.getInputStream());
+         inputStreamToOutputStream(compile.getErrorStream());
+         console_area.setCaretPosition (console_area.getDocument().getLength());
+         //compileCode();
       } catch (IOException e) {
-        System.err.println("Caught IOException: " + e.getMessage());
+         System.err.println("Caught IOException: " + e.getMessage());
       }
 
       return;
    }
 
-  //Detect if an Aithon board is present
-  public void detectAithonBoard() {
-     Process detect;
-     String path = "";
-     String os = System.getProperty("os.name").toLowerCase();
-     String userDir = System.getProperty("user.dir");
+   //Detect if an Aithon board is present
+   public void detectAithonBoard() 
+   {
+      Process detect;
+      String path = "";
+      String os = System.getProperty("os.name").toLowerCase();
+      String userDir = System.getProperty("user.dir");
 
-     if (os.indexOf("win") >= 0) {
-        path = userDir + "/Windows";
-     } else if (os.indexOf("mac") >= 0) {
-        try { 
-        String env[] = {"PATH=/usr/bin:/bin:/usr/sbin:."};
-        path = jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "programmer-filepath");    
-        File dir = new File(path);    
-        //console_area.append(path + "\n");
-        String detect_cmd[] = {path + "/AithonProgrammer", "detect"};
+      console_area.append("----------------------\n");
+      if (os.indexOf("win") >= 0) {
+         path = userDir + "/Windows";
+      } else if (os.indexOf("mac") >= 0) {
+         try { 
+            String env[] = {"PATH=/usr/bin:/bin:/usr/sbin:."};
+            path = jEdit.getProperty(AithonPlugin.OPTION_PREFIX + "programmer-filepath");    
+            File dir = new File(path);    
+            //console_area.append(path + "\n");
+            String detect_cmd[] = {path + "/AithonProgrammer", "detect"};
 
-        //console_area.append(detect_cmd[0] + "\n");
-        detect = r.exec(detect_cmd, env, dir);
-        inputStreamToOutputStream(detect.getInputStream());
-        inputStreamToOutputStream(detect.getErrorStream());
-        } catch (IOException e) {
-           System.err.println("Caught IOException: " + e.getMessage());
-        }
+            //console_area.append(detect_cmd[0] + "\n");
+            detect = r.exec(detect_cmd, env, dir);
+            inputStreamToOutputStream(detect.getInputStream());
+            inputStreamToOutputStream(detect.getErrorStream());
+         } catch (IOException e) {
+            System.err.println("Caught IOException: " + e.getMessage());
+         }
 
-        //scroll the area
-        console_area.setCaretPosition (console_area.getDocument().getLength());
-     } else if (os.indexOf("nux") >= 0) {
-        path = userDir + "/Linux";
-     }
+         //scroll the area
+         console_area.setCaretPosition (console_area.getDocument().getLength());
+      } else if (os.indexOf("nux") >= 0) {
+         path = userDir + "/Linux";
+      }
 
-     //jEdit.setProperty(AithonPlugin.OPTION_PREFIX + "gcc-filepath", path);
-     return;
-  }
+      //jEdit.setProperty(AithonPlugin.OPTION_PREFIX + "gcc-filepath", path);
+      return;
+   }
 
-    //Finds default directory for compiler
-  private String autoDetectGcc() {
-    String path = "";
-    String os = System.getProperty("os.name").toLowerCase();
-    String userDir = System.getProperty("user.dir");
+   //Finds default directory for compiler
+   private String autoDetectGcc() {
+      String path = "";
+      String os = System.getProperty("os.name").toLowerCase();
+      String userDir = System.getProperty("user.dir");
 
-    if (os.indexOf("win") >= 0) {
-      path = userDir + "/Windows";
-    } else if (os.indexOf("mac") >= 0) {
-      path = userDir + "/MacOSX";
-    } else if (os.indexOf("nux") >= 0) {
-      path = userDir + "/Linux";
-    }
+      if (os.indexOf("win") >= 0) {
+         path = userDir + "/Windows";
+      } else if (os.indexOf("mac") >= 0) {
+         path = userDir + "/MacOSX";
+      } else if (os.indexOf("nux") >= 0) {
+         path = userDir + "/Linux";
+      }
 
-    jEdit.setProperty(AithonPlugin.OPTION_PREFIX + "gcc-filepath", path);
-    return path;
-  }
+      jEdit.setProperty(AithonPlugin.OPTION_PREFIX + "gcc-filepath", path);
+      return path;
+   }
 
-  //Finds default directory for library
-  private String aithonLibraryPath() {
-    String path = jEdit.getJEditHome() + "/AithonLibrary/";
-    jEdit.setProperty(AithonPlugin.OPTION_PREFIX + "library-filepath", path);
-    return path;
-  }
+   //Finds default directory for library
+   private String aithonLibraryPath() {
+      String path = jEdit.getJEditHome() + "/AithonLibrary/";
+      jEdit.setProperty(AithonPlugin.OPTION_PREFIX + "library-filepath", path);
+      return path;
+   }
 
-  //Finds default directory for programmer/uploader
-  private String aithonProgrammerPath() {
-    String path = jEdit.getJEditHome() + "/AithonLibrary/Programmer";
-    jEdit.setProperty(AithonPlugin.OPTION_PREFIX + "programmer-filepath", path);    
-    return path;
-  }
-  // }}}
+   //Finds default directory for programmer/uploader
+   private String aithonProgrammerPath() {
+      String path = jEdit.getJEditHome() + "/AithonLibrary/Programmer";
+      jEdit.setProperty(AithonPlugin.OPTION_PREFIX + "programmer-filepath", path);    
+      return path;
+   }
 
-    // {{{ Member Functions
-    
-    // {{{ focusOnDefaultComponent
-	public void focusOnDefaultComponent() {
-	}
-    // }}}
+   public void focusOnDefaultComponent() 
+   {
+   }
 
-    // {{{ getFileName
-	public String getFilename() {
-		return filename;
-	}
-    // }}}
+   public void handleMessage(EBMessage message) 
+   {
+      if (message instanceof PropertiesChanged) 
+      {
+         propertiesChanged();
+      }
+   }
 
-	// EBComponent implementation
-	
-    // {{{ handleMessage
-	public void handleMessage(EBMessage message) {
-		if (message instanceof PropertiesChanged) {
-			propertiesChanged();
-		}
-	}
-    // }}}
-    
-    // {{{ propertiesChanged
-	private void propertiesChanged() {
-		String propertyFilename = jEdit
-				.getProperty(AithonPlugin.OPTION_PREFIX + "filepath");
-		if (!StandardUtilities.objectsEqual(defaultFilename, propertyFilename)) {
-			saveFile();
-			//toolPanel.propertiesChanged();
-			defaultFilename = propertyFilename;
-			filename = defaultFilename;
-		}
-		Font newFont = AithonOptionPane.makeFont();
-		//if (!newFont.equals(textArea.getFont())) {
-		//	textArea.setFont(newFont);
-		//}
-	}
-    // }}}
+   // {{{ propertiesChanged
+   private void propertiesChanged() 
+   {
+      String propertyFilename = jEdit
+         .getProperty(AithonPlugin.OPTION_PREFIX + "filepath");
+      if (!StandardUtilities.objectsEqual(defaultFilename, propertyFilename)) 
+      {
+         saveFile();
+         //toolPanel.propertiesChanged();
+         defaultFilename = propertyFilename;
+         filename = defaultFilename;
+      }
+      Font newFont = AithonOptionPane.makeFont();
+      //if (!newFont.equals(textArea.getFont())) {
+      //	textArea.setFont(newFont);
+      //}
+   }
 
-	// These JComponent methods provide the appropriate points
-	// to subscribe and unsubscribe this object to the EditBus.
+   // These JComponent methods provide the appropriate points
+   // to subscribe and unsubscribe this object to the EditBus.
 
-    // {{{ addNotify
-	public void addNotify() {
-		super.addNotify();
-		EditBus.addToBus(this);
-	}
-     // }}}
-     
-    // {{{ removeNotify
-	public void removeNotify() {
-		saveFile();
-		super.removeNotify();
-		EditBus.removeFromBus(this);
-	}
-    // }}}
-    
-	// AithonActions implementation
+   // {{{ addNotify
+   public void addNotify() 
+   {
+      super.addNotify();
+      EditBus.addToBus(this);
+   }
 
-    // {{{
-	public void saveFile() {
-		if (filename == null || filename.length() == 0)
-			return;
-		try {
-			FileWriter out = new FileWriter(filename);
-			//out.write(textArea.getText());
-			out.close();
-		} catch (IOException ioe) {
-			Log.log(Log.ERROR, Aithon.class,
-					"Could not write notepad text to " + filename);
-		}
-	}
-    // }}}
-    
-    // {{{ chooseFile
-	public void chooseFile() {
-		String[] paths = GUIUtilities.showVFSFileDialog(view, null,
-				JFileChooser.OPEN_DIALOG, false);
-		if (paths != null && !paths[0].equals(filename)) {
-			saveFile();
-			filename = paths[0];
-			//toolPanel.propertiesChanged();
-		}
-	}
-    // }}}
+   public void removeNotify() 
+   {
+      saveFile();
+      super.removeNotify();
+      EditBus.removeFromBus(this);
+   }
 
-    // {{{ copyToBuffer
-	public void copyToBuffer() {
-		jEdit.newFile(view);
-	}
-    // }}}
-    // }}}
+   public void saveFile() 
+   {
+      if (filename == null || filename.length() == 0)
+         return;
+      try {
+         FileWriter out = new FileWriter(filename);
+         //out.write(textArea.getText());
+         out.close();
+      } catch (IOException ioe) {
+         Log.log(Log.ERROR, Aithon.class,
+               "Could not write notepad text to " + filename);
+      }
+   }
+
+   public void chooseFile() 
+   {
+      String[] paths = GUIUtilities.showVFSFileDialog(view, null,
+            JFileChooser.OPEN_DIALOG, false);
+      if (paths != null && !paths[0].equals(filename)) {
+         saveFile();
+         filename = paths[0];
+         //toolPanel.propertiesChanged();
+      }
+   }
+
+   public void copyToBuffer() 
+   {
+      jEdit.newFile(view);
+   }
 }
-// }}}
