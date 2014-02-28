@@ -1254,6 +1254,17 @@
 			<arg file="/System/Library/Frameworks/JavaVM.framework/Resources/MacOS/JavaApplicationStub" />
 			<arg file="${dist.dir}/classes/mac/jEdit.app/Contents/MacOS/jedit" />
 		</exec>
+		<exec executable="ln"
+		      failonerror="true">
+			<arg value="-s" />
+			<arg value="AithonProgrammer.app/Contents/MacOS/AithonProgrammer" />
+			<arg file="${dist.dir}/classes/mac/jEdit.app/Contents/Resources/Java/AithonLibrary/Programmer/MacOSX/AithonProgrammer" />
+		</exec>
+		<exec executable="chmod"
+		      failonerror="true">
+			<arg value="u+rwx" />
+			<arg file="${dist.dir}/classes/mac/jEdit.app/Contents/Resources/Java/AithonLibrary/Programmer/MacOSX/AithonProgrammer" />
+		</exec>
 		<delete file="${dist.dir}/${mac.disk.image.filename}"
 			failonerror="false"/>
 		<exec executable="hdiutil"
