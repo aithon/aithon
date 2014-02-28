@@ -225,6 +225,15 @@ implements ActionListener, EBComponent, AithonActions,
       //scroll the area
       console_area.setCaretPosition (console_area.getDocument().getLength());
     } else if (src == compileButton) { //check if compile clicked
+      compileCode();
+      console_area.setCaretPosition (console_area.getDocument().getLength());
+    }
+  }
+
+   public void compileCode() {
+      Buffer curr_buffer = jEdit.getLastBuffer();
+      Process compile;
+      String line, makefile_path, lib_path;
       try {
          //Location of makefile and main.c - make general with working directory somehow
          makefile_path = curr_buffer.getDirectory().replace(" ", "\\s");
@@ -244,11 +253,39 @@ implements ActionListener, EBComponent, AithonActions,
       } catch (IOException e) {
         System.err.println("Caught IOException: " + e.getMessage());
       }
-    }
-  }
 
-  //Finds default directory for compiler
-  private String detectAithonBoard() {
+      return;
+   }
+
+   public void rebuildCode() {
+      Buffer curr_buffer = jEdit.getLastBuffer();
+      Process compile;
+      String line, makefile_path, lib_path;
+      try {
+         //Location of makefile and main.c - make general with working directory somehow
+         makefile_path = curr_buffer.getDirectory().replace(" ", "\\s");
+         File dir = new File(makefile_path);    
+      	//Path environment variables - required for mac/linux, use null for windows
+        String env[] = {"PATH=/usr/bin:/bin:/usr/sbin:/Users/jseng/gccarm/bin:."};
+        //String env[] = null;
+        //String user_src = "USERFOLDER=\"" + curr_buffer.getDirectory().replace(" ", "\\s") + "\"";
+        
+        String make_cmd[] = {"make clean"};
+        //console_area.append(user_src + "\n");
+      	compile = r.exec(make_cmd, env, dir);
+      	inputStreamToOutputStream(compile.getInputStream());
+      	inputStreamToOutputStream(compile.getErrorStream());
+        //scroll the area
+        console_area.setCaretPosition (console_area.getDocument().getLength());
+      } catch (IOException e) {
+        System.err.println("Caught IOException: " + e.getMessage());
+      }
+
+      return;
+   }
+
+  //Detect if an Aithon board is present
+  public void detectAithonBoard() {
      Process detect;
      String path = "";
      String os = System.getProperty("os.name").toLowerCase();
@@ -279,7 +316,7 @@ implements ActionListener, EBComponent, AithonActions,
      }
 
      //jEdit.setProperty(AithonPlugin.OPTION_PREFIX + "gcc-filepath", path);
-     return path;
+     return;
   }
 
     //Finds default directory for compiler

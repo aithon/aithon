@@ -29,7 +29,10 @@ plugin.AithonPlugin.menu=aithon \
 	- \
 	aithon.choose-file \
 	aithon.save-file \
-	aithon.copy-to-buffer
+	aithon.copy-to-buffer \
+	aithon.detect \
+	aithon.compile \
+	aithon.rebuild
 
 # action labels for actions supplied by dockables.xml
 aithon.label=Aithon
@@ -38,6 +41,9 @@ aithon.label=Aithon
 aithon.choose-file.label=Choose notepad file
 aithon.save-file.label=Save notepad file
 aithon.copy-to-buffer.label=Copy notepad to buffer
+aithon.detect.label=Detect Aithon board
+aithon.compile.label=Compile
+aithon.rebuild.label=Rebuild Project
 
 # plugin option pane
 plugin.AithonPlugin.option-pane=aithon

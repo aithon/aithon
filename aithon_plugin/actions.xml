@@ -25,5 +25,26 @@
 			wm.getDockableWindow(AithonPlugin.NAME).copyToBuffer();
 		</CODE>
 	</ACTION>
+
+	<ACTION NAME="aithon.detect">
+		<CODE>
+			wm.addDockableWindow(AithonPlugin.NAME);
+			wm.getDockableWindow(AithonPlugin.NAME).detectAithonBoard();
+		</CODE>
+	</ACTION>
+
+	<ACTION NAME="aithon.compile">
+		<CODE>
+			wm.addDockableWindow(AithonPlugin.NAME);
+			wm.getDockableWindow(AithonPlugin.NAME).compileCode();
+		</CODE>
+	</ACTION>
+
+	<ACTION NAME="aithon.rebuild">
+		<CODE>
+			wm.addDockableWindow(AithonPlugin.NAME);
+			wm.getDockableWindow(AithonPlugin.NAME).rebuildCode();
+		</CODE>
+	</ACTION>
 </ACTIONS>
 
