@@ -13,14 +13,14 @@ endif
 
 # Compiler options here.
 USE_OPT = -O2 -ggdb -fomit-frame-pointer -falign-functions=16
-
-# C specific options here (added to USE_OPT).
-USE_COPT =
 ifeq ($(UNAME), windows32)
 	USE_OPT += -DDATE="\"$(shell cmd /C date /T)\""
 else
 	USE_OPT += -DDATE="\"$(shell date)\""
 endif
+
+# C specific options here (added to USE_OPT).
+USE_COPT =
 
 # C++ specific options here (added to USE_OPT).
 USE_CPPOPT = -fno-rtti

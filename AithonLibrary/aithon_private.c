@@ -2,7 +2,8 @@
 
 
 extern int __flash_start__;
-__attribute__ ((section(".flash_size"))) __attribute__ ((used)) int __dummy = (int)&__flash_start__;
+extern void ResetHandler(void);
+__attribute__((section(".flash_size"))) __attribute__((used)) int __dummy = (int)&__flash_start__;
 
 /**
  * @file    aithon_private.c
@@ -11,9 +12,11 @@ __attribute__ ((section(".flash_size"))) __attribute__ ((used)) int __dummy = (i
 
 void __late_init(void)
 {
-   // Need this because for some reason the used attribute doesn't work
-   // and the compiler will remove this variable if it's not used.
-   __dummy = __dummy;
+   // Need use __dummy because for some reason the used attribute doesn't work
+   // and the compiler will remove this variable if it's not used. So, we'll use
+   // it to do a simple sanity check that the program is in the right place.
+   if (*((uint32_t *)(__dummy+4)) != (uint32_t)ResetHandler)
+      NVIC_SystemReset();
    
    // initialize ChibiOS
    halInit();
