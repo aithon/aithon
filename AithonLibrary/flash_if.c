@@ -26,6 +26,38 @@
 /* Includes ------------------------------------------------------------------*/
 #include "flash_if.h"
 
+const uint32_t FLASH_SECTOR_ADDR[NUM_FLASH_SECTORS+1] = {
+	0x08000000, // Base address of Sector 0, 16 Kbyte */
+	0x08004000, // Base address of Sector 1, 16 Kbyte */
+	0x08008000, // Base address of Sector 2, 16 Kbyte */
+	0x0800C000, // Base address of Sector 3, 16 Kbyte */
+	0x08010000, // Base address of Sector 4, 64 Kbyte */
+	0x08020000, // Base address of Sector 5, 128 Kbyte */
+	0x08040000, // Base address of Sector 6, 128 Kbyte */
+	0x08060000, // Base address of Sector 7, 128 Kbyte */
+	// 512KB
+	0x08080000, // Base address of Sector 8, 128 Kbyte */
+	0x080A0000, // Base address of Sector 9, 128 Kbyte */
+	0x080C0000, // Base address of Sector 10, 128 Kbyte */
+	0x080E0000, // Base address of Sector 11, 128 Kbyte */
+	// 1MB
+	0x08100000, // Base address of Sector 13, 16 Kbyte */
+	0x08104000, // Base address of Sector 13, 16 Kbyte */
+	0x08108000, // Base address of Sector 14, 16 Kbyte */
+	0x0810C000, // Base address of Sector 15, 16 Kbyte */
+	0x08110000, // Base address of Sector 16, 64 Kbyte */
+	0x08120000, // Base address of Sector 17, 128 Kbyte */
+	0x08140000, // Base address of Sector 18, 128 Kbyte */
+	0x08160000, // Base address of Sector 19, 128 Kbyte */
+	// 1.5MB
+	0x08180000, // Base address of Sector 20, 128 Kbyte */
+	0x081A0000, // Base address of Sector 21, 128 Kbyte */
+	0x081C0000, // Base address of Sector 22, 128 Kbyte */
+	0x081E0000, // Base address of Sector 23, 128 Kbyte */
+	// 2MB
+	0x08200000  // NOT A REAL FLASH SECTOR
+};
+
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
@@ -52,7 +84,7 @@ static int _nextEraseSector = -1;
 static int _currentEraseSector = 0;
 FLASH_EraseResult FLASH_If_Erase_Start(void)
 {
-   _nextEraseSector = APPLICATION_START_SECTOR;
+   _nextEraseSector = FLASH_SECTORS[APPLICATION_FIRST_SECTOR];
    _currentEraseSector = 0;
    return FLASH_ERASE_IN_PROGRESS;
 }
@@ -79,7 +111,7 @@ FLASH_EraseResult FLASH_If_Erase_Status(uint16_t endSector)
    }
    else if (status == FLASH_COMPLETE)
    {
-      _nextEraseSector += (FLASH_Sector_1-FLASH_Sector_0);
+      _nextEraseSector += FLASH_SECTOR_DIFF;
       if (_nextEraseSector > endSector)
          return FLASH_ERASE_COMPLETE;
       else
@@ -100,7 +132,7 @@ FLASH_EraseResult FLASH_If_Erase_Status(uint16_t endSector)
 uint32_t FLASH_If_Erase(void)
 {
 	int i = 0;
-	for (i = APPLICATION_START_SECTOR; i <= APPLICATION_END_SECTOR; i += (FLASH_Sector_1-FLASH_Sector_0))
+	for (i = FLASH_SECTORS[APPLICATION_FIRST_SECTOR]; i <= FLASH_SECTORS[APPLICATION_LAST_SECTOR]; i += FLASH_SECTOR_DIFF)
 	{
 		/* Device voltage range supposed to be [2.7V to 3.6V], the operation will
 		be done by word */ 
@@ -128,7 +160,7 @@ uint32_t FLASH_If_Write(__IO uint32_t* FlashAddress, uint32_t* Data ,uint32_t Da
 {
 	uint32_t i = 0;
 
-	for (i = 0; (i < DataLength) && (*FlashAddress <= (APPLICATION_END_ADDRESS-4)); i++)
+	for (i = 0; (i < DataLength) && (*FlashAddress < (FLASH_SECTOR_ADDR[APPLICATION_LAST_SECTOR+1]-1)); i++)
 	{
 		/* Device voltage range supposed to be [2.7V to 3.6V], the operation will
 			be done by word */
@@ -155,57 +187,15 @@ uint32_t FLASH_If_Write(__IO uint32_t* FlashAddress, uint32_t* Data ,uint32_t Da
 
 uint16_t FLASH_Addr_To_Sector(uint32_t addr)
 {
-   if (addr < ADDR_FLASH_SECTOR_0)
-      return 0xFFFF;
-   if (addr < ADDR_FLASH_SECTOR_1)
-      return FLASH_Sector_0;
-   if (addr < ADDR_FLASH_SECTOR_2)
-      return FLASH_Sector_1;
-   if (addr < ADDR_FLASH_SECTOR_3)
-      return FLASH_Sector_2;
-   if (addr < ADDR_FLASH_SECTOR_4)
-      return FLASH_Sector_3;
-   if (addr < ADDR_FLASH_SECTOR_5)
-      return FLASH_Sector_4;
-   if (addr < ADDR_FLASH_SECTOR_6)
-      return FLASH_Sector_5;
-   if (addr < ADDR_FLASH_SECTOR_7)
-      return FLASH_Sector_6;
-   if (addr < ADDR_FLASH_SECTOR_8)
-      return FLASH_Sector_7;
-   if (addr < ADDR_FLASH_SECTOR_9)
-      return FLASH_Sector_8;
-   if (addr < ADDR_FLASH_SECTOR_10)
-      return FLASH_Sector_9;
-   if (addr < ADDR_FLASH_SECTOR_11)
-      return FLASH_Sector_10;
-   if (addr < ADDR_FLASH_SECTOR_12)
-      return FLASH_Sector_11;
-   if (addr < ADDR_FLASH_SECTOR_13)
-      return FLASH_Sector_12;
-   if (addr < ADDR_FLASH_SECTOR_14)
-      return FLASH_Sector_13;
-   if (addr < ADDR_FLASH_SECTOR_15)
-      return FLASH_Sector_14;
-   if (addr < ADDR_FLASH_SECTOR_16)
-      return FLASH_Sector_15;
-   if (addr < ADDR_FLASH_SECTOR_17)
-      return FLASH_Sector_16;
-   if (addr < ADDR_FLASH_SECTOR_18)
-      return FLASH_Sector_17;
-   if (addr < ADDR_FLASH_SECTOR_19)
-      return FLASH_Sector_18;
-   if (addr < ADDR_FLASH_SECTOR_20)
-      return FLASH_Sector_19;
-   if (addr < ADDR_FLASH_SECTOR_21)
-      return FLASH_Sector_20;
-   if (addr < ADDR_FLASH_SECTOR_22)
-      return FLASH_Sector_21;
-   if (addr < ADDR_FLASH_SECTOR_23)
-      return FLASH_Sector_22;
-   if (addr < ADDR_FLASH_SECTOR_24)
-      return FLASH_Sector_23;
-      
+   int i;
+   for (i = 0; i < NUM_FLASH_SECTORS; i++)
+   {
+      if (addr >= FLASH_SECTOR_ADDR[i] && addr < FLASH_SECTOR_ADDR[i+1])
+      {
+         return FLASH_SECTORS[i];
+      }
+   }
+   
    return 0xFFFF;
 }
 

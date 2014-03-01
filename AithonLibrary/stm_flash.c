@@ -69,6 +69,33 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm_flash.h"
 
+const uint16_t FLASH_SECTORS[NUM_FLASH_SECTORS] = {
+	0x0000, /*!< Sector Number 0 */
+	0x0008, /*!< Sector Number 1 */
+	0x0010, /*!< Sector Number 2 */
+	0x0018, /*!< Sector Number 3 */
+	0x0020, /*!< Sector Number 4 */
+	0x0028, /*!< Sector Number 5 */
+	0x0030, /*!< Sector Number 6 */
+	0x0038, /*!< Sector Number 7 */
+	0x0040, /*!< Sector Number 8 */
+	0x0048, /*!< Sector Number 9 */
+	0x0050, /*!< Sector Number 10 */
+	0x0058, /*!< Sector Number 11 */
+	0x0060, /*!< Sector Number 12 */
+	0x0068, /*!< Sector Number 13 */
+	0x0070, /*!< Sector Number 14 */
+	0x0078, /*!< Sector Number 15 */
+	0x0080, /*!< Sector Number 16 */
+	0x0088, /*!< Sector Number 17 */
+	0x0090, /*!< Sector Number 18 */
+	0x0098, /*!< Sector Number 19 */
+	0x00A0, /*!< Sector Number 20 */
+	0x00A8, /*!< Sector Number 21 */
+	0x00B0, /*!< Sector Number 22 */
+	0x00B8, /*!< Sector Number 23 */
+};
+
 /** @addtogroup STM32F4xx_StdPeriph_Driver
   * @{
   */
@@ -314,7 +341,7 @@ void FLASH_Lock(void)
   * @brief  Erases a specified FLASH Sector.
   *   
   * @param  FLASH_Sector: The Sector number to be erased.
-  *          This parameter can be a value between FLASH_Sector_0 and FLASH_Sector_11
+  *          This parameter can be a value between FLASH_SECTORS[0] and FLASH_SECTORS[11]
   *    
   * @param  VoltageRange: The device voltage range which defines the erase parallelism.  
   *          This parameter can be one of the following values:

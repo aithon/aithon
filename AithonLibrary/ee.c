@@ -30,10 +30,7 @@ typedef struct {
 } PageInfo;
 
 // Internal page information
-PageInfo _pages[2] = {
-   {0, EEPROM_PAGE0_START_ADDRESS, EEPROM_PAGE0_END_ADDRESS, EEPROM_PAGE0_SECTOR, INVALID_STATE},
-   {1, EEPROM_PAGE1_START_ADDRESS, EEPROM_PAGE1_END_ADDRESS, EEPROM_PAGE1_SECTOR, INVALID_STATE}
-};
+PageInfo _pages[2];
 
 // Map to go from virtual address to real address (relative to start of page)
 uint16_t _addrMap[MAX_ADDRESS];
@@ -194,8 +191,16 @@ uint16_t _pageTransfer(uint16_t VirtAddress, uint16_t Data)
 uint16_t _ee_init(void)
 {
    FLASH_Unlock();
-   // Initialize cached page state members
+   // Initialize _pages structs
+   _pages[0].pageNum = 0;
+   _pages[0].start = FLASH_SECTOR_ADDR[EEPROM_PAGE0_FIRST_SECTOR];
+   _pages[0].end = FLASH_SECTOR_ADDR[EEPROM_PAGE0_LAST_SECTOR+1]-1;
+   _pages[0].sector = FLASH_SECTORS[EEPROM_PAGE0_FIRST_SECTOR];
    _pages[0].state = (*(__IO uint16_t*)_pages[0].start);
+   _pages[1].pageNum = 1;
+   _pages[1].start = FLASH_SECTOR_ADDR[EEPROM_PAGE1_FIRST_SECTOR];
+   _pages[1].end = FLASH_SECTOR_ADDR[EEPROM_PAGE1_LAST_SECTOR+1]-1;
+   _pages[1].sector = FLASH_SECTORS[EEPROM_PAGE1_FIRST_SECTOR];
    _pages[1].state = (*(__IO uint16_t*)_pages[1].start);
    
    int i;

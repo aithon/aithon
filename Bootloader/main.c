@@ -76,18 +76,18 @@ void flushInterface(void)
 void startProgram(void)
 {
    /* Jump to user application */
-   funcPtr userAppStart = (funcPtr) (*(__IO uint32_t*) (APPLICATION_START_ADDRESS + 4));
+   funcPtr userAppStart = (funcPtr) (*(__IO uint32_t*) (FLASH_SECTOR_ADDR[APPLICATION_FIRST_SECTOR] + 4));
    /* Initialize user application's Stack Pointer */
-   __set_MSP(*(__IO uint32_t*) APPLICATION_START_ADDRESS);
+   __set_MSP(*(__IO uint32_t*) FLASH_SECTOR_ADDR[APPLICATION_FIRST_SECTOR]);
    userAppStart();
 }
 
 void startDemoProgram(void)
 {
    /* Jump to user application */
-   funcPtr userAppStart = (funcPtr) (*(__IO uint32_t*) (DEMO_START_ADDRESS + 4));
+   funcPtr userAppStart = (funcPtr) (*(__IO uint32_t*) (FLASH_SECTOR_ADDR[DEMO_FIRST_SECTOR] + 4));
    /* Initialize user application's Stack Pointer */
-   __set_MSP(*(__IO uint32_t*) DEMO_START_ADDRESS);
+   __set_MSP(*(__IO uint32_t*) FLASH_SECTOR_ADDR[DEMO_FIRST_SECTOR]);
    userAppStart();
 }
 
@@ -105,14 +105,13 @@ uint8_t calcChecksum(uint8_t *bytes, int len)
 
 void updateProgram(void)
 {
-   int clear = 0;
    int cmdByte, i, temp;
    FLASH_EraseResult result;
    uint32_t addr, maxAddr = 0;
    uint16_t endSector = 0xFFFF;
    _ee_getReserved(_AI_EE_RES_ADDR_MAX_SECTOR, &endSector);
-   if (endSector > APPLICATION_END_SECTOR || !IS_FLASH_SECTOR(endSector))
-      endSector = APPLICATION_END_SECTOR;
+   if (endSector > FLASH_SECTORS[APPLICATION_LAST_SECTOR] || !IS_FLASH_SECTOR(endSector))
+      endSector = FLASH_SECTORS[APPLICATION_LAST_SECTOR];
 
    lcd_clear();
    lcd_printf("Aithon Board\nProgramming...");
@@ -164,7 +163,7 @@ void updateProgram(void)
          {
             sendResponse(SET_ADDR, ACK);
             // We'll get relative addresses, so add the start address.
-            addr += APPLICATION_START_ADDRESS;
+            addr += FLASH_SECTOR_ADDR[APPLICATION_FIRST_SECTOR];
          }
          break;
       case CHECK_ADDR:
@@ -175,12 +174,12 @@ void updateProgram(void)
          else
          {
             // Subtract the start address before calculating the checksum
-            addr -= APPLICATION_START_ADDRESS;
+            addr -= FLASH_SECTOR_ADDR[APPLICATION_FIRST_SECTOR];
             if (temp == calcChecksum((uint8_t *)&addr, 4))
                sendResponse(CHECK_ADDR, ACK);
             else
                sendResponse(CHECK_ADDR, NACK);
-            addr += APPLICATION_START_ADDRESS;
+            addr += FLASH_SECTOR_ADDR[APPLICATION_FIRST_SECTOR];
          }
          break;
       case FILL_BUFFER:
@@ -220,11 +219,6 @@ void updateProgram(void)
          return;
       case Q_TIMEOUT:
       default:
-         if (clear == 0) {
-           lcd_clear();
-           clear = 1;
-         }
-         lcd_printf ("0%x ", cmdByte); 
          break;
       }
    }
@@ -270,7 +264,7 @@ int main(void)
             displayCountdown = TRUE;
          }
 
-         // show the bootloader build date if button 0 pressed
+         // start the demo program if button 0 is pressed
          if (button_get(0) && displayCountdown) 
          {
             if (i > (.03 * BOOT_TIMEOUT)) 

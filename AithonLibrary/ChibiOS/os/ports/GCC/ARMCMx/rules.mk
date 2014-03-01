@@ -119,9 +119,9 @@ ifneq ($(USE_VERBOSE_COMPILE),yes)
 	@echo
 endif
 ifeq ($(OS), windows32)
-	md $(BUILDDIR)
-	md $(BUILDDIR)\obj
-	md $(BUILDDIR)\lst
+	mkdir $(BUILDDIR)
+	mkdir $(BUILDDIR)\obj
+	mkdir $(BUILDDIR)\lst
 else
 	mkdir -p $(OBJDIR)
 	mkdir -p $(LSTDIR)

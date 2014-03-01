@@ -17,7 +17,7 @@ void updateBootloader(void)
 
    //erase the bootloader flash sectors
    i = 0;
-   for (i = FLASH_Sector_0; i <= FLASH_Sector_1; i += (FLASH_Sector_1-FLASH_Sector_0))
+   for (i = FLASH_SECTORS[BOOTLOADER_FIRST_SECTOR]; i <= FLASH_SECTORS[BOOTLOADER_LAST_SECTOR]; i += FLASH_SECTOR_DIFF)
    {
       /* Device voltage range supposed to be [2.7V to 3.6V], the operation will
        *                 be done by word */
@@ -33,7 +33,7 @@ void updateBootloader(void)
    }
 
    //write the bootloader to the flash
-   addr = ADDR_FLASH_SECTOR_0;
+   addr = FLASH_SECTOR_ADDR[BOOTLOADER_FIRST_SECTOR];
    stat = FLASH_If_Write((__IO uint32_t *)&addr, (uint32_t *)bootloader, lines);
    lcd_clear();
    if (stat == 2) {
@@ -56,7 +56,7 @@ int main(void)
 
    //check that the bootloader has not already been flashed
    for (i=0;i<lines;i++) {
-      data = *(__IO uint32_t*) (ADDR_FLASH_SECTOR_0 + i*4); 
+      data = *(__IO uint32_t*) (FLASH_SECTOR_ADDR[BOOTLOADER_FIRST_SECTOR] + i*4); 
       if (bootloader[i] != data) {
          break;
       }
