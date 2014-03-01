@@ -90,24 +90,33 @@ void flushInterface(void)
       sdGet(_interface);
 }
 
-bool_t isValidProgramStart(uint16_t sector)
+extern int __ram_start__, __ram_end__;
+bool_t isValidProgramStart(uint32_t addr)
 {
-   uint32_t resetVector = (*(__IO uint32_t*) (FLASH_SECTOR_ADDR[sector] + 4));
-   return (resetVector != (uint32_t)-1);
+   uint32_t stackEnd = (*(__IO uint32_t*)(addr));
+   uint32_t resetVector = (*(__IO uint32_t*)(addr + 4));
+   if (resetVector == 0xFFFFFFFF)
+      return FALSE;
+   if (resetVector < addr)
+      return FALSE;
+   if (stackEnd < (uint32_t)&__ram_start__ || stackEnd > (uint32_t)&__ram_end__)
+      return FALSE;
+      
+   return TRUE;
 }
 
-void startProgram(uint16_t startSector)
+void startProgram(uint32_t startAddr)
 {
-   if (!isValidProgramStart(startSector))
+   if (!isValidProgramStart(startAddr))
    {
       lcd_clear();
       lcd_printf("No valid\nprogram found!");
       while(1);
    }
    /* Jump to user application */
-   funcPtr userAppStart = (funcPtr) (*(__IO uint32_t*) (FLASH_SECTOR_ADDR[startSector] + 4));
+   funcPtr userAppStart = (funcPtr) (*(__IO uint32_t*) (startAddr + 4));
    /* Initialize user application's Stack Pointer */
-   __set_MSP(*(__IO uint32_t*) FLASH_SECTOR_ADDR[startSector]);
+   __set_MSP(*(__IO uint32_t*) startAddr);
    userAppStart();
 }
 
@@ -237,7 +246,7 @@ void updateProgram(void)
          sendResponse(START_PROGRAM, ACK);
          flushInterface();
          delayMs(100);
-         startProgram(startSector);
+         startProgram(USER_START_ADDR);
          // ...should never get here
          return;
       case Q_TIMEOUT:
@@ -250,23 +259,25 @@ void updateProgram(void)
 int main(void)
 {
    bool_t isUserRun = FALSE;
-   bool_t displayCountdown = TRUE;
-   uint16_t bootByte;
-   _ee_getReserved(_AI_EE_RES_ADDR_BOOT, &bootByte);
+   uint16_t bootOptions;
+   _ee_getReserved(_AI_EE_RES_BOOT_OPTIONS, &bootOptions);
+   
    if (button_get(0) && button_get(1))
       // Both buttons are pressed so the user
       // wants to run the bootloader.
       isUserRun = TRUE;
-   else if (bootByte != _AI_EE_RES_VAL_BOOT_RUN)
+   else if (button_get(1))
+      startProgram(DEMO_START_ADDR);
+   else if ((bootOptions >> 12) != BOOT_MAGIC)
    {
-      if (isValidProgramStart(APPLICATION_FIRST_SECTOR))
-         startProgram(APPLICATION_FIRST_SECTOR);
+      if (isValidProgramStart(USER_START_ADDR))
+         startProgram(USER_START_ADDR);
       else
          // If there's no valid program, run the
          // bootloader in user-run mode.
          isUserRun = TRUE;
    }
-   _ee_putReserved(_AI_EE_RES_ADDR_BOOT, _AI_EE_RES_VAL_DEFAULT);
+   _ee_putReserved(_AI_EE_RES_BOOT_OPTIONS, (bootOptions & 0x0FFF));
 
    led_on(0);
    led_on(1);
@@ -286,18 +297,16 @@ int main(void)
          if (i % 1000 == 0)
          {
             lcd_cursor(0,0);
-            lcd_printf("Aithon Board  %2d ", (BOOT_TIMEOUT-i)/1000);
-            displayCountdown = TRUE;
+            lcd_printf("Aithon Board  %2d\n%s", (BOOT_TIMEOUT-i)/1000, DATE);
          }
 
-         // start the program if button 0 is pressed
-         if (button_get(0) && displayCountdown) 
-         {
-            if (i > (.03 * BOOT_TIMEOUT))
-            {
-               startProgram(DEMO_FIRST_SECTOR);
-            }
-         }
+         // start the user program if button 0 is pressed
+         if (button_get(0) && i > 1000 && isValidProgramStart(DEMO_START_ADDR)) 
+            startProgram(USER_START_ADDR);
+
+         // start the demo program if button 1 is pressed
+         if (button_get(1) && i > 1000 && isValidProgramStart(DEMO_START_ADDR)) 
+            startProgram(DEMO_START_ADDR);
       }
 
       // check all the interfaces for a SYNC
@@ -313,6 +322,6 @@ int main(void)
       }
       chThdSleepMilliseconds(1);
    }
-   startProgram(APPLICATION_FIRST_SECTOR);
+   startProgram(USER_START_ADDR);
    return 0;
 }

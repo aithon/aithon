@@ -5,6 +5,9 @@
 #define PACKET_LEN         1024
 #define BOOT_TIMEOUT       30000
 #define DEFAULT_TIMEOUT    1000
+#define BOOT_MAGIC         0xA
+#define DEMO_START_ADDR    0x08010000
+#define USER_START_ADDR    0x08020000
 
 
 // Commands

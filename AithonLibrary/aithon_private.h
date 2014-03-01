@@ -21,11 +21,7 @@ void _usb_stop(void);
 
 
 // reserved EEPROM addresses
-#define _AI_EE_RES_ADDR_BOOT        0x00 // should bootloader run
-
-// reserved EEPROM values
-#define _AI_EE_RES_VAL_BOOT_RUN     0xABCD // bootloader should run
-#define _AI_EE_RES_VAL_DEFAULT      0x00 // default value
+#define _AI_EE_RES_BOOT_OPTIONS     0x00 // options for the bootloader
 
 
 void _reset_to_bootloader(void);

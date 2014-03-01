@@ -55,7 +55,10 @@ void _default_exit(void)
 
 void _reset_to_bootloader(void)
 {
-   _ee_putReserved(_AI_EE_RES_ADDR_BOOT, _AI_EE_RES_VAL_BOOT_RUN);
+   uint16_t data = 0xFFFF;
+   _ee_getReserved(_AI_EE_RES_BOOT_OPTIONS, &data);
+   data = (data & 0xFFF) | 0xA000;
+   _ee_putReserved(_AI_EE_RES_BOOT_OPTIONS, data);
    NVIC_SystemReset();
 }
 
