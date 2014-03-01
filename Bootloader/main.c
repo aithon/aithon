@@ -213,7 +213,7 @@ void updateProgram(void)
          sendResponse(START_PROGRAM, ACK);
          flushInterface();
          _ee_putReserved(_AI_EE_RES_ADDR_MAX_SECTOR, FLASH_Addr_To_Sector(maxAddr));
-         delayS(1);
+         delayMs(100);
          startProgram();
          // ...should never get here
          return;
