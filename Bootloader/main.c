@@ -5,14 +5,18 @@
 #endif
 #define debugPrintf(fmt, ...) chprintf((BaseSequentialStream *)&SD2, fmt, ##__VA_ARGS__)
 
-extern Mutex _scrollMtx;
-
 void debugPrintCmd(int cmdByte)
 {
    switch (cmdByte)
    {
    case SYNC:
       debugPrintf("CMD: SYNC\r\n");
+      break;
+   case SET_START_ADDR:
+      debugPrintf("CMD: SET_START_ADDR\r\n");
+      break;
+   case SET_PROG_LEN:
+      debugPrintf("CMD: SET_PROG_LEN\r\n");
       break;
    case ERASE_FLASH_START:
       debugPrintf("CMD: ERASE_FLASH_START\r\n");
@@ -42,8 +46,11 @@ void debugPrintCmd(int cmdByte)
       debugPrintf("CMD: Q_TIMEOUT\r\n");
       break;
    default:
-      debugPrintf("CMD: UNKNOWN (0x%x|%d|%c)\r\n", cmdByte, cmdByte, cmdByte);
-      break;
+      debugPrintf("CMD: UNKNOWN (0x%x|%d", cmdByte, cmdByte);
+      if (cmdByte < ' ')
+         debugPrintf(")\r\n", cmdByte);
+      else
+         debugPrintf("|%c)\r\n", cmdByte);
    }
 }
 
@@ -57,19 +64,17 @@ int getByte(void)
    return sdGetTimeout(_interface, DEFAULT_TIMEOUT);
 }
 
-uint32_t getAddr(void)
+bool_t getBytes(uint8_t *data, int numBytes)
 {
-   // Read in the address, MSB first
    int temp, i;
-   uint32_t addr = 0;
-   for (i = 0; i < 4; i++)
+   for (i = 0; i < numBytes; i++)
    {
       if ((temp = getByte()) == Q_TIMEOUT)
-         return 0;
-      addr |= (((uint8_t) temp) & 0xFF) << (i * 8);
+         return FALSE;
+      data[i] = (uint8_t)temp;
    }
    
-   return addr;
+   return TRUE;
 }
 
 void flushInterface(void)
@@ -120,10 +125,11 @@ uint8_t calcChecksum(uint8_t *bytes, int len)
 
 void updateProgram(void)
 {
-   int cmdByte, i, temp;
+   int cmdByte;
    FLASH_EraseResult result;
-   uint32_t addr, numPackets;
-   uint16_t startSector = 0xFFFF, endSector = 0xFFFF;
+   uint32_t addr, temp;
+   int startSector = -1, endSector = -1;
+   uint8_t tempByte = 0;
 
    lcd_clear();
    lcd_printf("Aithon Board\nProgramming...");
@@ -144,37 +150,35 @@ void updateProgram(void)
          sendResponse(SYNC, ACK);
          break;
       case SET_START_ADDR:
-         temp = getAddr();
-         
-         if (!temp)
+         if (!getBytes((uint8_t *)&temp, 4))
             sendResponse(SET_START_ADDR, NACK);
          else
          {
-            startSector = FLASH_Addr_To_Sector(temp);
-            if (startSector == (uint16_t)-1)
+            startSector = FLASH_Addr_To_Index(temp);
+            if (startSector == -1)
                sendResponse(SET_START_ADDR, NACK);
             else
                sendResponse(SET_START_ADDR, ACK);
          }
          break;
       case SET_PROG_LEN:
-         numPackets = getAddr();
-         if (!numPackets)
+         if (!getBytes((uint8_t *)&temp, 4))
             sendResponse(SET_PROG_LEN, NACK);
          else
          {
-            endSector = FLASH_Addr_To_Sector(FLASH_SECTOR_ADDR[startSector] + ((uint32_t)numPackets)*1024 - 1);
+            uint32_t endAddr = FLASH_SECTOR_ADDR[startSector] + (temp * PACKET_LEN) - 1;
+            endSector = FLASH_Addr_To_Index(endAddr);
             sendResponse(SET_PROG_LEN, ACK);
          }
          break;
       case ERASE_FLASH_START:
-         if (startSector != 0xFFFF && FLASH_If_Erase_Start(FLASH_SECTORS[startSector]) == FLASH_ERASE_IN_PROGRESS)
+         if (startSector != -1 && FLASH_If_Erase_Start(FLASH_SECTORS[startSector]) == FLASH_ERASE_IN_PROGRESS)
             sendResponse(ERASE_FLASH_START, ACK);
          else
             sendResponse(ERASE_FLASH_START, NACK);
          break;
       case ERASE_FLASH_STATUS:
-         result = FLASH_If_Erase_Status(endSector);
+         result = FLASH_If_Erase_Status(FLASH_SECTORS[endSector]);
          if (result == FLASH_ERASE_COMPLETE)
             sendResponse(ERASE_FLASH_STATUS, ACK);
          else if (result == FLASH_ERASE_IN_PROGRESS)
@@ -183,29 +187,26 @@ void updateProgram(void)
             sendResponse(ERASE_FLASH_STATUS, NACK);
          break;
       case SET_ADDR:
-         // Read in the address, MSB first.
-         addr = getAddr();
-
-         // Check for errors.
-         if (!addr)
+         // Read in the address
+         if (!getBytes((uint8_t *)&addr, 4))
             sendResponse(SET_ADDR, NACK);
          else
          {
             sendResponse(SET_ADDR, ACK);
             // We'll get relative addresses, so add the start address.
             addr += FLASH_SECTOR_ADDR[startSector];
+            debugPrintf("Set ADDR to %x\r\n", addr);
          }
          break;
       case CHECK_ADDR:
          // Get the checksum
-         temp = getByte();
-         if (temp == Q_TIMEOUT)
+         if (!getBytes((uint8_t *)&tempByte, 1))
             sendResponse(CHECK_ADDR, NACK);
          else
          {
             // Subtract the start address before calculating the checksum
             addr -= FLASH_SECTOR_ADDR[startSector];
-            if (temp == calcChecksum((uint8_t *)&addr, 4))
+            if (tempByte == calcChecksum((uint8_t *)&addr, 4))
                sendResponse(CHECK_ADDR, ACK);
             else
                sendResponse(CHECK_ADDR, NACK);
@@ -213,26 +214,20 @@ void updateProgram(void)
          }
          break;
       case FILL_BUFFER:
-         for (i = 0; i < PACKET_LEN; i++)
-         {
-            if ((temp = getByte()) == Q_TIMEOUT)
-               break;
-            _buffer[i] = (uint8_t) (temp & 0xFF);
-         }
-         if (temp == Q_TIMEOUT)
+         if (!getBytes(_buffer, PACKET_LEN))
             sendResponse(FILL_BUFFER, NACK);
          else
             sendResponse(FILL_BUFFER, ACK);
          break;
       case CHECK_BUFFER:
          // Get the checksum
-         temp = getByte();
-         if (temp != Q_TIMEOUT && temp == calcChecksum(_buffer, PACKET_LEN))
-            sendResponse(CHECK_BUFFER, ACK);
-         else
+         if (!getBytes((uint8_t *)&tempByte, 1) || tempByte != calcChecksum(_buffer, PACKET_LEN))
             sendResponse(CHECK_BUFFER, NACK);
+         else
+            sendResponse(CHECK_BUFFER, ACK);
          break;
       case COMMIT_BUFFER:
+         debugPrintf("Writing at %x\r\n", addr);
          if (FLASH_If_Write((__IO uint32_t *)&addr, (uint32_t *)_buffer, PACKET_LEN/4))
             sendResponse(COMMIT_BUFFER, NACK);
          else

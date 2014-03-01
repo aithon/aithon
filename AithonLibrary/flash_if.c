@@ -162,18 +162,18 @@ uint32_t FLASH_If_Write(__IO uint32_t* FlashAddress, uint32_t* Data ,uint32_t Da
 	return 0;
 }
 
-uint16_t FLASH_Addr_To_Sector(uint32_t addr)
+int FLASH_Addr_To_Index(uint32_t addr)
 {
    int i;
    for (i = 0; i < NUM_FLASH_SECTORS; i++)
    {
       if (addr >= FLASH_SECTOR_ADDR[i] && addr < FLASH_SECTOR_ADDR[i+1])
       {
-         return FLASH_SECTORS[i];
+         return i;
       }
    }
    
-   return 0xFFFF;
+   return -1;
 }
 
 /**

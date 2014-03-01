@@ -58,7 +58,7 @@ void FLASH_If_Init(void);
 FLASH_EraseResult FLASH_If_Erase_Start(uint16_t startSector);
 FLASH_EraseResult FLASH_If_Erase_Status(uint16_t endSector);
 uint32_t FLASH_If_Write(__IO uint32_t* FlashAddress, uint32_t* Data, uint32_t DataLength);
-uint16_t FLASH_Addr_To_Sector(uint32_t addr);
+int FLASH_Addr_To_Index(uint32_t addr);
 
 
 #endif  /* __FLASH_IF_H */
