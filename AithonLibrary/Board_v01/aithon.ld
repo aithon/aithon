@@ -153,10 +153,10 @@ SECTIONS
         PROVIDE(_bss_end = .);
     } > ram
 	 
-	 .test_section :
+	 .flash_size :
 	 {
 		. = ALIGN(4);
-		*(.test_section)
+		*(.flash_size)
 	 } > flash
 }
 

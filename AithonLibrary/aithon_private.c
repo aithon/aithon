@@ -2,7 +2,7 @@
 
 
 extern int __flash_start__;
-__attribute__ ((section(".test_section"))) __attribute__ ((used)) int test_variable = (int)&__flash_start__;
+__attribute__ ((section(".flash_size"))) __attribute__ ((used)) int __dummy = (int)&__flash_start__;
 
 /**
  * @file    aithon_private.c
@@ -11,8 +11,9 @@ __attribute__ ((section(".test_section"))) __attribute__ ((used)) int test_varia
 
 void __late_init(void)
 {
-   // need this because for some reason the used attribute doesn't work
-   test_variable = test_variable;
+   // Need this because for some reason the used attribute doesn't work
+   // and the compiler will remove this variable if it's not used.
+   __dummy = __dummy;
    
    // initialize ChibiOS
    halInit();
