@@ -9,6 +9,8 @@
 
 // Commands
 #define SYNC               0x01
+#define SET_START_ADDR     0x2A
+#define SET_PROG_LEN       0x07
 #define ERASE_FLASH_START  0x1B
 #define ERASE_FLASH_STATUS 0x09
 #define SET_ADDR           0x1A

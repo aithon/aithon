@@ -28,13 +28,6 @@
 #ifndef _CHCONF_H_
 #define _CHCONF_H_
 
-#ifdef USE_IAP
-#define CORTEX_VTOR_INIT 0x00020000
-#endif
-#ifdef USE_DEMO_MODE
-#define CORTEX_VTOR_INIT 0x00010000
-#endif
-
 /*===========================================================================*/
 /**
  * @name Kernel parameters and options

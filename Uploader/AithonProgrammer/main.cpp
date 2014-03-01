@@ -41,6 +41,8 @@ extern "C" {
 
 // Commands
 #define SYNC               0x01
+#define SET_START_ADDR     0x2A
+#define SET_PROG_LEN       0x07
 #define ERASE_FLASH_START  0x1B
 #define ERASE_FLASH_STATUS 0x09
 #define SET_ADDR           0x1A
@@ -90,6 +92,7 @@ QString _portName;
 QByteArray _programData;
 error_t _error;
 int _numPackets;
+uint32_t _startAddr;
 bool _debug = false;
 qint64 startTime = 0;
 #ifndef Q_OS_WIN32
@@ -388,6 +391,8 @@ void readFile(QString fileName)
 
     std::cout << "Reading binary file...\t\t";
     _programData = file.readAll();
+    _startAddr = *((uint32_t *) _programData.right(4).data());
+    debug("Start address: "+QString::number(_startAddr, 16));
     while (_programData.length() % PACKET_LEN)
         _programData.append(0xFF);
     _numPackets = _programData.length() / PACKET_LEN;
@@ -465,6 +470,9 @@ state_t initChip()
 
 state_t eraseFlash()
 {
+    writeBytesAndAck(SET_START_ADDR, (uint8_t *)&_startAddr, 4);
+    writeBytesAndAck(SET_PROG_LEN, (uint8_t *)&_numPackets, 4);
+
     // send command
     writeAndAck(ERASE_FLASH_START, FLASH_TIMEOUT);
 

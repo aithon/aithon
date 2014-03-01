@@ -1,5 +1,9 @@
 #include "Aithon.h"
 
+
+extern int __flash_start__;
+__attribute__ ((section(".test_section"))) __attribute__ ((used)) int test_variable = (int)&__flash_start__;
+
 /**
  * @file    aithon_private.c
  * @brief   Private Aithon library functions - should NOT be called by user-applications.
@@ -7,6 +11,9 @@
 
 void __late_init(void)
 {
+   // need this because for some reason the used attribute doesn't work
+   test_variable = test_variable;
+   
    // initialize ChibiOS
    halInit();
    chSysInit();

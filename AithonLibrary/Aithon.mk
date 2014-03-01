@@ -16,6 +16,11 @@ USE_OPT = -O2 -ggdb -fomit-frame-pointer -falign-functions=16
 
 # C specific options here (added to USE_OPT).
 USE_COPT =
+ifeq ($(UNAME), windows32)
+	USE_OPT += -DDATE="\"$(shell cmd /C date /T)\""
+else
+	USE_OPT += -DDATE="\"$(shell date)\""
+endif
 
 # C++ specific options here (added to USE_OPT).
 USE_CPPOPT = -fno-rtti
@@ -61,30 +66,10 @@ endif
 
 # Directory containing board-specific files
 BOARDDIR = $(AITHON_LIBRARY)/Board_$(BOARD_REV)
-
-# use the appropriate linker script based on whether or not we're using an IAP
-ifdef IS_BOOTLOADER
-   LDSCRIPT = $(BOARDDIR)/AithonBootloader.ld
-ifeq ($(UNAME), windows32)
-	USE_COPT += -DDATE="\"$(shell cmd /C date /T)\""
-else
-	USE_COPT += -DDATE="\"$(shell date)\""
-endif
-else ifdef IS_DEMO_MODE
-ifeq ($(UNAME), windows32)
-	USE_COPT += -DDATE="\"$(shell cmd /C date /T)\""
-else
-	USE_COPT += -DDATE="\"$(shell date)\""
-   LDSCRIPT = $(BOARDDIR)/AithonDemoMode.ld
-   USE_COPT += -DUSE_DEMO_MODE
-endif
-else
-   LDSCRIPT = $(BOARDDIR)/AithonIAP.ld
-   USE_COPT += -DUSE_IAP
-endif
+LDSCRIPT = $(BOARDDIR)/aithon.ld
 
 
-USE_COPT += -DAITHON_$(BOARD_REV)
+USE_OPT += -DAITHON_$(BOARD_REV)
 
 # Imported source files and paths
 include $(CHIBIOS)/os/hal/platforms/STM32F4xx/platform.mk

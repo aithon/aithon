@@ -55,9 +55,21 @@ void sendResponse(uint8_t command, uint8_t response)
 int getByte(void)
 {
    return sdGetTimeout(_interface, DEFAULT_TIMEOUT);
-   //uint8_t cmd = 0;
-   //sdRead(_interface,&cmd,1);
-   //return cmd;
+}
+
+uint32_t getAddr(void)
+{
+   // Read in the address, MSB first
+   int temp, i;
+   uint32_t addr = 0;
+   for (i = 0; i < 4; i++)
+   {
+      if ((temp = getByte()) == Q_TIMEOUT)
+         return 0;
+      addr |= (((uint8_t) temp) & 0xFF) << (i * 8);
+   }
+   
+   return addr;
 }
 
 void flushInterface(void)
@@ -73,21 +85,24 @@ void flushInterface(void)
       sdGet(_interface);
 }
 
-void startProgram(void)
+bool_t isValidProgramStart(uint16_t sector)
 {
-   /* Jump to user application */
-   funcPtr userAppStart = (funcPtr) (*(__IO uint32_t*) (FLASH_SECTOR_ADDR[APPLICATION_FIRST_SECTOR] + 4));
-   /* Initialize user application's Stack Pointer */
-   __set_MSP(*(__IO uint32_t*) FLASH_SECTOR_ADDR[APPLICATION_FIRST_SECTOR]);
-   userAppStart();
+   uint32_t resetVector = (*(__IO uint32_t*) (FLASH_SECTOR_ADDR[sector] + 4));
+   return (resetVector != (uint32_t)-1);
 }
 
-void startDemoProgram(void)
+void startProgram(uint16_t startSector)
 {
+   if (!isValidProgramStart(startSector))
+   {
+      lcd_clear();
+      lcd_printf("No valid\nprogram found!");
+      while(1);
+   }
    /* Jump to user application */
-   funcPtr userAppStart = (funcPtr) (*(__IO uint32_t*) (FLASH_SECTOR_ADDR[DEMO_FIRST_SECTOR] + 4));
+   funcPtr userAppStart = (funcPtr) (*(__IO uint32_t*) (FLASH_SECTOR_ADDR[startSector] + 4));
    /* Initialize user application's Stack Pointer */
-   __set_MSP(*(__IO uint32_t*) FLASH_SECTOR_ADDR[DEMO_FIRST_SECTOR]);
+   __set_MSP(*(__IO uint32_t*) FLASH_SECTOR_ADDR[startSector]);
    userAppStart();
 }
 
@@ -107,11 +122,8 @@ void updateProgram(void)
 {
    int cmdByte, i, temp;
    FLASH_EraseResult result;
-   uint32_t addr, maxAddr = 0;
-   uint16_t endSector = 0xFFFF;
-   _ee_getReserved(_AI_EE_RES_ADDR_MAX_SECTOR, &endSector);
-   if (endSector > FLASH_SECTORS[APPLICATION_LAST_SECTOR] || !IS_FLASH_SECTOR(endSector))
-      endSector = FLASH_SECTORS[APPLICATION_LAST_SECTOR];
+   uint32_t addr, numPackets;
+   uint16_t startSector = 0xFFFF, endSector = 0xFFFF;
 
    lcd_clear();
    lcd_printf("Aithon Board\nProgramming...");
@@ -131,8 +143,32 @@ void updateProgram(void)
          flushInterface();
          sendResponse(SYNC, ACK);
          break;
+      case SET_START_ADDR:
+         temp = getAddr();
+         
+         if (!temp)
+            sendResponse(SET_START_ADDR, NACK);
+         else
+         {
+            startSector = FLASH_Addr_To_Sector(temp);
+            if (startSector == (uint16_t)-1)
+               sendResponse(SET_START_ADDR, NACK);
+            else
+               sendResponse(SET_START_ADDR, ACK);
+         }
+         break;
+      case SET_PROG_LEN:
+         numPackets = getAddr();
+         if (!numPackets)
+            sendResponse(SET_PROG_LEN, NACK);
+         else
+         {
+            endSector = FLASH_Addr_To_Sector(FLASH_SECTOR_ADDR[startSector] + ((uint32_t)numPackets)*1024 - 1);
+            sendResponse(SET_PROG_LEN, ACK);
+         }
+         break;
       case ERASE_FLASH_START:
-         if (FLASH_If_Erase_Start() == FLASH_ERASE_IN_PROGRESS)
+         if (startSector != 0xFFFF && FLASH_If_Erase_Start(FLASH_SECTORS[startSector]) == FLASH_ERASE_IN_PROGRESS)
             sendResponse(ERASE_FLASH_START, ACK);
          else
             sendResponse(ERASE_FLASH_START, NACK);
@@ -148,22 +184,16 @@ void updateProgram(void)
          break;
       case SET_ADDR:
          // Read in the address, MSB first.
-         addr = 0;
-         for (i = 0; i < 4; i++)
-         {
-            if ((temp = getByte()) == Q_TIMEOUT)
-               break;
-            addr |= (((uint8_t) temp) & 0xFF) << (i * 8);
-         }
+         addr = getAddr();
 
          // Check for errors.
-         if (temp == Q_TIMEOUT)
+         if (!addr)
             sendResponse(SET_ADDR, NACK);
          else
          {
             sendResponse(SET_ADDR, ACK);
             // We'll get relative addresses, so add the start address.
-            addr += FLASH_SECTOR_ADDR[APPLICATION_FIRST_SECTOR];
+            addr += FLASH_SECTOR_ADDR[startSector];
          }
          break;
       case CHECK_ADDR:
@@ -174,12 +204,12 @@ void updateProgram(void)
          else
          {
             // Subtract the start address before calculating the checksum
-            addr -= FLASH_SECTOR_ADDR[APPLICATION_FIRST_SECTOR];
+            addr -= FLASH_SECTOR_ADDR[startSector];
             if (temp == calcChecksum((uint8_t *)&addr, 4))
                sendResponse(CHECK_ADDR, ACK);
             else
                sendResponse(CHECK_ADDR, NACK);
-            addr += FLASH_SECTOR_ADDR[APPLICATION_FIRST_SECTOR];
+            addr += FLASH_SECTOR_ADDR[startSector];
          }
          break;
       case FILL_BUFFER:
@@ -203,7 +233,6 @@ void updateProgram(void)
             sendResponse(CHECK_BUFFER, NACK);
          break;
       case COMMIT_BUFFER:
-         maxAddr = addr + PACKET_LEN - 1;
          if (FLASH_If_Write((__IO uint32_t *)&addr, (uint32_t *)_buffer, PACKET_LEN/4))
             sendResponse(COMMIT_BUFFER, NACK);
          else
@@ -212,9 +241,8 @@ void updateProgram(void)
       case START_PROGRAM:
          sendResponse(START_PROGRAM, ACK);
          flushInterface();
-         _ee_putReserved(_AI_EE_RES_ADDR_MAX_SECTOR, FLASH_Addr_To_Sector(maxAddr));
          delayMs(100);
-         startProgram();
+         startProgram(startSector);
          // ...should never get here
          return;
       case Q_TIMEOUT:
@@ -231,14 +259,17 @@ int main(void)
    uint16_t bootByte;
    _ee_getReserved(_AI_EE_RES_ADDR_BOOT, &bootByte);
    if (button_get(0) && button_get(1))
-   {
       // Both buttons are pressed so the user
       // wants to run the bootloader.
       isUserRun = TRUE;
-   }
    else if (bootByte != _AI_EE_RES_VAL_BOOT_RUN)
    {
-      startProgram();
+      if (isValidProgramStart(APPLICATION_FIRST_SECTOR))
+         startProgram(APPLICATION_FIRST_SECTOR);
+      else
+         // If there's no valid program, run the
+         // bootloader in user-run mode.
+         isUserRun = TRUE;
    }
    _ee_putReserved(_AI_EE_RES_ADDR_BOOT, _AI_EE_RES_VAL_DEFAULT);
 
@@ -264,12 +295,12 @@ int main(void)
             displayCountdown = TRUE;
          }
 
-         // start the demo program if button 0 is pressed
+         // start the program if button 0 is pressed
          if (button_get(0) && displayCountdown) 
          {
-            if (i > (.03 * BOOT_TIMEOUT)) 
+            if (i > (.03 * BOOT_TIMEOUT))
             {
-               startDemoProgram();
+               startProgram(DEMO_FIRST_SECTOR);
             }
          }
       }
@@ -287,6 +318,6 @@ int main(void)
       }
       chThdSleepMilliseconds(1);
    }
-   startProgram();
+   startProgram(APPLICATION_FIRST_SECTOR);
    return 0;
 }

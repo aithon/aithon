@@ -82,9 +82,9 @@ void FLASH_If_Init(void)
 // Async erase wrapper function
 static int _nextEraseSector = -1;
 static int _currentEraseSector = 0;
-FLASH_EraseResult FLASH_If_Erase_Start(void)
+FLASH_EraseResult FLASH_If_Erase_Start(uint16_t startSector)
 {
-   _nextEraseSector = FLASH_SECTORS[APPLICATION_FIRST_SECTOR];
+   _nextEraseSector = startSector;
    _currentEraseSector = 0;
    return FLASH_ERASE_IN_PROGRESS;
 }
@@ -121,29 +121,6 @@ FLASH_EraseResult FLASH_If_Erase_Status(uint16_t endSector)
    {
       return FLASH_ERASE_COMPLETE;
    }
-}
-
-/**
-  * @brief  This function does an erase of all user flash area
-  * @param  StartSector: start of user flash area
-  * @retval 0: user flash area successfully erased
-  *         1: in progress
-  */
-uint32_t FLASH_If_Erase(void)
-{
-	int i = 0;
-	for (i = FLASH_SECTORS[APPLICATION_FIRST_SECTOR]; i <= FLASH_SECTORS[APPLICATION_LAST_SECTOR]; i += FLASH_SECTOR_DIFF)
-	{
-		/* Device voltage range supposed to be [2.7V to 3.6V], the operation will
-		be done by word */ 
-		if (FLASH_EraseSector(i, VoltageRange_3) != FLASH_COMPLETE)
-		{
-			/* Error occurred while page erase */
-			return 1;
-		}
-	}
-
-	return 0;
 }
 
 /**

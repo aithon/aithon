@@ -56,6 +56,11 @@ ADEFS 	  = $(DADEFS) $(UADEFS)
 # Libs
 LIBS      = $(DLIBS) $(ULIBS)
 
+# flash.ld definitions
+FLASHLD = $(BUILDDIR)/flash.ld
+FLASH_ORIG ?= 0x08020000
+FLASH_LEN ?= 896k
+
 # Various settings
 MCFLAGS   = -mcpu=$(MCU)
 ODFLAGS	  = -x --syms
@@ -64,9 +69,9 @@ ASXFLAGS  = $(MCFLAGS) -Wa,-amhls=$(LSTDIR)/$(notdir $(<:.S=.lst)) $(ADEFS)
 CFLAGS    = $(MCFLAGS) $(OPT) $(COPT) $(CWARN) -Wa,-alms=$(LSTDIR)/$(notdir $(<:.c=.lst)) $(DEFS)
 CPPFLAGS  = $(MCFLAGS) $(OPT) $(CPPOPT) $(CPPWARN) -Wa,-alms=$(LSTDIR)/$(notdir $(<:.cpp=.lst)) $(DEFS)
 ifeq ($(USE_LINK_GC),yes)
-  LDFLAGS = $(MCFLAGS) -nostartfiles -T$(LDSCRIPT) -Wl,-Map=$(BUILDDIR)/$(PROJECT).map,--cref,--no-warn-mismatch,--gc-sections $(LLIBDIR)
+  LDFLAGS = $(MCFLAGS) -nostartfiles -T$(FLASHLD) -T$(LDSCRIPT) -Wl,-Map=$(BUILDDIR)/$(PROJECT).map,--cref,--no-warn-mismatch,--gc-sections $(LLIBDIR)
 else
-  LDFLAGS = $(MCFLAGS) -nostartfiles -T$(LDSCRIPT) -Wl,-Map=$(BUILDDIR)/$(PROJECT).map,--cref,--no-warn-mismatch $(LLIBDIR)
+  LDFLAGS = $(MCFLAGS) -nostartfiles -T$(FLASHLD) -T$(LDSCRIPT) -Wl,-Map=$(BUILDDIR)/$(PROJECT).map,--cref,--no-warn-mismatch $(LLIBDIR)
 endif
 
 # Thumb interwork enabled only if needed because it kills performance.
@@ -181,7 +186,17 @@ else
 	@$(CC) -c $(ASXFLAGS) $(TOPT) -I. $(IINCDIR) $< -o $@
 endif
 
-%.elf: $(OBJS) $(LDSCRIPT)
+$(FLASHLD): $(OBJS)
+ifeq ($(USE_VERBOSE_COMPILE),yes)
+	@echo
+	echo "MEMORY {flash : org = $(FLASH_ORIG), len = $(FLASH_LEN)}" > $(FLASHLD)
+	$(LD) $(OBJS) $(LDFLAGS) $(LIBS) -o $@
+else
+	@echo Creating $@
+	@echo "MEMORY {flash : org = $(FLASH_ORIG), len = $(FLASH_LEN)}" > $(FLASHLD)
+endif
+
+%.elf: $(OBJS) $(LDSCRIPT) $(FLASHLD)
 ifeq ($(USE_VERBOSE_COMPILE),yes)
 	@echo
 	$(LD) $(OBJS) $(LDFLAGS) $(LIBS) -o $@
@@ -190,7 +205,7 @@ else
 	@$(LD) $(OBJS) $(LDFLAGS) $(LIBS) -o $@
 endif
 
-%.hex: %.elf $(LDSCRIPT)
+%.hex: %.elf $(LDSCRIPT) $(FLASHLD)
 ifeq ($(USE_VERBOSE_COMPILE),yes)
 	$(HEX) $< $@
 else
@@ -198,7 +213,7 @@ else
 	@$(HEX) $< $@
 endif
 
-%.bin: %.elf $(LDSCRIPT)
+%.bin: %.elf $(LDSCRIPT) $(FLASHLD)
 ifeq ($(USE_VERBOSE_COMPILE),yes)
 	$(BIN) $< $@
 else
@@ -206,7 +221,7 @@ else
 	@$(BIN) $< $@
 endif
 
-%.dmp: %.elf $(LDSCRIPT)
+%.dmp: %.elf $(LDSCRIPT) $(FLASHLD)
 ifeq ($(USE_VERBOSE_COMPILE),yes)
 	$(OD) $(ODFLAGS) $< > $@
 else

@@ -115,10 +115,11 @@ void PendSVVector(void) {
 /**
  * @brief   Port-related initialization code.
  */
+extern unsigned int __flash_start__;
 void _port_init(void) {
 
   /* Initialization of the vector table and priority related settings.*/
-  SCB_VTOR = CORTEX_VTOR_INIT;
+  SCB_VTOR = (uint32_t)&__flash_start__ - 0x08000000;
   SCB_AIRCR = AIRCR_VECTKEY | AIRCR_PRIGROUP(CORTEX_PRIGROUP_INIT);
 
   /* Initialization of the system vectors used by the port.*/

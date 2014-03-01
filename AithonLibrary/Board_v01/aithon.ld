@@ -26,14 +26,13 @@
 */
 
 /*
- * ST32F407xG memory setup.
+ * ST32F437xG memory setup.
  */
 __main_stack_size__     = 0x0400;
 __process_stack_size__  = 0x0400;
 
 MEMORY
 {
-    flash : org = 0x08010000, len = 64k
     ram : org = 0x20000000, len = 112k
     ethram : org = 0x2001C000, len = 16k
     ccmram : org = 0x10000000, len = 64k
@@ -42,6 +41,8 @@ MEMORY
 __ram_start__           = ORIGIN(ram);
 __ram_size__            = LENGTH(ram);
 __ram_end__             = __ram_start__ + __ram_size__;
+__flash_start__         = ORIGIN(flash);
+ASSERT((LENGTH(flash) + 1), "No flash section.")
 
 SECTIONS
 {
@@ -107,6 +108,7 @@ SECTIONS
         . = ALIGN(8);
     } > flash
 
+    . = ALIGN(4);
     _etext = .;
     _textdata = _etext;
 
@@ -149,7 +151,13 @@ SECTIONS
         *(COMMON)
         . = ALIGN(4);
         PROVIDE(_bss_end = .);
-    } > ram    
+    } > ram
+	 
+	 .test_section :
+	 {
+		. = ALIGN(4);
+		*(.test_section)
+	 } > flash
 }
 
 PROVIDE(end = .);
