@@ -9906,8 +9906,8 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <part name="SUPPLY32" library="supply2" deviceset="GND" device=""/>
 <part name="SUPPLY33" library="supply2" deviceset="GND" device=""/>
 <part name="R21" library="SparkFun" deviceset="RESISTOR" device="0402-RES" value="220"/>
-<part name="D9" library="led" deviceset="LED" device="CHIP-LED0603" value="YELLOW"/>
-<part name="D10" library="led" deviceset="LED" device="CHIP-LED0603" value="YELLOW"/>
+<part name="D9" library="led" deviceset="LED" device="CHIP-LED0603" value="YLW"/>
+<part name="D10" library="led" deviceset="LED" device="CHIP-LED0603" value="YLW"/>
 <part name="D8" library="led" deviceset="LED" device="CHIP-LED0603" value="RED"/>
 <part name="R22" library="SparkFun" deviceset="RESISTOR" device="0402-RES" value="4.7k"/>
 <part name="R23" library="SparkFun" deviceset="RESISTOR" device="0402-RES" value="4.7k"/>
@@ -9982,8 +9982,8 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <part name="POWER" library="r_cubed" deviceset="2POS_TERMINAL" device=""/>
 <part name="MOTOR1" library="r_cubed" deviceset="2POS_TERMINAL" device=""/>
 <part name="MOTOR0" library="r_cubed" deviceset="2POS_TERMINAL" device=""/>
-<part name="D6" library="r_cubed" deviceset="LED_BICOLOR" device="" value="LED_R/G"/>
-<part name="D7" library="r_cubed" deviceset="LED_BICOLOR" device="" value="LED_R/G"/>
+<part name="D6" library="r_cubed" deviceset="LED_BICOLOR" device="" value="RED/GRN"/>
+<part name="D7" library="r_cubed" deviceset="LED_BICOLOR" device="" value="RED/GRN"/>
 <part name="R35" library="SparkFun" deviceset="RESISTOR" device="0402-RES" value="220"/>
 <part name="D11" library="led" deviceset="LED" device="CHIP-LED0603" value="YELLOW"/>
 <part name="J9" library="SparkFun" deviceset="M08" device="1X08" value="AGND"/>

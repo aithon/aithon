@@ -10894,14 +10894,10 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <wire x1="213.36" y1="133.35" x2="213.36" y2="134.62" width="0.1524" layer="91"/>
 </segment>
 <segment>
-<pinref part="USD" gate="G$1" pin="SHIELD@1"/>
 <wire x1="359.41" y1="60.96" x2="359.41" y2="62.23" width="0.1524" layer="91"/>
-<wire x1="359.41" y1="62.23" x2="359.41" y2="69.85" width="0.1524" layer="91"/>
-<wire x1="359.41" y1="69.85" x2="363.22" y2="69.85" width="0.1524" layer="91"/>
-<wire x1="359.41" y1="69.85" x2="359.41" y2="80.01" width="0.1524" layer="91"/>
+<wire x1="359.41" y1="62.23" x2="359.41" y2="80.01" width="0.1524" layer="91"/>
 <pinref part="USD" gate="G$1" pin="GND"/>
 <wire x1="359.41" y1="80.01" x2="363.22" y2="80.01" width="0.1524" layer="91"/>
-<junction x="359.41" y="69.85"/>
 <pinref part="SUPPLY30" gate="GND" pin="GND"/>
 <pinref part="USD" gate="G$1" pin="SHIELD@4"/>
 <wire x1="363.22" y1="62.23" x2="359.41" y2="62.23" width="0.1524" layer="91"/>

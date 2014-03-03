@@ -10115,7 +10115,7 @@ Basic schematic elements and footprints for 0603, 1206, and PTH resistors.</desc
 <part name="Q3" library="r_cubed" deviceset="DUAL-MOSFET" device=""/>
 <part name="Q4" library="r_cubed" deviceset="DUAL-MOSFET" device=""/>
 <part name="+3V12" library="supply1" deviceset="+3V3" device=""/>
-<part name="U3" library="r_cubed" deviceset="LD1117" device="" value="LD1117V33"/>
+<part name="U3" library="r_cubed" deviceset="LD1117" device="" value="LD1117D33TR"/>
 <part name="Q6" library="r_cubed" deviceset="STL4P2UH7" device="" value="STL4P2UH7"/>
 <part name="U$6" library="SparkFun" deviceset="5V" device=""/>
 <part name="SUPPLY73" library="supply2" deviceset="GND" device=""/>
